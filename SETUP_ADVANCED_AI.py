@@ -372,6 +372,7 @@ SYSTEM REQUIREMENTS:
 def main():
     """Main setup function"""
     try:
+        show_setup_wizard()
         check_and_create_dirs()
         check_python()
         check_venv()
