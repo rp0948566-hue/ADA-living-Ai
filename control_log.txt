@@ -1,0 +1,85 @@
+2025-12-02 21:04:22.320069: Controller auto-activated.
+2025-12-02 21:04:29.475204: Typed text: <!DOCTYPE html>
+<html>
+<head>
+<title>My Webpage</title>
+</head>
+<body>
+
+<h1>Hello, World!</h1>
+<p>This is a simple HTML webpage.</p>
+
+</body>
+</html>
+2025-12-02 21:04:31.472650: Controller auto-deactivated.
+2025-12-02 21:23:19.713136: Controller auto-activated.
+2025-12-02 21:23:21.715411: Controller auto-deactivated.
+2025-12-02 22:27:07.331332: Controller auto-activated.
+2025-12-02 22:27:22.227286: Controller auto-activated.
+2025-12-02 22:27:40.430099: Controller auto-activated.
+2025-12-02 22:28:26.005321: Controller auto-activated.
+2025-12-02 22:28:27.210776: Typed text: print("Hello, World!")
+2025-12-02 22:28:29.206694: Controller auto-deactivated.
+2025-12-02 22:29:07.284226: Controller auto-activated.
+2025-12-02 22:29:12.295412: Typed text: #include <iostream>
+
+int main() {
+    std::cout << "Hello, World!" << std::endl;
+    return 0;
+}
+2025-12-02 22:29:14.296950: Controller auto-deactivated.
+2025-12-02 22:30:21.428395: Controller auto-activated.
+2025-12-02 22:30:21.873993: Typed text: brainfuck
+2025-12-02 22:30:23.875603: Controller auto-deactivated.
+2025-12-02 22:32:29.319898: Controller auto-activated.
+2025-12-02 22:32:30.910300: Typed text: main = putStrLn "Hello, World!"
+2025-12-02 22:32:32.911881: Controller auto-deactivated.
+2025-12-02 22:32:47.221568: Controller auto-activated.
+2025-12-02 22:32:51.111827: Typed text: #include <stdio.h>
+
+int main() {
+    printf("Hello, World!\n");
+    return 0;
+}
+2025-12-02 22:32:53.119044: Controller auto-deactivated.
+2025-12-02 22:34:01.818028: Controller auto-activated.
+2025-12-02 22:34:44.914564: Typed text: #include <iostream>
+
+using namespace std;
+
+int main() {
+    char op;
+    float num1, num2;
+
+    cout << "Enter operator: +, -, *, /: ";
+    cin >> op;
+
+    cout << "Enter two operands: ";
+    cin >> num1 >> num2;
+
+    switch(op) {
+        case '+':
+            cout << num1 << " + " << num2 << " = " << num1 + num2;
+            break;
+
+        case '-':
+            cout << num1 << " - " << num2 << " = " << num1 - num2;
+            break;
+
+        case '*':
+            cout << num1 << " * " << num2 << " = " << num1 * num2;
+            break;
+
+        case '/':
+            cout << num1 << " / " << num2 << " = " << num1 / num2;
+            break;
+
+        default:
+            // If the operator is other than +, -, * or /, error message is displayed
+            cout << "Error! operator is not correct";
+            break;
+    }
+
+    return 0;
+}
+2025-12-02 22:34:46.918020: Controller auto-deactivated.

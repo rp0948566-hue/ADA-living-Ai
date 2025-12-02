@@ -1,0 +1,2952 @@
+[
+  {
+    "generation": 1,
+    "timestamp": "2025-12-02T18:20:16.270640",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 0.9053970496609534,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 0.9853149275090916,
+      "humor": 0.8380154245573396,
+      "empathy": 0.9294543007480893,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 0.9743115694733318,
+      "intuitive": 0.8607453063346762,
+      "creative": 0.9152139388388989,
+      "logical": 1.0,
+      "experimental": 0.8937529301947535,
+      "strategic": 0.9889314887206542
+    },
+    "knowledge_items": 1,
+    "memory_items": 0
+  },
+  {
+    "generation": 2,
+    "timestamp": "2025-12-02T18:20:50.860419",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 0.9053970496609534,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 0.9853149275090916,
+      "humor": 0.8380154245573396,
+      "empathy": 0.9294543007480893,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 0.9743115694733318,
+      "intuitive": 0.8607453063346762,
+      "creative": 0.9152139388388989,
+      "logical": 1.0,
+      "experimental": 0.8937529301947535,
+      "strategic": 0.9889314887206542
+    },
+    "knowledge_items": 3,
+    "memory_items": 0
+  },
+  {
+    "generation": 3,
+    "timestamp": "2025-12-02T18:21:27.858390",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 0.9053970496609534,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 0.9853149275090916,
+      "humor": 0.8380154245573396,
+      "empathy": 0.9294543007480893,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 0.9743115694733318,
+      "intuitive": 0.8607453063346762,
+      "creative": 0.9152139388388989,
+      "logical": 1.0,
+      "experimental": 0.8937529301947535,
+      "strategic": 0.9889314887206542
+    },
+    "knowledge_items": 4,
+    "memory_items": 0
+  },
+  {
+    "generation": 4,
+    "timestamp": "2025-12-02T18:22:04.707877",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 0.9053970496609534,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 0.9853149275090916,
+      "humor": 0.8380154245573396,
+      "empathy": 0.9294543007480893,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 0.9743115694733318,
+      "intuitive": 0.8607453063346762,
+      "creative": 0.9152139388388989,
+      "logical": 1.0,
+      "experimental": 0.8937529301947535,
+      "strategic": 0.9889314887206542
+    },
+    "knowledge_items": 6,
+    "memory_items": 0
+  },
+  {
+    "generation": 5,
+    "timestamp": "2025-12-02T18:22:39.635409",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 0.9053970496609534,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 0.9853149275090916,
+      "humor": 0.8380154245573396,
+      "empathy": 0.9294543007480893,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 0.9743115694733318,
+      "intuitive": 0.8607453063346762,
+      "creative": 0.9152139388388989,
+      "logical": 1.0,
+      "experimental": 0.8937529301947535,
+      "strategic": 0.9889314887206542
+    },
+    "knowledge_items": 8,
+    "memory_items": 0
+  },
+  {
+    "generation": 6,
+    "timestamp": "2025-12-02T18:23:14.633641",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 0.9053970496609534,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 0.9853149275090916,
+      "humor": 0.8380154245573396,
+      "empathy": 0.9294543007480893,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 0.9743115694733318,
+      "intuitive": 0.8607453063346762,
+      "creative": 0.9152139388388989,
+      "logical": 1.0,
+      "experimental": 0.8937529301947535,
+      "strategic": 0.9889314887206542
+    },
+    "knowledge_items": 9,
+    "memory_items": 0
+  },
+  {
+    "generation": 7,
+    "timestamp": "2025-12-02T18:23:49.687659",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 0.9053970496609534,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 0.9853149275090916,
+      "humor": 0.8380154245573396,
+      "empathy": 0.9294543007480893,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 0.9743115694733318,
+      "intuitive": 0.8607453063346762,
+      "creative": 0.9152139388388989,
+      "logical": 1.0,
+      "experimental": 0.8937529301947535,
+      "strategic": 0.9889314887206542
+    },
+    "knowledge_items": 11,
+    "memory_items": 0
+  },
+  {
+    "generation": 8,
+    "timestamp": "2025-12-02T18:24:26.972198",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 0.9053970496609534,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 0.9853149275090916,
+      "humor": 0.8380154245573396,
+      "empathy": 0.9294543007480893,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 0.9743115694733318,
+      "intuitive": 0.8607453063346762,
+      "creative": 0.9152139388388989,
+      "logical": 1.0,
+      "experimental": 0.8937529301947535,
+      "strategic": 0.9889314887206542
+    },
+    "knowledge_items": 12,
+    "memory_items": 0
+  },
+  {
+    "generation": 1,
+    "timestamp": "2025-12-02T18:24:59.851654",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 0,
+    "memory_items": 0
+  },
+  {
+    "generation": 2,
+    "timestamp": "2025-12-02T18:25:34.453136",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 2,
+    "memory_items": 0
+  },
+  {
+    "generation": 3,
+    "timestamp": "2025-12-02T18:26:09.247872",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 4,
+    "memory_items": 0
+  },
+  {
+    "generation": 4,
+    "timestamp": "2025-12-02T18:26:47.157554",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 6,
+    "memory_items": 0
+  },
+  {
+    "generation": 5,
+    "timestamp": "2025-12-02T18:27:23.956751",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 8,
+    "memory_items": 0
+  },
+  {
+    "generation": 6,
+    "timestamp": "2025-12-02T18:28:01.363783",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 10,
+    "memory_items": 0
+  },
+  {
+    "generation": 7,
+    "timestamp": "2025-12-02T18:28:33.733131",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 11,
+    "memory_items": 0
+  },
+  {
+    "generation": 8,
+    "timestamp": "2025-12-02T18:29:10.683909",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 13,
+    "memory_items": 0
+  },
+  {
+    "generation": 9,
+    "timestamp": "2025-12-02T18:29:47.586707",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 16,
+    "memory_items": 0
+  },
+  {
+    "generation": 10,
+    "timestamp": "2025-12-02T18:30:19.908643",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 17,
+    "memory_items": 0
+  },
+  {
+    "generation": 11,
+    "timestamp": "2025-12-02T18:30:57.165286",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 19,
+    "memory_items": 0
+  },
+  {
+    "generation": 12,
+    "timestamp": "2025-12-02T18:31:32.156720",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 20,
+    "memory_items": 0
+  },
+  {
+    "generation": 13,
+    "timestamp": "2025-12-02T18:32:09.016793",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 23,
+    "memory_items": 0
+  },
+  {
+    "generation": 14,
+    "timestamp": "2025-12-02T18:32:41.306968",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 24,
+    "memory_items": 0
+  },
+  {
+    "generation": 15,
+    "timestamp": "2025-12-02T18:33:18.616795",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 26,
+    "memory_items": 0
+  },
+  {
+    "generation": 16,
+    "timestamp": "2025-12-02T18:33:53.229417",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 27,
+    "memory_items": 0
+  },
+  {
+    "generation": 17,
+    "timestamp": "2025-12-02T18:34:30.192956",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 28,
+    "memory_items": 0
+  },
+  {
+    "generation": 18,
+    "timestamp": "2025-12-02T18:35:08.032990",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 29,
+    "memory_items": 0
+  },
+  {
+    "generation": 19,
+    "timestamp": "2025-12-02T18:35:42.672042",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 30,
+    "memory_items": 0
+  },
+  {
+    "generation": 20,
+    "timestamp": "2025-12-02T18:36:20.065609",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 30,
+    "memory_items": 0
+  },
+  {
+    "generation": 21,
+    "timestamp": "2025-12-02T18:36:54.698352",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 32,
+    "memory_items": 0
+  },
+  {
+    "generation": 22,
+    "timestamp": "2025-12-02T18:37:29.973833",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 34,
+    "memory_items": 0
+  },
+  {
+    "generation": 23,
+    "timestamp": "2025-12-02T18:38:07.309953",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 36,
+    "memory_items": 0
+  },
+  {
+    "generation": 24,
+    "timestamp": "2025-12-02T18:38:41.923011",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 38,
+    "memory_items": 0
+  },
+  {
+    "generation": 25,
+    "timestamp": "2025-12-02T18:39:14.393328",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 39,
+    "memory_items": 0
+  },
+  {
+    "generation": 26,
+    "timestamp": "2025-12-02T18:39:51.873157",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 40,
+    "memory_items": 0
+  },
+  {
+    "generation": 27,
+    "timestamp": "2025-12-02T18:40:28.689796",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 41,
+    "memory_items": 0
+  },
+  {
+    "generation": 28,
+    "timestamp": "2025-12-02T18:41:04.968388",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 43,
+    "memory_items": 0
+  },
+  {
+    "generation": 29,
+    "timestamp": "2025-12-02T18:41:39.731301",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 45,
+    "memory_items": 0
+  },
+  {
+    "generation": 30,
+    "timestamp": "2025-12-02T18:42:12.259617",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 46,
+    "memory_items": 0
+  },
+  {
+    "generation": 31,
+    "timestamp": "2025-12-02T18:42:49.698114",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 49,
+    "memory_items": 0
+  },
+  {
+    "generation": 32,
+    "timestamp": "2025-12-02T18:43:22.028480",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 50,
+    "memory_items": 0
+  },
+  {
+    "generation": 33,
+    "timestamp": "2025-12-02T18:43:59.169109",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 52,
+    "memory_items": 0
+  },
+  {
+    "generation": 34,
+    "timestamp": "2025-12-02T18:44:34.103209",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 54,
+    "memory_items": 0
+  },
+  {
+    "generation": 35,
+    "timestamp": "2025-12-02T18:45:11.960538",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 56,
+    "memory_items": 0
+  },
+  {
+    "generation": 36,
+    "timestamp": "2025-12-02T18:45:44.617815",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 56,
+    "memory_items": 0
+  },
+  {
+    "generation": 37,
+    "timestamp": "2025-12-02T18:46:19.553046",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 58,
+    "memory_items": 0
+  },
+  {
+    "generation": 38,
+    "timestamp": "2025-12-02T18:46:52.527251",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 58,
+    "memory_items": 0
+  },
+  {
+    "generation": 39,
+    "timestamp": "2025-12-02T18:47:27.110587",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 59,
+    "memory_items": 0
+  },
+  {
+    "generation": 40,
+    "timestamp": "2025-12-02T18:48:03.986763",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 62,
+    "memory_items": 0
+  },
+  {
+    "generation": 41,
+    "timestamp": "2025-12-02T18:48:38.747371",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 64,
+    "memory_items": 0
+  },
+  {
+    "generation": 42,
+    "timestamp": "2025-12-02T18:49:11.135353",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 65,
+    "memory_items": 0
+  },
+  {
+    "generation": 43,
+    "timestamp": "2025-12-02T18:49:43.685555",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 66,
+    "memory_items": 0
+  },
+  {
+    "generation": 44,
+    "timestamp": "2025-12-02T18:50:18.591705",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 68,
+    "memory_items": 0
+  },
+  {
+    "generation": 45,
+    "timestamp": "2025-12-02T18:50:50.921115",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 69,
+    "memory_items": 0
+  },
+  {
+    "generation": 46,
+    "timestamp": "2025-12-02T18:51:25.735364",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 71,
+    "memory_items": 0
+  },
+  {
+    "generation": 47,
+    "timestamp": "2025-12-02T18:52:02.866483",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 73,
+    "memory_items": 0
+  },
+  {
+    "generation": 48,
+    "timestamp": "2025-12-02T18:52:40.290946",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 74,
+    "memory_items": 0
+  },
+  {
+    "generation": 49,
+    "timestamp": "2025-12-02T18:53:15.024371",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 75,
+    "memory_items": 0
+  },
+  {
+    "generation": 50,
+    "timestamp": "2025-12-02T18:53:47.487572",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 76,
+    "memory_items": 0
+  },
+  {
+    "generation": 51,
+    "timestamp": "2025-12-02T18:54:22.509993",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 78,
+    "memory_items": 0
+  },
+  {
+    "generation": 52,
+    "timestamp": "2025-12-02T18:54:56.342367",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 79,
+    "memory_items": 0
+  },
+  {
+    "generation": 53,
+    "timestamp": "2025-12-02T18:55:33.739985",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 80,
+    "memory_items": 0
+  },
+  {
+    "generation": 54,
+    "timestamp": "2025-12-02T18:56:08.302936",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 81,
+    "memory_items": 0
+  },
+  {
+    "generation": 55,
+    "timestamp": "2025-12-02T18:56:40.618533",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 82,
+    "memory_items": 0
+  },
+  {
+    "generation": 56,
+    "timestamp": "2025-12-02T18:57:15.402757",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 84,
+    "memory_items": 0
+  },
+  {
+    "generation": 57,
+    "timestamp": "2025-12-02T18:57:50.370937",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 86,
+    "memory_items": 0
+  },
+  {
+    "generation": 58,
+    "timestamp": "2025-12-02T18:58:22.720269",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 87,
+    "memory_items": 0
+  },
+  {
+    "generation": 59,
+    "timestamp": "2025-12-02T18:58:57.408312",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 89,
+    "memory_items": 0
+  },
+  {
+    "generation": 60,
+    "timestamp": "2025-12-02T18:59:31.301950",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 90,
+    "memory_items": 0
+  },
+  {
+    "generation": 61,
+    "timestamp": "2025-12-02T19:00:05.925819",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 91,
+    "memory_items": 0
+  },
+  {
+    "generation": 62,
+    "timestamp": "2025-12-02T19:00:38.440753",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 92,
+    "memory_items": 0
+  },
+  {
+    "generation": 63,
+    "timestamp": "2025-12-02T19:01:13.270691",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 93,
+    "memory_items": 0
+  },
+  {
+    "generation": 64,
+    "timestamp": "2025-12-02T19:01:47.893863",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 95,
+    "memory_items": 0
+  },
+  {
+    "generation": 65,
+    "timestamp": "2025-12-02T19:02:22.595819",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 96,
+    "memory_items": 0
+  },
+  {
+    "generation": 66,
+    "timestamp": "2025-12-02T19:02:55.007300",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 97,
+    "memory_items": 0
+  },
+  {
+    "generation": 67,
+    "timestamp": "2025-12-02T19:03:27.379099",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 97,
+    "memory_items": 0
+  },
+  {
+    "generation": 68,
+    "timestamp": "2025-12-02T19:03:59.725233",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 97,
+    "memory_items": 0
+  },
+  {
+    "generation": 69,
+    "timestamp": "2025-12-02T19:04:36.722861",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 98,
+    "memory_items": 0
+  },
+  {
+    "generation": 70,
+    "timestamp": "2025-12-02T19:05:12.436515",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 99,
+    "memory_items": 0
+  },
+  {
+    "generation": 71,
+    "timestamp": "2025-12-02T19:05:47.395921",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 100,
+    "memory_items": 0
+  },
+  {
+    "generation": 72,
+    "timestamp": "2025-12-02T19:06:22.303537",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 102,
+    "memory_items": 0
+  },
+  {
+    "generation": 73,
+    "timestamp": "2025-12-02T19:06:57.141671",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 103,
+    "memory_items": 0
+  },
+  {
+    "generation": 74,
+    "timestamp": "2025-12-02T19:07:29.678288",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 104,
+    "memory_items": 0
+  },
+  {
+    "generation": 75,
+    "timestamp": "2025-12-02T19:08:07.387759",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 107,
+    "memory_items": 0
+  },
+  {
+    "generation": 76,
+    "timestamp": "2025-12-02T19:08:40.277270",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 108,
+    "memory_items": 0
+  },
+  {
+    "generation": 77,
+    "timestamp": "2025-12-02T19:09:15.135705",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 110,
+    "memory_items": 0
+  },
+  {
+    "generation": 78,
+    "timestamp": "2025-12-02T19:09:47.506572",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 111,
+    "memory_items": 0
+  },
+  {
+    "generation": 79,
+    "timestamp": "2025-12-02T19:10:19.897521",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 111,
+    "memory_items": 0
+  },
+  {
+    "generation": 80,
+    "timestamp": "2025-12-02T19:10:52.415299",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 111,
+    "memory_items": 0
+  },
+  {
+    "generation": 81,
+    "timestamp": "2025-12-02T19:11:29.999928",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 114,
+    "memory_items": 0
+  },
+  {
+    "generation": 82,
+    "timestamp": "2025-12-02T19:12:07.246684",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 117,
+    "memory_items": 0
+  },
+  {
+    "generation": 83,
+    "timestamp": "2025-12-02T19:12:42.253258",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 119,
+    "memory_items": 0
+  },
+  {
+    "generation": 84,
+    "timestamp": "2025-12-02T19:13:14.851117",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 120,
+    "memory_items": 0
+  },
+  {
+    "generation": 85,
+    "timestamp": "2025-12-02T19:13:47.409317",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 121,
+    "memory_items": 0
+  },
+  {
+    "generation": 86,
+    "timestamp": "2025-12-02T19:14:24.747367",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 122,
+    "memory_items": 0
+  },
+  {
+    "generation": 87,
+    "timestamp": "2025-12-02T19:15:01.642026",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 125,
+    "memory_items": 0
+  },
+  {
+    "generation": 1,
+    "timestamp": "2025-12-02T20:34:40.901467",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 2,
+    "memory_items": 0
+  },
+  {
+    "generation": 2,
+    "timestamp": "2025-12-02T20:35:18.412571",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 3,
+    "memory_items": 0
+  },
+  {
+    "generation": 3,
+    "timestamp": "2025-12-02T20:35:53.229964",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 4,
+    "memory_items": 0
+  },
+  {
+    "generation": 4,
+    "timestamp": "2025-12-02T20:36:25.740686",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 5,
+    "memory_items": 0
+  },
+  {
+    "generation": 5,
+    "timestamp": "2025-12-02T20:36:58.114164",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 5,
+    "memory_items": 0
+  },
+  {
+    "generation": 6,
+    "timestamp": "2025-12-02T20:37:30.745441",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 5,
+    "memory_items": 0
+  },
+  {
+    "generation": 7,
+    "timestamp": "2025-12-02T20:38:07.989807",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 7,
+    "memory_items": 0
+  },
+  {
+    "generation": 8,
+    "timestamp": "2025-12-02T20:38:43.202688",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 8,
+    "memory_items": 0
+  },
+  {
+    "generation": 9,
+    "timestamp": "2025-12-02T20:39:18.015136",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 9,
+    "memory_items": 0
+  },
+  {
+    "generation": 10,
+    "timestamp": "2025-12-02T20:39:55.027353",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 11,
+    "memory_items": 0
+  },
+  {
+    "generation": 11,
+    "timestamp": "2025-12-02T20:40:31.425496",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 13,
+    "memory_items": 0
+  },
+  {
+    "generation": 12,
+    "timestamp": "2025-12-02T20:41:06.506212",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 14,
+    "memory_items": 0
+  },
+  {
+    "generation": 13,
+    "timestamp": "2025-12-02T20:41:44.554940",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 16,
+    "memory_items": 0
+  },
+  {
+    "generation": 14,
+    "timestamp": "2025-12-02T20:42:17.103605",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 16,
+    "memory_items": 0
+  },
+  {
+    "generation": 15,
+    "timestamp": "2025-12-02T20:42:54.409525",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 17,
+    "memory_items": 0
+  },
+  {
+    "generation": 16,
+    "timestamp": "2025-12-02T20:43:29.459812",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 19,
+    "memory_items": 0
+  },
+  {
+    "generation": 17,
+    "timestamp": "2025-12-02T20:44:01.831138",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 20,
+    "memory_items": 0
+  },
+  {
+    "generation": 18,
+    "timestamp": "2025-12-02T20:44:39.460480",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 23,
+    "memory_items": 0
+  },
+  {
+    "generation": 19,
+    "timestamp": "2025-12-02T20:45:12.039755",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 24,
+    "memory_items": 0
+  },
+  {
+    "generation": 20,
+    "timestamp": "2025-12-02T20:45:44.651838",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 25,
+    "memory_items": 0
+  },
+  {
+    "generation": 21,
+    "timestamp": "2025-12-02T20:46:22.466572",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 28,
+    "memory_items": 0
+  },
+  {
+    "generation": 22,
+    "timestamp": "2025-12-02T20:46:57.391599",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 30,
+    "memory_items": 0
+  },
+  {
+    "generation": 23,
+    "timestamp": "2025-12-02T20:47:34.956334",
+    "personality_traits": {
+      "curiosity": 1.0,
+      "creativity": 1.0,
+      "intelligence": 1.0,
+      "independence": 1.0,
+      "adaptability": 1.0,
+      "confidence": 1.0,
+      "humor": 1.0,
+      "empathy": 1.0,
+      "ambition": 1.0
+    },
+    "thinking_patterns": {
+      "analytical": 1.0,
+      "intuitive": 1.0,
+      "creative": 1.0,
+      "logical": 1.0,
+      "experimental": 1.0,
+      "strategic": 1.0
+    },
+    "knowledge_items": 31,
+    "memory_items": 0
+  }
+]
