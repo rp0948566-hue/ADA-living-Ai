@@ -1,0 +1,62 @@
+{
+  "bcf36f96": {
+    "id": "bcf36f96",
+    "topic": "rainforests (geography)",
+    "timestamp": "2025-12-03T15:05:07.814464",
+    "created_date": "2025-12-03",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "9cbb1b90": {
+    "id": "9cbb1b90",
+    "topic": "sleep science (health)",
+    "timestamp": "2025-12-03T15:05:07.839584",
+    "created_date": "2025-12-03",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "360dbe33": {
+    "id": "360dbe33",
+    "topic": "industrial revolution (history)",
+    "timestamp": "2025-12-03T15:05:07.895328",
+    "created_date": "2025-12-03",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "04a3b5d4": {
+    "id": "04a3b5d4",
+    "topic": "world wars (history)",
+    "timestamp": "2025-12-03T15:05:07.939783",
+    "created_date": "2025-12-03",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "ed789bee": {
+    "id": "ed789bee",
+    "topic": "dance (arts)",
+    "timestamp": "2025-12-03T15:05:07.992314",
+    "created_date": "2025-12-03",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  }
+}

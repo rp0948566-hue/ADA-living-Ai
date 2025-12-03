@@ -47,6 +47,54 @@ from keyboard_mouse_CTRL import (
 # 7. WINDOWS POWER CONTROL
 from windows_power_ctrl import shutdown_pc, restart_pc, lock_screen, sleep_pc, lock_pc
 
+# 7A. WHATSAPP MESSAGING
+try:
+    from whatsapp_sender import send_whatsapp_message, WhatsAppSender
+    from whatsapp_message_generator import generate_whatsapp_message, AIMessageGenerator
+    from whatsapp_tools import send_whatsapp_tool, generate_whatsapp_message_tool, get_whatsapp_info_tool, WHATSAPP_TOOLS
+except (ImportError, AttributeError, SyntaxError):
+    send_whatsapp_message = None
+    WhatsAppSender = None
+    generate_whatsapp_message = None
+    AIMessageGenerator = None
+    send_whatsapp_tool = None
+    generate_whatsapp_message_tool = None
+    get_whatsapp_info_tool = None
+    WHATSAPP_TOOLS = []
+
+# 7B. ADVANCED WHATSAPP + SCREEN SHARING
+try:
+    from whatsapp_advanced_control import send_whatsapp_message_advanced, check_whatsapp_status
+    from screen_sharing_system import (
+        start_screen_share_voice,
+        stop_screen_share_voice,
+        get_screen_share_status,
+        get_screen_share_summary
+    )
+    from whatsapp_screen_tools import (
+        open_and_send_whatsapp_tool,
+        check_whatsapp_status_tool,
+        start_screen_share_tool,
+        stop_screen_share_tool,
+        get_screen_share_status_tool,
+        get_screen_share_summary_tool,
+        ALL_ADVANCED_TOOLS
+    )
+except (ImportError, AttributeError, SyntaxError):
+    send_whatsapp_message_advanced = None
+    check_whatsapp_status = None
+    start_screen_share_voice = None
+    stop_screen_share_voice = None
+    get_screen_share_status = None
+    get_screen_share_summary = None
+    open_and_send_whatsapp_tool = None
+    check_whatsapp_status_tool = None
+    start_screen_share_tool = None
+    stop_screen_share_tool = None
+    get_screen_share_status_tool = None
+    get_screen_share_summary_tool = None
+    ALL_ADVANCED_TOOLS = []
+
 # 8. AUTONOMOUS SYSTEMS & LEARNING
 try:
     from autonomous_ada import AutonomousADA, run_autonomous_background
@@ -60,6 +108,31 @@ except (ImportError, AttributeError):
     BrainEngine = None
     IntelligenceEngine = None
     AutonomousBackend = None
+
+# 8A. ORCHESTRATION SYSTEM - CONTINUOUS LEARNING IN BACKGROUND
+try:
+    from autonomous_orchestrator import run_orchestrator_async
+    from agent_learning import AgentLearningTools
+except (ImportError, AttributeError, SyntaxError):
+    run_orchestrator_async = None
+    AgentLearningTools = None
+
+# 8B. RANDOM TOPIC MEMORY SYSTEM - Auto-save, auto-update
+try:
+    from random_topic_memory import (
+        generate_random_topic, save_topic_to_memory, get_random_saved_topic,
+        search_topics, get_memory_stats, auto_update_memory,
+        MemoryEvolutionEngine, TOPIC_MEMORY_TOOLS
+    )
+except (ImportError, AttributeError, SyntaxError):
+    generate_random_topic = None
+    save_topic_to_memory = None
+    get_random_saved_topic = None
+    search_topics = None
+    get_memory_stats = None
+    auto_update_memory = None
+    MemoryEvolutionEngine = None
+    TOPIC_MEMORY_TOOLS = []
 
 # 9. CODE GENERATION & ADVANCED FEATURES
 try:
@@ -270,6 +343,70 @@ class Assistant(Agent):
             except Exception as e:
                 print(f"⚠️ Could not add sleep_pc: {e}")
         
+        # Add WhatsApp messaging tools
+        if send_whatsapp_tool is not None:
+            try:
+                tools.append(send_whatsapp_tool)
+            except Exception as e:
+                print(f"⚠️ Could not add send_whatsapp_tool: {e}")
+        
+        if generate_whatsapp_message_tool is not None:
+            try:
+                tools.append(generate_whatsapp_message_tool)
+            except Exception as e:
+                print(f"⚠️ Could not add generate_whatsapp_message_tool: {e}")
+        
+        if get_whatsapp_info_tool is not None:
+            try:
+                tools.append(get_whatsapp_info_tool)
+            except Exception as e:
+                print(f"⚠️ Could not add get_whatsapp_info_tool: {e}")
+        
+        # Add Advanced WhatsApp + Screen Sharing tools
+        if open_and_send_whatsapp_tool is not None:
+            try:
+                tools.append(open_and_send_whatsapp_tool)
+            except Exception as e:
+                print(f"⚠️ Could not add open_and_send_whatsapp_tool: {e}")
+        
+        if check_whatsapp_status_tool is not None:
+            try:
+                tools.append(check_whatsapp_status_tool)
+            except Exception as e:
+                print(f"⚠️ Could not add check_whatsapp_status_tool: {e}")
+        
+        if start_screen_share_tool is not None:
+            try:
+                tools.append(start_screen_share_tool)
+            except Exception as e:
+                print(f"⚠️ Could not add start_screen_share_tool: {e}")
+        
+        if stop_screen_share_tool is not None:
+            try:
+                tools.append(stop_screen_share_tool)
+            except Exception as e:
+                print(f"⚠️ Could not add stop_screen_share_tool: {e}")
+        
+        if get_screen_share_status_tool is not None:
+            try:
+                tools.append(get_screen_share_status_tool)
+            except Exception as e:
+                print(f"⚠️ Could not add get_screen_share_status_tool: {e}")
+        
+        if get_screen_share_summary_tool is not None:
+            try:
+                tools.append(get_screen_share_summary_tool)
+            except Exception as e:
+                print(f"⚠️ Could not add get_screen_share_summary_tool: {e}")
+        
+        # Add Topic Memory tools
+        if TOPIC_MEMORY_TOOLS:
+            for tool in TOPIC_MEMORY_TOOLS:
+                try:
+                    tools.append(tool)
+                except Exception as e:
+                    print(f"⚠️ Could not add topic memory tool: {e}")
+        
         print(f"✅ Loaded {len(tools)} tools for ADA Agent")
         
         super().__init__(instructions=behavior_prompts, tools=tools)
@@ -277,6 +414,43 @@ class Assistant(Agent):
 
 async def entrypoint(ctx: agents.JobContext):
     """Entry point for LiveKit agent session with improved error handling"""
+    
+    # ═════════════════════════════════════════════════════════════════════════════════
+    # 🧠 START RANDOM TOPIC MEMORY EVOLUTION ENGINE
+    # ═════════════════════════════════════════════════════════════════════════════════
+    evolution_engine = None
+    if MemoryEvolutionEngine is not None:
+        try:
+            print("\n🧠 Launching Random Topic Memory Evolution Engine...")
+            evolution_engine = MemoryEvolutionEngine(auto_upgrade_interval=1800)  # Update every 30 minutes
+            evolution_engine.start_background_evolution()
+            print("✓ Memory evolution engine active - Auto-update running")
+        except Exception as e:
+            print(f"⚠️  Could not start memory evolution engine: {e}")
+            evolution_engine = None
+    
+    # ═════════════════════════════════════════════════════════════════════════════════
+    # 🎯 START ORCHESTRATION SYSTEM - Continuous Learning in Background
+    # ═════════════════════════════════════════════════════════════════════════════════
+    orchestrator_thread = None
+    orchestrator_obj = None
+    
+    if run_orchestrator_async is not None:
+        try:
+            print("\n📚 Launching Autonomous Orchestrator System...")
+            print("   ├─ Initializing learning systems")
+            print("   ├─ Starting background threads")
+            print("   └─ Entering endless learning loop")
+            orchestrator_thread, orchestrator_obj = run_orchestrator_async(daemon=True)
+            print("✓ Orchestrator active - All learning systems running in background")
+            print("  → Learning will continue automatically until agent stops\n")
+        except Exception as e:
+            print(f"⚠️  Could not start orchestrator: {e}")
+            orchestrator_thread = None
+            orchestrator_obj = None
+    
+    # ═════════════════════════════════════════════════════════════════════════════════
+    
     max_retries = 5  # Increased from 3
     retry_count = 0
     base_wait_time = 3  # Increased from 2
@@ -369,6 +543,28 @@ async def entrypoint(ctx: agents.JobContext):
             else:
                 print("❌ Max retries exceeded. Shutting down.")
                 raise
+    
+    # ═════════════════════════════════════════════════════════════════════════════════
+    # 🛑 CLEANUP - Save learning memory and stop evolution on shutdown
+    # ═════════════════════════════════════════════════════════════════════════════════
+    
+    # Stop evolution engine
+    if evolution_engine is not None:
+        try:
+            evolution_engine.stop_background_evolution()
+            print("✓ Memory evolution engine stopped")
+        except Exception as e:
+            print(f"⚠️ Could not stop evolution engine: {e}")
+    
+    if AgentLearningTools is not None:
+        try:
+            print("\n💾 Saving learning memory before shutdown...")
+            AgentLearningTools.save_learning_memory()
+            print("✓ Learning memory saved successfully")
+        except Exception as e:
+            print(f"⚠️ Could not save learning memory: {e}")
+    
+    # ═════════════════════════════════════════════════════════════════════════════════
 
 
 if __name__ == "__main__":
@@ -383,4 +579,4 @@ if __name__ == "__main__":
     except Exception as e:
         print("Failed to start GUI subprocess:", e)
 
-    agents.cli.run_app(agents.WorkerOptions(entrypoint_fnc=entrypoint))
+    agents.cli.run_app(agents.WorkerOptions(entrypoint_fnc=entrypoint)) 

@@ -1,0 +1,10 @@
+[
+  {
+    "timestamp": "2025-12-03T13:04:26.231784",
+    "operation": "lock",
+    "command": "rundll32.exe user32.dll,LockWorkStation",
+    "status": "success",
+    "details": "",
+    "system": "Windows 10/11 HP Laptop"
+  }
+]

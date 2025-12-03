@@ -465,7 +465,7 @@ class SettingsDialog(QDialog):
 class NovaHUD(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("J.A.R.V.I.S HUD — v2.2")
+        self.setWindowTitle("A.D.A HUD — v2.2")
         self.resize(1280, 800)
         self.settings = {"speed":1.0,"glow":1.0,"rings":5,"particles":18,"grid_spacing":40,"grid_opacity":18}
         self.theme_index=0; self.theme_key=THEME_ORDER[self.theme_index]
@@ -572,14 +572,14 @@ class NovaHUD(QMainWindow):
     def camera_snapshot(self):
         if not getattr(self.camera.capture, 'isOpened', lambda: False)(): QMessageBox.information(self, "Snapshot", "Camera is not running."); return
         path, _ = QFileDialog.getSaveFileName(self, "Save Snapshot", f"snapshot_{safe_now_str()}.png", "PNG Files (*.png)")
-        if path and self.camera.snapshot(path): self.append_console(f"[JARVIS] Snapshot saved."); QMessageBox.information(self, "Snapshot", "Saved.")
-        elif path: self.append_console("[JARVIS] Snapshot failed."); QMessageBox.warning(self, "Snapshot", "Failed to save.")
+        if path and self.camera.snapshot(path): self.append_console(f"[ADA] Snapshot saved."); QMessageBox.information(self, "Snapshot", "Saved.")
+        elif path: self.append_console("[ADA] Snapshot failed."); QMessageBox.warning(self, "Snapshot", "Failed to save.")
 
     def save_screenshot(self):
         path, _ = QFileDialog.getSaveFileName(self, "Save HUD Screenshot", f"hud_{safe_now_str()}.png", "PNG Files (*.png)")
         if path:
-            try: self.grab().save(path); self.append_console(f"[JARVIS] Screenshot saved."); QMessageBox.information(self, "Screenshot", "Saved.")
-            except Exception as e: self.append_console(f"[JARVIS] Screenshot failed: {e}"); QMessageBox.warning(self, "Screenshot", "Failed to save.")
+            try: self.grab().save(path); self.append_console(f"[ADA] Screenshot saved."); QMessageBox.information(self, "Screenshot", "Saved.")
+            except Exception as e: self.append_console(f"[ADA] Screenshot failed: {e}"); QMessageBox.warning(self, "Screenshot", "Failed to save.")
 
     def open_screen_share(self):
         """Open Screen Vision window"""
@@ -595,7 +595,7 @@ class NovaHUD(QMainWindow):
                 self.append_console("[JARVIS] Screen Vision file not found.")
         except Exception as e:
             QMessageBox.warning(self, "Screen Vision", f"Error: {str(e)}")
-            self.append_console(f"[JARVIS] Screen Vision error: {e}")
+            self.append_console(f"[ADA] Screen Vision error: {e}")
 
     def open_chatbot(self):
         """Open AI Chatbot window"""

@@ -1,0 +1,15 @@
+"""
+REQUIREMENTS FOR OBJECT DETECTION & ADVANCED VISION
+Add these to your existing requirements.txt
+"""
+
+# Object Detection & Vision
+ultralytics>=8.0.0  # YOLOv8 object detection
+torch>=2.0.0        # PyTorch (required by YOLOv8)
+torchvision>=0.15.0 # Computer vision utilities
+Pillow>=9.0.0       # Image processing for screen capture
+
+# Already required, but listed for reference:
+# opencv-python>=4.7.0
+# PySide6>=6.0.0
+# numpy>=1.21.0
