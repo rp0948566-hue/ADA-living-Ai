@@ -15,6 +15,11 @@ from livekit.plugins import (
 # 🔗 COMPLETE FILE LINKING - ALL 34+ WORKSPACE FILES
 # ═════════════════════════════════════════════════════════════════════════════
 
+# 🔗 LINK TO USER TONE AI INTERACTION MODULE
+# Edit user_tone_ai_interaction.py for advanced user tone handling and liveliness features
+# This module adds dynamic responses to make the AI feel more alive and interactive
+# Integration: Import and use handle_user_tone() in response generation
+
 # 1. PROMPTS & BEHAVIOR
 from Jarvis_prompts import behavior_prompts, Reply_prompts
 
@@ -201,6 +206,19 @@ except (ImportError, SyntaxError):
     run_screenshot_test = None
 
 try:
+    from personality_enhancer import get_personality_prompt
+except (ImportError, SyntaxError):
+    get_personality_prompt = None
+
+# 🔗 INTEGRATION: User Tone AI Interaction for enhanced liveliness
+try:
+    from user_tone_ai_interaction import handle_user_tone, add_liveliness, get_emotional_response
+except (ImportError, SyntaxError):
+    handle_user_tone = None
+    add_liveliness = None
+    get_emotional_response = None
+
+try:
     from test_memory_direct import test_memory
 except (ImportError, SyntaxError):
     test_memory = None
@@ -244,7 +262,7 @@ class Assistant(Agent):
         # Build complete tool list - only include tools that are proper LiveKit agent tools
         # Filter tools to only include instances of agents.Tool or properly decorated functions
         tools = []
-        
+
         # Helper function to check if something is a valid LiveKit tool
         def is_valid_tool(obj):
             """Check if object is a valid LiveKit agent tool"""
@@ -254,157 +272,157 @@ class Assistant(Agent):
             return hasattr(obj, '__self__') and hasattr(obj.__self__, '_tool') or \
                    isinstance(obj, agents.Tool) or \
                    hasattr(obj, '__call__') and hasattr(obj, 'metadata')
-        
+
         # Add core tools (must verify these are properly decorated in their modules)
         # For now, we'll use a minimal tool set to fix the "unknown tool type" error
         # and gradually add tools as we verify they're properly decorated
-        
+
         # Start with search and information tools
         if google_search is not None:
             try:
                 tools.append(google_search)
             except Exception as e:
                 print(f"⚠️ Could not add google_search: {e}")
-        
+
         if get_current_datetime is not None:
             try:
                 tools.append(get_current_datetime)
             except Exception as e:
                 print(f"⚠️ Could not add get_current_datetime: {e}")
-        
+
         if get_weather is not None:
             try:
                 tools.append(get_weather)
             except Exception as e:
                 print(f"⚠️ Could not add get_weather: {e}")
-        
+
         # Add memory tools if available
         if get_recent_conversations is not None:
             try:
                 tools.append(get_recent_conversations)
             except Exception as e:
                 print(f"⚠️ Could not add get_recent_conversations: {e}")
-        
+
         # Add backend knowledge tools
         if get_backend_knowledge is not None:
             try:
                 tools.append(get_backend_knowledge)
             except Exception as e:
                 print(f"⚠️ Could not add get_backend_knowledge: {e}")
-        
+
         if get_search_knowledge is not None:
             try:
                 tools.append(get_search_knowledge)
             except Exception as e:
                 print(f"⚠️ Could not add get_search_knowledge: {e}")
-        
+
         # Add file management tools
         if create_file_tool is not None:
             try:
                 tools.append(create_file_tool)
             except Exception as e:
                 print(f"⚠️ Could not add create_file_tool: {e}")
-        
+
         if screenshot_tool is not None:
             try:
                 tools.append(screenshot_tool)
             except Exception as e:
                 print(f"⚠️ Could not add screenshot_tool: {e}")
-        
+
         # Add input control tools
         if type_text_tool is not None:
             try:
                 tools.append(type_text_tool)
             except Exception as e:
                 print(f"⚠️ Could not add type_text_tool: {e}")
-        
+
         if press_key_tool is not None:
             try:
                 tools.append(press_key_tool)
             except Exception as e:
                 print(f"⚠️ Could not add press_key_tool: {e}")
-        
+
         # Add power control tools - these are critical
         if shutdown_pc is not None:
             try:
                 tools.append(shutdown_pc)
             except Exception as e:
                 print(f"⚠️ Could not add shutdown_pc: {e}")
-        
+
         if restart_pc is not None:
             try:
                 tools.append(restart_pc)
             except Exception as e:
                 print(f"⚠️ Could not add restart_pc: {e}")
-        
+
         if lock_screen is not None:
             try:
                 tools.append(lock_screen)
             except Exception as e:
                 print(f"⚠️ Could not add lock_screen: {e}")
-        
+
         if sleep_pc is not None:
             try:
                 tools.append(sleep_pc)
             except Exception as e:
                 print(f"⚠️ Could not add sleep_pc: {e}")
-        
+
         # Add WhatsApp messaging tools
         if send_whatsapp_tool is not None:
             try:
                 tools.append(send_whatsapp_tool)
             except Exception as e:
                 print(f"⚠️ Could not add send_whatsapp_tool: {e}")
-        
+
         if generate_whatsapp_message_tool is not None:
             try:
                 tools.append(generate_whatsapp_message_tool)
             except Exception as e:
                 print(f"⚠️ Could not add generate_whatsapp_message_tool: {e}")
-        
+
         if get_whatsapp_info_tool is not None:
             try:
                 tools.append(get_whatsapp_info_tool)
             except Exception as e:
                 print(f"⚠️ Could not add get_whatsapp_info_tool: {e}")
-        
+
         # Add Advanced WhatsApp + Screen Sharing tools
         if open_and_send_whatsapp_tool is not None:
             try:
                 tools.append(open_and_send_whatsapp_tool)
             except Exception as e:
                 print(f"⚠️ Could not add open_and_send_whatsapp_tool: {e}")
-        
+
         if check_whatsapp_status_tool is not None:
             try:
                 tools.append(check_whatsapp_status_tool)
             except Exception as e:
                 print(f"⚠️ Could not add check_whatsapp_status_tool: {e}")
-        
+
         if start_screen_share_tool is not None:
             try:
                 tools.append(start_screen_share_tool)
             except Exception as e:
                 print(f"⚠️ Could not add start_screen_share_tool: {e}")
-        
+
         if stop_screen_share_tool is not None:
             try:
                 tools.append(stop_screen_share_tool)
             except Exception as e:
                 print(f"⚠️ Could not add stop_screen_share_tool: {e}")
-        
+
         if get_screen_share_status_tool is not None:
             try:
                 tools.append(get_screen_share_status_tool)
             except Exception as e:
                 print(f"⚠️ Could not add get_screen_share_status_tool: {e}")
-        
+
         if get_screen_share_summary_tool is not None:
             try:
                 tools.append(get_screen_share_summary_tool)
             except Exception as e:
                 print(f"⚠️ Could not add get_screen_share_summary_tool: {e}")
-        
+
         # Add Topic Memory tools
         if TOPIC_MEMORY_TOOLS:
             for tool in TOPIC_MEMORY_TOOLS:
@@ -412,7 +430,7 @@ class Assistant(Agent):
                     tools.append(tool)
                 except Exception as e:
                     print(f"⚠️ Could not add topic memory tool: {e}")
-        
+
         # Initialize Randomized Tone Adapter (v2.3)
         self.tone_adapter = None
         if ToneAdapter is not None:
@@ -422,10 +440,28 @@ class Assistant(Agent):
             except Exception as e:
                 print(f"⚠️ Could not initialize ToneAdapter: {e}")
                 self.tone_adapter = None
-        
+
         print(f"✅ Loaded {len(tools)} tools for ADA Agent")
-        
+
         super().__init__(instructions=behavior_prompts, tools=tools)
+
+    async def on_message(self, message: str, session: AgentSession) -> None:
+        """Handle incoming messages and apply tone handling for abusive responses"""
+        # Apply tone handling to each message for realtime abusive responses
+        if handle_user_tone:
+            try:
+                tone_response = handle_user_tone(message)
+                # Inject the tone response into the session instructions for this message
+                enhanced_instructions = f"{self.instructions}\n\n[TONE RESPONSE]\n{tone_response}\n[/TONE RESPONSE]"
+                # Update the session's instructions temporarily for this response
+                session.llm.instructions = enhanced_instructions
+                print(f"🎭 Applied tone response for message: {message[:50]}...")
+            except Exception as e:
+                print(f"⚠️ Tone handling failed for message: {e}")
+                # Fall back to original instructions
+                session.llm.instructions = self.instructions
+        else:
+            session.llm.instructions = self.instructions
 
 
 async def entrypoint(ctx: agents.JobContext):
@@ -519,6 +555,36 @@ async def entrypoint(ctx: agents.JobContext):
                         print(f"⚠️ Memory injection skipped: {e}")
                         instructions = Reply_prompts
                 
+                # ✨ Inject a bit of personality to feel more alive
+                if get_personality_prompt:
+                    try:
+                        personality_injection = get_personality_prompt()
+                        instructions = f"{instructions}\n\n[PERSONALITY INSTRUCTION]\n{personality_injection}\n[/PERSONALITY INSTRUCTION]"
+                        print(f"✨ Personality injected: {personality_injection}")
+                    except Exception as e:
+                        print(f"⚠️ Personality injection failed: {e}")
+
+                # 🔗 INTEGRATION: Enhanced liveliness from user_tone_ai_interaction
+                if add_liveliness:
+                    try:
+                        liveliness_boost = add_liveliness()
+                        instructions = f"{instructions}\n\n[LIVELINESS BOOST]\n{liveliness_boost}\n[/LIVELINESS BOOST]"
+                        print(f"🚀 Liveliness boosted: {liveliness_boost}")
+                    except Exception as e:
+                        print(f"⚠️ Liveliness boost failed: {e}")
+
+                # 🔗 INTEGRATION: User tone handling with abusive responses
+                if handle_user_tone:
+                    try:
+                        # Get user input from context (assuming it's available)
+                        user_input = getattr(ctx, 'user_input', '') or getattr(ctx.room, 'last_message', '')
+                        if user_input:
+                            tone_response = handle_user_tone(user_input)
+                            instructions = f"{instructions}\n\n[TONE RESPONSE]\n{tone_response}\n[/TONE RESPONSE]"
+                            print(f"🎭 Tone response added: {tone_response}")
+                    except Exception as e:
+                        print(f"⚠️ Tone response failed: {e}")
+
                 print("📡 Sending instructions to LLM (this may take a moment)...")
                 
                 # ═════════════════════════════════════════════════════════════════════════════════
