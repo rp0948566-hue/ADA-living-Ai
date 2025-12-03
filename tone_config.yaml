@@ -1,0 +1,118 @@
+# Tone Adapter Configuration (YAML)
+# Load with: ToneAdapter(config=ToneConfig(config_file='tone_config.yaml'))
+
+# Model configuration
+model: 'llama3.1'  # Ollama model name (llama3.1, mistral, neural-chat, etc.)
+
+# Logging
+log_file: 'memory/tone_logs.json'
+
+# History management
+max_history: 5      # Max conversation exchanges to retain
+max_words: 150      # Max words in reply
+
+# Tone detection keywords (extend/customize here)
+tone_keywords:
+  playful_roast:
+    - 'haha'
+    - 'lol'
+    - 'dude'
+    - 'bro'
+    - 'roast me'
+    - 'lmao'
+    
+  romantic:
+    - 'love'
+    - 'heart'
+    - 'miss you'
+    - 'darling'
+    - 'crush'
+    
+  sarcastic:
+    - 'yeah right'
+    - 'sure'
+    - 'duh'
+    - 'eye roll'
+    
+  motivational:
+    - 'goal'
+    - 'achieve'
+    - 'win'
+    - 'hustle'
+    - 'inspire'
+    
+  excited:
+    - 'wow'
+    - 'amazing'
+    - 'yay'
+    - 'epic'
+    - 'thrilled'
+    
+  frustrated:
+    - 'ugh'
+    - 'hate'
+    - 'stuck'
+    - 'annoying'
+    
+  professional:
+    - 'meeting'
+    - 'project'
+    - 'report'
+    - 'strategy'
+    - 'stakeholder'
+
+# Topic clusters (extend with new topics)
+topic_clusters:
+  coding:
+    - 'python'
+    - 'code'
+    - 'bug'
+    - 'debug'
+    - 'api'
+    
+  relationships:
+    - 'love'
+    - 'friend'
+    - 'family'
+    - 'feelings'
+    
+  motivation:
+    - 'goal'
+    - 'success'
+    - 'dream'
+    
+  gaming:
+    - 'game'
+    - 'play'
+    - 'level'
+    
+  food:
+    - 'recipe'
+    - 'eat'
+    - 'cooking'
+
+# TTS prosody hints (for voice synthesis)
+tts_prosody:
+  playful_roast:
+    speed: 0.9
+    pitch: 1.2
+    emphasis: 'teasing'
+    volume: 1.0
+    
+  romantic:
+    speed: 0.8
+    pitch: 0.9
+    emphasis: 'warm'
+    volume: 0.9
+    
+  excited:
+    speed: 1.2
+    pitch: 1.3
+    emphasis: 'upbeat'
+    volume: 1.2
+    
+  professional:
+    speed: 0.95
+    pitch: 1.0
+    emphasis: 'clear'
+    volume: 1.0

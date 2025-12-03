@@ -58,5 +58,14 @@
     },
     "interactions": 0,
     "relevance_score": 0.5
+  },
+  "4d050e91": {
+    "id": "4d050e91",
+    "topic": "deserts (geography)",
+    "timestamp": "2025-12-03T17:30:42.270203",
+    "created_date": "2025-12-03",
+    "metadata": {},
+    "interactions": 0,
+    "relevance_score": 0.5
   }
 }

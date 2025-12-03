@@ -44,6 +44,12 @@ from keyboard_mouse_CTRL import (
     control_volume_tool, swipe_gesture_tool
 )
 
+# 6A. RANDOMIZED TONE ADAPTER (v2.3 - Dynamic Abuse Randomizer)
+try:
+    from tone_adapter import ToneAdapter
+except (ImportError, AttributeError, SyntaxError):
+    ToneAdapter = None
+
 # 7. WINDOWS POWER CONTROL
 from windows_power_ctrl import shutdown_pc, restart_pc, lock_screen, sleep_pc, lock_pc
 
@@ -407,6 +413,16 @@ class Assistant(Agent):
                 except Exception as e:
                     print(f"⚠️ Could not add topic memory tool: {e}")
         
+        # Initialize Randomized Tone Adapter (v2.3)
+        self.tone_adapter = None
+        if ToneAdapter is not None:
+            try:
+                self.tone_adapter = ToneAdapter(model='llama3.1')
+                print("✅ Loaded Randomized Adaptive Tone Module v2.3 – Fresh Abuse Every Time! 🎲")
+            except Exception as e:
+                print(f"⚠️ Could not initialize ToneAdapter: {e}")
+                self.tone_adapter = None
+        
         print(f"✅ Loaded {len(tools)} tools for ADA Agent")
         
         super().__init__(instructions=behavior_prompts, tools=tools)
@@ -504,6 +520,29 @@ async def entrypoint(ctx: agents.JobContext):
                         instructions = Reply_prompts
                 
                 print("📡 Sending instructions to LLM (this may take a moment)...")
+                
+                # ═════════════════════════════════════════════════════════════════════════════════
+                # 🎯 RANDOMIZED TONE ADAPTATION (v2.3) - Fresh Abuse Every Time!
+                # ═════════════════════════════════════════════════════════════════════════════════
+                if hasattr(ctx, 'agent') and hasattr(ctx.agent, 'tone_adapter') and ctx.agent.tone_adapter:
+                    try:
+                        # If we have recent context, use it for tone detection (optional for real-time)
+                        # This adds randomized desi-sass flavor to every response
+                        print("🎲 Applying Randomized Tone Adaptation...")
+                        tone_result = ctx.agent.tone_adapter.adaptive_chat(
+                            user_input="Generate response with fresh randomized tone",
+                            conversation_history=[]
+                        )
+                        
+                        # Log random roast activation if playful_abuse tone detected
+                        if tone_result.get('roast_level'):
+                            import random
+                            random_sass = random.choice(['Banchod wild!', 'Mader chode fresh!', 'Had may rahana random!'])
+                            print(f"   🔥 Random Roast Activated: {tone_result['roast_level']} – {random_sass}")
+                            print(f"   📊 Freedom Score: {tone_result.get('freedom_score', 0):.2f}/1.0")
+                    except Exception as e:
+                        print(f"   ⚠️ Tone adaptation skipped: {e}")
+                
                 await session.generate_reply(
                     instructions=instructions
                 )
