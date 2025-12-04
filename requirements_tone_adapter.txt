@@ -1,0 +1,20 @@
+# Tone Adapter Module - Python Dependencies
+# ============================================
+# Install with: pip install -r requirements_tone_adapter.txt
+
+# REQUIRED (Core functionality)
+ollama>=0.1.0           # Local LLM backend for tone detection
+pytest>=7.0.0           # Testing framework
+pyyaml>=6.0            # YAML configuration file support
+
+# OPTIONAL (Recommended for full features)
+pyttsx3>=2.90          # Text-to-speech for prosody hints
+pytest-cov>=4.0.0      # Code coverage reporting
+
+# OPTIONAL (Development/Advanced)
+black>=23.0.0          # Code formatting
+flake8>=6.0.0          # Linting
+mypy>=1.0.0            # Type checking
+
+# Python version requirement: 3.8+
+# If you have issues, try upgrading pip: pip install --upgrade pip

@@ -1,0 +1,220 @@
+# WhatsApp Feature - Quick Reference Guide
+
+## What You Can Do Now
+
+✅ **Send WhatsApp messages** to any contact with customized tone and style
+✅ **Auto-generate messages** based on AI and your preferences
+✅ **Choose message tone** (formal, casual, friendly, professional, urgent, apologetic, humorous)
+✅ **Select message type** (greeting, query, update, reminder, request, confirmation, apology, announcement)
+✅ **Automatic tone suggestion** based on context
+✅ **Fully integrated** with ADA Agent voice commands
+
+---
+
+## How to Use
+
+### Via Voice Commands to ADA Agent
+
+1. **Simple Send:**
+   ```
+   "Send a WhatsApp message to John saying I'm ready for the meeting"
+   ```
+
+2. **With Tone:**
+   ```
+   "Send a professional WhatsApp message to Mr. Smith about the project update"
+   ```
+
+3. **Generate and Send:**
+   ```
+   "Generate a friendly WhatsApp message about birthday wishes to Sarah and send it"
+   ```
+
+4. **Check Status:**
+   ```
+   "What WhatsApp tones are available?"
+   "Show me the available message types"
+   ```
+
+### Via Python Code
+
+```python
+from whatsapp_sender import send_whatsapp_message
+
+# Simple send
+send_whatsapp_message(
+    contact_name="John Doe",
+    message="I'm ready for the meeting"
+)
+
+# Send with tone
+send_whatsapp_message(
+    contact_name="Mr. Smith",
+    message="I wanted to discuss the project timeline",
+    tone="professional",
+    message_type="query",
+    person_name="Mr. Smith"
+)
+```
+
+---
+
+## Available Tones
+
+| Tone | Best For | Example |
+|------|----------|---------|
+| **formal** | Official business | "I would like to inquire about..." |
+| **casual** | Friends & relaxed | "Hey! Just wanted to reach out..." |
+| **friendly** | Familiar people | "Hi! How have you been?" |
+| **professional** | Colleagues | "Good day, I wanted to..." |
+| **urgent** | Time-sensitive | "This requires immediate attention" |
+| **apologetic** | Apologies | "I sincerely apologize for..." |
+| **humorous** | Fun conversation | "So guess what? 😄" |
+
+---
+
+## Available Message Types
+
+| Type | Use | Example |
+|------|-----|---------|
+| **greeting** | Say hello | Simple hello message |
+| **query** | Ask question | "Could you help with...?" |
+| **update** | Share news | "I wanted to let you know..." |
+| **reminder** | Remind someone | "Just a quick reminder about..." |
+| **request** | Ask for help | "Could you help me with...?" |
+| **confirmation** | Agree to something | "Yes, that works for me" |
+| **apology** | Say sorry | "I'm sorry about..." |
+| **announcement** | Share important news | "We're excited to announce..." |
+
+---
+
+## Examples
+
+### Example 1: Casual Greeting
+```
+You: "Send a casual WhatsApp message to Alex saying let's grab coffee"
+
+ADA generates & sends:
+"Hey Alex! 😄
+
+Just wanted to reach out to you.
+
+Let's grab coffee let's grab coffee
+
+By the way, I'd love to catch up!
+
+Take care!"
+```
+
+### Example 2: Professional Update
+```
+You: "Send a professional WhatsApp to Mr. Johnson about the quarterly report"
+
+ADA generates & sends:
+"Hello Mr. Johnson,
+
+I am writing to inform you that the quarterly report is now ready for your review.
+
+Kind regards"
+```
+
+### Example 3: Urgent Request
+```
+You: "Send an urgent WhatsApp to Emma about the deadline"
+
+ADA generates & sends:
+"Emma,
+
+This requires immediate attention regarding the deadline.
+
+Critically, we need to finalize this ASAP.
+
+Please respond as soon as possible."
+```
+
+### Example 4: Friendly Reminder
+```
+You: "Send a friendly WhatsApp reminder to Sarah about the meeting tomorrow"
+
+ADA generates & sends:
+"Hi Sarah!
+
+Just a quick reminder about our meeting tomorrow at 2 PM.
+
+Also, please bring the documents we discussed.
+
+Looking forward to chatting!"
+```
+
+---
+
+## Installation & Setup
+
+### 1. Install WhatsApp Desktop
+- Download: https://www.whatsapp.com/download/
+- Install and login to your account
+
+### 2. Install Python Dependencies
+```bash
+pip install pyautogui
+```
+
+### 3. Ready to Use!
+The feature is already integrated into ADA Agent. Just run it normally.
+
+---
+
+## Files Created
+
+1. **whatsapp_sender.py** - Main WhatsApp automation module
+2. **whatsapp_message_generator.py** - AI message generation
+3. **whatsapp_tools.py** - LiveKit agent tool wrappers
+4. **agent.py** - Updated with WhatsApp integration
+5. **WHATSAPP_FEATURE_GUIDE.md** - Detailed documentation
+
+---
+
+## Troubleshooting
+
+### WhatsApp Not Found?
+- Make sure WhatsApp Desktop is installed
+- Restart the agent and try again
+
+### Message Not Sending?
+- Check that the contact name is exactly as it appears in WhatsApp
+- Ensure WhatsApp window is accessible
+
+### Want to Use WhatsApp Web Instead?
+- The system will automatically fall back to WhatsApp Web if Desktop isn't available
+
+---
+
+## Tips & Tricks
+
+💡 **Tip 1**: Use "quick_mode=True" if you want just the message without greeting/closing
+
+💡 **Tip 2**: Let ADA suggest the tone - just say "Send a message about..." and it will pick the right tone
+
+💡 **Tip 3**: You can combine tone AND message type for precise control
+
+💡 **Tip 4**: Check available options anytime:
+```
+You: "What WhatsApp tones do we have?"
+ADA: Shows all available tones
+```
+
+---
+
+## Next Steps
+
+🚀 **Ready to try it?** Just tell ADA Agent to send a WhatsApp message!
+
+📚 **Want more details?** Check `WHATSAPP_FEATURE_GUIDE.md`
+
+💬 **Have feedback?** The system learns and improves automatically!
+
+---
+
+**Created**: December 3, 2025
+**Version**: 1.0
+**Status**: ✅ Ready to Use
