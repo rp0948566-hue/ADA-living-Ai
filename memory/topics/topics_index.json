@@ -67,5 +67,59 @@
     "metadata": {},
     "interactions": 0,
     "relevance_score": 0.5
+  },
+  "01170328": {
+    "id": "01170328",
+    "topic": "basketball (sports)",
+    "timestamp": "2025-12-05T17:51:58.682469",
+    "created_date": "2025-12-05",
+    "metadata": {},
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "75cd0816": {
+    "id": "75cd0816",
+    "topic": "stoicism (philosophy)",
+    "timestamp": "2025-12-05T17:52:27.194511",
+    "created_date": "2025-12-05",
+    "metadata": {},
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "cdc1b5e6": {
+    "id": "cdc1b5e6",
+    "topic": "oceans (geography)",
+    "timestamp": "2025-12-05T17:55:11.085239",
+    "created_date": "2025-12-05",
+    "metadata": {},
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "f953b4d0": {
+    "id": "f953b4d0",
+    "topic": "disease prevention (health)",
+    "timestamp": "2025-12-05T19:37:27.658268",
+    "created_date": "2025-12-05",
+    "metadata": {},
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "a84cd892": {
+    "id": "a84cd892",
+    "topic": "leadership (business)",
+    "timestamp": "2025-12-05T19:37:48.906867",
+    "created_date": "2025-12-05",
+    "metadata": {},
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "9451a17a": {
+    "id": "9451a17a",
+    "topic": "STEM education (education)",
+    "timestamp": "2025-12-05T19:38:41.317101",
+    "created_date": "2025-12-05",
+    "metadata": {},
+    "interactions": 0,
+    "relevance_score": 0.5
   }
 }
