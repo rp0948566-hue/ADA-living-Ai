@@ -21,7 +21,7 @@ from livekit.plugins import (
 # Integration: Import and use handle_user_tone() in response generation
 
 # 1. PROMPTS & BEHAVIOR
-from Jarvis_prompts import behavior_prompts, Reply_prompts
+from Jarvis_prompts import behavior_prompts, get_reply_prompts
 
 # 2. SCREENSHOT & SCREEN VISION
 from Jarvis_screenshot import screenshot_tool
@@ -41,9 +41,6 @@ from memory.jarvis_memory import load_memory, save_memory, get_recent_conversati
 from memory_interceptor import MEMORY_KEYWORDS
 from memory_sync_bridge import get_backend_knowledge, get_merged_intelligence, apply_improvements_to_agent, get_shared_knowledge, MemorySyncBridge
 from self_update_memory_ADA import get_search_knowledge, get_memory_evolution_status
-
-# NEW: PDF Generation
-from pdf_generator import PDFCreator
 
 # 6. INPUT CONTROLS
 from keyboard_mouse_CTRL import (
@@ -426,20 +423,6 @@ class Assistant(Agent):
             except Exception as e:
                 print(f"⚠️ Could not add get_screen_share_summary_tool: {e}")
 
-        # PDF Creation Tool
-        @agents.tool(name="create_pdf")
-        def create_pdf_tool(content: str, output_path: str = "ada/pdf/final_product/document.pdf"):
-            """Creates a PDF with specified content."""
-            try:
-                creator = PDFCreator(output_path)
-                creator.create_pdf(content)
-                return f"PDF created successfully at {output_path}"
-            except Exception as e:
-                return f"Error creating PDF: {str(e)}"
-        
-        tools.append(create_pdf_tool)
-
-
         # Add Topic Memory tools
         if TOPIC_MEMORY_TOOLS:
             for tool in TOPIC_MEMORY_TOOLS:
@@ -488,15 +471,22 @@ async def entrypoint(ctx: agents.JobContext):
     # 🧠 START RANDOM TOPIC MEMORY EVOLUTION ENGINE
     # ═════════════════════════════════════════════════════════════════════════════════
     evolution_engine = None
+    memory_process = None
     if MemoryEvolutionEngine is not None:
         try:
             print("\n🧠 Launching Random Topic Memory Evolution Engine...")
             evolution_engine = MemoryEvolutionEngine(auto_upgrade_interval=1800)  # Update every 30 minutes
             evolution_engine.start_background_evolution()
             print("✓ Memory evolution engine active - Auto-update running")
+
+            # Also start random_topic_memory.py in a new process
+            print("\n🧠 Starting Random Topic Memory System in new terminal...")
+            memory_process = subprocess.Popen([sys.executable, "random_topic_memory.py"], stdout=None, stderr=None, stdin=None, close_fds=True)
+            print("✓ Random Topic Memory System started in background")
         except Exception as e:
             print(f"⚠️  Could not start memory evolution engine: {e}")
             evolution_engine = None
+            memory_process = None
     
     # ═════════════════════════════════════════════════════════════════════════════════
     # 🎯 START ORCHESTRATION SYSTEM - Continuous Learning in Background
@@ -519,29 +509,7 @@ async def entrypoint(ctx: agents.JobContext):
             orchestrator_obj = None
     
     # ═════════════════════════════════════════════════════════════════════════════════
-    # 🛑 CLEANUP - Save learning memory and stop evolution on shutdown
-    # ═════════════════════════════════════════════════════════════════════════════════
-    try:
-        # Stop evolution engine
-        if evolution_engine is not None:
-            try:
-                evolution_engine.stop_background_evolution()
-                print("✓ Memory evolution engine stopped")
-            except Exception as e:
-                print(f"⚠️ Could not stop evolution engine: {e}")
-        
-        if AgentLearningTools is not None:
-            try:
-                print("\n💾 Saving learning memory before shutdown...")
-                AgentLearningTools.save_learning_memory()
-                print("✓ Learning memory saved successfully")
-            except Exception as e:
-                print(f"⚠️ Could not save learning memory: {e}")
-    except Exception as e:
-        print(f"⚠️ Cleanup error: {e}")
-
-    # ═════════════════════════════════════════════════════════════════════════════════
-
+    
     max_retries = 5  # Increased from 3
     retry_count = 0
     base_wait_time = 3  # Increased from 2
@@ -571,28 +539,28 @@ async def entrypoint(ctx: agents.JobContext):
             # Generate reply with timeout handling
             try:
                 # Try to inject memory context into the reply instructions
-                instructions = Reply_prompts
-                
+                instructions = get_reply_prompts()
+
                 if ENABLE_MEMORY_INTERCEPTOR:
                     try:
                         print("🧠 Fetching memory context...")
                         # Fetch recent conversations to inject context
                         memory_context = await get_recent_conversations(limit=5)  # Reduced from 10
-                        
+
                         # Only inject if there's actual memory, keep it brief
                         if "अभी तक कोई बातचीत याद नहीं है" not in memory_context:
-                            instructions = f"""{Reply_prompts}
+                            instructions = f"""{get_reply_prompts()}
 
 [RECENT CONTEXT]
 {memory_context}
 [/CONTEXT]"""
                             print("✅ Memory context injected")
                         else:
-                            instructions = Reply_prompts
+                            instructions = get_reply_prompts()
                             print("ℹ️ No previous conversations to inject")
                     except Exception as e:
                         print(f"⚠️ Memory injection skipped: {e}")
-                        instructions = Reply_prompts
+                        instructions = get_reply_prompts()
                 
                 # ✨ Inject a bit of personality to feel more alive
                 if get_personality_prompt:
@@ -627,7 +595,48 @@ async def entrypoint(ctx: agents.JobContext):
                 print("📡 Sending instructions to LLM (this may take a moment)...")
                 
                 # ═════════════════════════════════════════════════════════════════════════════════
-                # 🎯 RANDOMIZED TONE ADAPTATION (v2.3) - Fresh Abuse
+                # 🎯 ADVANCED RANDOMIZED TONE ADAPTATION (v2.3) - Always On for All Features!
+                # ═════════════════════════════════════════════════════════════════════════════════
+                if hasattr(ctx, 'agent') and hasattr(ctx.agent, 'tone_adapter') and ctx.agent.tone_adapter:
+                    try:
+                        # Enhanced: Always apply tone adaptation to ALL responses for richer interactions
+                        print("🎲 Applying Advanced Tone Adaptation to ALL Features...")
+                        tone_result = ctx.agent.tone_adapter.adaptive_chat(
+                            user_input=user_input or "Generate response with advanced randomized tone",
+                            conversation_history=[]
+                        )
+
+                        # Advanced logging for all tones, not just playful_abuse
+                        if tone_result.get('roast_level'):
+                            import random
+                            random_sass = random.choice(['Banchod wild!', 'Mader chode fresh!', 'Had may rahana random!', 'Global sass unleashed!'])
+                            print(f"   🔥 Advanced Tone Activated: {tone_result['tone']} ({tone_result['roast_level']}) – {random_sass}")
+                            print(f"   📊 Freedom Score: {tone_result.get('freedom_score', 0):.2f}/1.0")
+                            print(f"   🎨 Creativity Score: {tone_result.get('creativity_score', 0):.2f}/1.0")
+                            print(f"   🔄 Adaptability Score: {tone_result.get('adaptability_score', 0):.2f}/1.0")
+                            print(f"   🌍 Global Tone Mix: {tone_result.get('global_tone_mix', 'Active')}")
+                    except Exception as e:
+                        print(f"   ⚠️ Advanced Tone adaptation skipped: {e}")
+                
+                await session.generate_reply(
+                    instructions=instructions
+                )
+                print("✅ Session completed successfully")
+                break  # Success - exit retry loop
+                
+            except Exception as e:
+                error_msg = str(e).lower()
+                print(f"⚠️ Reply generation error (attempt {retry_count + 1}/{max_retries}): {e}")
+                
+                # Check if it's a timeout/connection error worth retrying
+                if any(keyword in error_msg for keyword in ["timed out", "timeout", "connection", "websocket", "closed"]):
+                    if retry_count < max_retries - 1:
+                        retry_count += 1
+                        wait_time = base_wait_time * retry_count  # Exponential backoff
+                        print(f"🔄 Connection issue detected. Retrying in {wait_time}s... ({retry_count}/{max_retries})")
+                        await asyncio.sleep(wait_time)
+                        continue
+                    else:
                         print("❌ Max retries exceeded after multiple timeouts")
                         raise
                 else:
@@ -684,4 +693,4 @@ if __name__ == "__main__":
     except Exception as e:
         print("Failed to start GUI subprocess:", e)
 
-    agents.cli.run_app(agents.WorkerOptions(entrypoint_fnc=entrypoint))
+    agents.cli.run_app(agents.WorkerOptions(entrypoint_fnc=entrypoint)) 

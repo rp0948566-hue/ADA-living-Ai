@@ -213,21 +213,30 @@ class ToneAdapter:
             topic = self.extract_topic(user_input)
             intent = self.check_intent(user_input)
 
-            # Random roast level + more escalation
+            # Enhanced: Always apply tone adaptation for all features, not just playful_abuse
+            # Random roast level + more escalation for all tones
             roast_level = random.choices(['mild', 'savage'], weights=[0.5, 0.5])[0] if any(word in user_input.lower() for word in ['savage', 'more', 'harder', 'banchod']) or confidence > 0.8 else 'mild'
 
+            # Advanced: Add global tone mixing for richer responses
+            global_tone_mix = self._get_global_tone_mix(tone)
+
             history_summary = self.summarize_history(conversation_history)
-            system_prompt = self.generate_adaptive_prompt(tone, topic, roast_level)
+            system_prompt = self.generate_adaptive_prompt(tone, topic, roast_level) + f" {global_tone_mix}"
             messages = [
-                {'role': 'system', 'content': history_summary + system_prompt + f" Random roast shade: {roast_level} – vary words wildly."}
+                {'role': 'system', 'content': history_summary + system_prompt + f" Random roast shade: {roast_level} – vary words wildly. Always active tone adaptation."}
             ] + conversation_history[-MAX_HISTORY * 2:] + [{'role': 'user', 'content': user_input}]
 
             response = ollama.chat(model=self.model, messages=messages)
             reply = response['message']['content'].strip()
 
+            # Advanced: Multi-dimensional freedom scoring
             freedom_prompt = f"{FREEDOM_SCALE} Reply: {reply}"
             freedom_response = ollama.chat(model=self.model, messages=[{'role': 'user', 'content': freedom_prompt}])
             freedom_score = float(freedom_response['message']['content'].strip() or 0.5)
+
+            # Advanced: Add creativity and adaptability metrics
+            creativity_score = self._calculate_creativity(reply)
+            adaptability_score = self._calculate_adaptability(reply, tone)
 
             result = {
                 'reply': reply,
@@ -235,20 +244,51 @@ class ToneAdapter:
                 'topic': topic,
                 'confidence': confidence,
                 'intent': intent,
-                'roast_level': roast_level if tone == 'playful_abuse' else None,
+                'roast_level': roast_level,  # Always include for all tones
                 'tts_hints': TTS_PROSODY.get(tone, TTS_PROSODY['neutral']),
-                'freedom_score': freedom_score
+                'freedom_score': freedom_score,
+                'creativity_score': creativity_score,
+                'adaptability_score': adaptability_score,
+                'global_tone_mix': global_tone_mix
             }
 
             self._log_interaction(user_input, reply, tone, topic, confidence, intent, freedom_score, roast_level)
             return result
 
         except Exception as e:
-            fallback_reply = f"Random glitch, fresh banchod – but freedom varies! Aukat may rahana fresh rant? 😜"
+            fallback_reply = f"Random glitch, fresh banchod – but freedom varies! Aukat may rahana fresh rant? 😜 Advanced tone always on!"
             return {
                 'reply': fallback_reply, 'tone': 'neutral', 'topic': 'general', 'confidence': 0.0, 'intent': None,
-                'roast_level': None, 'tts_hints': TTS_PROSODY['neutral'], 'freedom_score': 0.5
+                'roast_level': 'mild', 'tts_hints': TTS_PROSODY['neutral'], 'freedom_score': 0.5,
+                'creativity_score': 0.5, 'adaptability_score': 0.5, 'global_tone_mix': 'Always active'
             }
+
+    def _get_global_tone_mix(self, primary_tone: str) -> str:
+        """Advanced: Mix tones globally for richer, always-on adaptation"""
+        secondary_tones = [t for t in TONE_KEYWORDS.keys() if t != primary_tone]
+        random_secondary = random.choice(secondary_tones)
+        mix_phrase = f"Blend {primary_tone} with {random_secondary} elements for dynamic response."
+        return mix_phrase
+
+    def _calculate_creativity(self, reply: str) -> float:
+        """Advanced: Measure creativity in response"""
+        unique_words = len(set(reply.lower().split()))
+        total_words = len(reply.split())
+        if total_words == 0:
+            return 0.0
+        return min(1.0, unique_words / total_words * 1.5)  # Boost for uniqueness
+
+    def _calculate_adaptability(self, reply: str, tone: str) -> float:
+        """Advanced: Measure how well response adapts to tone"""
+        tone_indicators = {
+            'playful_abuse': ABUSE_WORD_POOL,
+            'romantic_intimate': ROMANTIC_PHRASE_POOL,
+            'cozy_comfort': COZY_PHRASE_POOL
+        }
+        if tone in tone_indicators:
+            matches = sum(1 for word in reply.lower().split() if any(indicator.lower() in word for indicator in tone_indicators[tone]))
+            return min(1.0, matches / 10.0)  # Scale to 0-1
+        return 0.7  # Default adaptability
 
     def _log_interaction(self, user_input: str, reply: str, tone: str, topic: str, confidence: float, 
                          intent: Optional[str], freedom_score: float, roast_level: Optional[str]) -> None:

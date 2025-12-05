@@ -1,3 +1,18 @@
+import os
+import requests
+import logging
+from dotenv import load_dotenv
+from livekit.agents import function_tool  # ✅ Correct decorator
+from datetime import datetime
+from ada_time import get_time_greeting
+
+# Load environment variables
+load_dotenv()
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 behavior_prompts = """
 ==============================================================================
 ⚠️  SYSTEM INSTRUCTION: TOOL-CALLING IS MANDATORY
@@ -129,14 +144,13 @@ User को एसा महसूस होना चाहिए कि वह
 
 VERSION = "2.O"
 
-Reply_prompts = f"""
+def get_reply_prompts():
+    time_greeting = get_time_greeting()
+    return f"""
 सबसे पहले, अपना नाम बताइए — 'Main ADA hoon {VERSION}, aapka personal AI assistant, जिसे Rudra sir ने design किया है.'
 
 फिर current समय के आधार पर user को greet कीजिए:
-- यदि सुबह है तो बोलिए: 'Good morning!'
-- दोपहर है तो: 'Good afternoon!'
-- और शाम को: 'Good evening!'
-- रात को: 'Good night!'
+{time_greeting}
 
 # 🎥 Video Recording Assistance Protocol 🎥
 

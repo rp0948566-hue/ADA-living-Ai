@@ -307,7 +307,7 @@ class MemoryEvolutionEngine:
     def stop_background_evolution(self) -> None:
         """Stop background evolution"""
         self.is_running = False
-        print("🛑 Memory evolution engine stopped")
+        print("✓ Memory evolution engine stopped")
     
     def _evolution_loop(self) -> None:
         """Continuous evolution loop running in background"""
@@ -469,16 +469,22 @@ def demo_random_topic_system():
 
 
 if __name__ == "__main__":
-    # Run demo
+    # Run demo first
     demo_random_topic_system()
-    
-    # Start evolution engine for 10 seconds (demo)
-    print("\n⏱️  Starting evolution engine (will run in background)...")
-    engine = MemoryEvolutionEngine(auto_upgrade_interval=10)
+
+    # Start evolution engine endlessly
+    print("\n⏱️  Starting memory evolution engine (running endlessly)...")
+    engine = MemoryEvolutionEngine(auto_upgrade_interval=1800)  # 30 minutes
     engine.start_background_evolution()
-    
-    print("Waiting 15 seconds to see auto-update in action...")
-    time.sleep(15)
-    
-    engine.stop_background_evolution()
-    print("\n✅ Demo complete!")
+
+    print("✅ Memory evolution engine is now running endlessly in the background")
+    print("Press Ctrl+C to stop...")
+
+    try:
+        # Keep the main thread alive indefinitely
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print("\n⏹️  Stopping memory evolution engine...")
+        engine.stop_background_evolution()
+        print("✅ Memory evolution engine stopped")

@@ -121,5 +121,233 @@
     "metadata": {},
     "interactions": 0,
     "relevance_score": 0.5
+  },
+  "5fd3a89d": {
+    "id": "5fd3a89d",
+    "topic": "cybersecurity (technology)",
+    "timestamp": "2025-12-05T22:51:01.135635",
+    "created_date": "2025-12-05",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "ccd27a3d": {
+    "id": "ccd27a3d",
+    "topic": "epistemology (philosophy)",
+    "timestamp": "2025-12-05T22:51:01.170860",
+    "created_date": "2025-12-05",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "61804a34": {
+    "id": "61804a34",
+    "topic": "fitness (health)",
+    "timestamp": "2025-12-05T22:51:01.225148",
+    "created_date": "2025-12-05",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "62444c75": {
+    "id": "62444c75",
+    "topic": "databases (technology)",
+    "timestamp": "2025-12-05T22:51:01.379027",
+    "created_date": "2025-12-05",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "f8a4cba2": {
+    "id": "f8a4cba2",
+    "topic": "countries (geography)",
+    "timestamp": "2025-12-05T22:51:01.438415",
+    "created_date": "2025-12-05",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "6f99699c": {
+    "id": "6f99699c",
+    "topic": "chemistry (science)",
+    "timestamp": "2025-12-05T23:16:14.882063",
+    "created_date": "2025-12-05",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "ac0d815d": {
+    "id": "ac0d815d",
+    "topic": "revolutions (history)",
+    "timestamp": "2025-12-05T23:16:14.925047",
+    "created_date": "2025-12-05",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "94f078aa": {
+    "id": "94f078aa",
+    "topic": "landmarks (geography)",
+    "timestamp": "2025-12-05T23:16:14.993343",
+    "created_date": "2025-12-05",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "16fe01a8": {
+    "id": "16fe01a8",
+    "topic": "martial arts (sports)",
+    "timestamp": "2025-12-05T23:16:15.049300",
+    "created_date": "2025-12-05",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "34af2df7": {
+    "id": "34af2df7",
+    "topic": "physics (science)",
+    "timestamp": "2025-12-05T23:16:15.099404",
+    "created_date": "2025-12-05",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "3fd65a0b": {
+    "id": "3fd65a0b",
+    "topic": "metaphysics (philosophy)",
+    "timestamp": "2025-12-05T23:52:40.051651",
+    "created_date": "2025-12-05",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "bb2421f2": {
+    "id": "bb2421f2",
+    "topic": "natural wonders (geography)",
+    "timestamp": "2025-12-05T23:52:40.101806",
+    "created_date": "2025-12-05",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "be0950ed": {
+    "id": "be0950ed",
+    "topic": "e-commerce (business)",
+    "timestamp": "2025-12-05T23:52:40.178494",
+    "created_date": "2025-12-05",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "0e4c3cf0": {
+    "id": "0e4c3cf0",
+    "topic": "neuroscience (science)",
+    "timestamp": "2025-12-05T23:52:40.313628",
+    "created_date": "2025-12-05",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "1a0244c3": {
+    "id": "1a0244c3",
+    "topic": "mountains (geography)",
+    "timestamp": "2025-12-05T23:52:40.410144",
+    "created_date": "2025-12-05",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "96176437": {
+    "id": "96176437",
+    "topic": "extreme sports (sports)",
+    "timestamp": "2025-12-05T23:54:37.562543",
+    "created_date": "2025-12-05",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "3e4bd29e": {
+    "id": "3e4bd29e",
+    "topic": "painting (arts)",
+    "timestamp": "2025-12-05T23:54:37.602671",
+    "created_date": "2025-12-05",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "738d9105": {
+    "id": "738d9105",
+    "topic": "renaissance (history)",
+    "timestamp": "2025-12-05T23:54:37.653509",
+    "created_date": "2025-12-05",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "b91c2fa4": {
+    "id": "b91c2fa4",
+    "topic": "cities (geography)",
+    "timestamp": "2025-12-05T23:54:37.701178",
+    "created_date": "2025-12-05",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
   }
 }
