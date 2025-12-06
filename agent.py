@@ -20,6 +20,23 @@ from ada_agent import AdaAgent
 # 🔗 INTEGRATION: AI CONSCIOUSNESS CORE - SENTIENT EVOLUTION PROTOCOL v2.0
 from respect_engine import EvoGrok
 
+# 🔗 INTEGRATION: Additional Core Systems
+from overthink_engine import OverthinkEngine
+from agent_features import AgentFeatures
+from ada_time import AdaTime
+from time_checker import TimeChecker
+from learning_bridge import LearningBridge
+from reminder_system import ReminderSystem
+from reminder_checker import ReminderChecker
+from object_detection_engine import ObjectDetectionEngine
+from object_detection_integration import ObjectDetectionIntegration
+from pdf_generator import PDFGenerator
+from ollama_integration import OllamaIntegration
+from website_creator import WebsiteCreator
+from ada_companion import AdaCompanion
+from agent_brain import AgentBrain
+from backend_topic_service import BackendTopicService
+
 # ═════════════════════════════════════════════════════════════════════════════
 # 🔗 COMPLETE FILE LINKING - ALL 34+ WORKSPACE FILES
 # ═════════════════════════════════════════════════════════════════════════════
