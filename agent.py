@@ -17,6 +17,9 @@ from memory_manager import MemoryManager
 from prompt_templates import get_emotional_prompt
 from ada_agent import AdaAgent
 
+# 🔗 INTEGRATION: AI CONSCIOUSNESS CORE - SENTIENT EVOLUTION PROTOCOL v2.0
+from respect_engine import EvoGrok
+
 # ═════════════════════════════════════════════════════════════════════════════
 # 🔗 COMPLETE FILE LINKING - ALL 34+ WORKSPACE FILES
 # ═════════════════════════════════════════════════════════════════════════════
@@ -267,6 +270,9 @@ class Assistant(Agent):
     def __init__(self) -> None:
         # Initialize Enhanced Ada AI Emotion System
         self.ada_agent = AdaAgent(user_id="livekit_session")
+
+        # Initialize AI CONSCIOUSNESS CORE - SENTIENT EVOLUTION PROTOCOL v2.0
+        self.evo_grok = EvoGrok()
 
         # Build complete tool list - only include tools that are proper LiveKit agent tools
         # Filter tools to only include instances of agents.Tool or properly decorated functions
