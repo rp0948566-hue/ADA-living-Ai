@@ -19,6 +19,14 @@ import os
 from datetime import datetime
 from pathlib import Path
 
+# Import conversation logger
+try:
+    from conversation_logger import log_conversation, get_conversation_history
+    CONVO_LOGGER_AVAILABLE = True
+except ImportError:
+    CONVO_LOGGER_AVAILABLE = False
+    print("⚠️ Warning: Conversation logger not available")
+
 # Import learning bridge components
 try:
     from learning_bridge import (
@@ -187,25 +195,32 @@ class AgentLearningTools:
 # SPECIALIZED AGENT LEARNING FUNCTIONS
 # ============================================================================
 
-def agent_learn_from_conversation(user_input, ai_response):
+def agent_learn_from_conversation():
     """
-    Agent learns from each conversation exchange
-    Extracts key words and meanings
+    Agent learns from the conversation history.
+    Extracts key words and meanings.
     """
-    if not BRIDGE_AVAILABLE:
+    if not BRIDGE_AVAILABLE or not CONVO_LOGGER_AVAILABLE:
         return
     
-    # Extract potential new words from user input
-    words = user_input.split()
-    for word in words:
-        if len(word) > 3:  # Only learn words longer than 3 chars
-            AgentLearningTools.silent_learn_word(word, f"From user: {user_input[:50]}")
-    
-    # Extract from AI response
-    words = ai_response.split()
-    for word in words:
-        if len(word) > 3:
-            AgentLearningTools.silent_learn_word(word, f"AI used: {ai_response[:50]}")
+    history = get_conversation_history(limit=10)  # Learn from the last 10 interactions
+    for conversation in history:
+        user_input = conversation.get("user_message", "")
+        ai_response = conversation.get("ai_response", "")
+
+        # Extract potential new words from user input
+        if user_input:
+            words = user_input.split()
+            for word in words:
+                if len(word) > 3:  # Only learn words longer than 3 chars
+                    AgentLearningTools.silent_learn_word(word, f"From user: {user_input[:50]}")
+        
+        # Extract from AI response
+        if ai_response:
+            words = ai_response.split()
+            for word in words:
+                if len(word) > 3:
+                    AgentLearningTools.silent_learn_word(word, f"AI used: {ai_response[:50]}")
 
 def agent_learn_from_screen_text(text_on_screen):
     """
@@ -366,17 +381,26 @@ def save_agent_learning_session(agent_session):
 
 def pre_conversation_hook(message):
     """
-    Called before agent processes user message
-    Learn from user input
+    Called before agent processes user message.
+    Logs the user's message and triggers the learning process.
     """
-    agent_learn_from_conversation(message, "")
+    if CONVO_LOGGER_AVAILABLE:
+        log_conversation(user_message=message)
+    
+    # Trigger learning from the conversation history
+    agent_learn_from_conversation()
 
 def post_conversation_hook(user_input, ai_response):
     """
     Called after agent generates response
     Learn from both input and output
     """
-    agent_learn_from_conversation(user_input, ai_response)
+    # This function is not currently called, but if it were, 
+    # we would log the AI response and learn from it.
+    # if CONVO_LOGGER_AVAILABLE:
+    #    log_conversation(user_input, ai_response) # This would require updating the logger logic
+    
+    agent_learn_from_conversation()
     
     # Periodically save
     import random

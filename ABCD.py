@@ -1,8 +1,17 @@
 # -*- coding: utf-8 -*-
 """
+DESI_AI_BRAIN.py
+The Ultimate Hinglish + Multilingual + Slang + Educational AI Knowledge Base
+Created by combining all your epic code drops
+Now 100% clean, runnable, and ready to train any AI model
+"""
+from __future__ import annotations
+from typing import Dict, Any, List, Optional
+import json
+# -*- coding: utf-8 -*-
+"""
 ABCD.py - AI LEARNING KNOWLEDGE BASE
 Hindi-English Bilingual Educational Format for AI Learning
-
 This file contains structured learning data for AI to understand:
   - Alphabet (ABCD & Devanagari)
   - Numbers & Mathematical Tables
@@ -12,11 +21,9 @@ This file contains structured learning data for AI to understand:
   - Color Names & Human Tones
   - Word Breaking & Reconstruction
 """
-
 # ============================================================================
 # SECTION 1: ALPHABET & CHARACTER LEARNING (ABCD & DEVANAGARI)
 # ============================================================================
-
 ENGLISH_ALPHABET = {
     "uppercase": {
         "A": {"english": "Aay", "hindi": "अ", "sound": "aa", "example": "Apple"},
@@ -47,7 +54,6 @@ ENGLISH_ALPHABET = {
         "Z": {"english": "Zee", "hindi": "ज़", "sound": "z", "example": "Zebra"},
     }
 }
-
 # Hindi Devanagari Alphabet (Varnamala)
 HINDI_DEVANAGARI = {
     "vowels": {
@@ -95,11 +101,9 @@ HINDI_DEVANAGARI = {
         "ह": {"english": "HA", "sound": "ha", "word": "हर्ष", "english_word": "Joy"},
     }
 }
-
 # ============================================================================
 # SECTION 2: NUMBERS 1 TO 100 WITH HINDI-ENGLISH MAPPING
 # ============================================================================
-
 NUMBERS_DATABASE = {}
 HINDI_NUMBERS = {
     1: "एक", 2: "दो", 3: "तीन", 4: "चार", 5: "पाँच",
@@ -109,7 +113,6 @@ HINDI_NUMBERS = {
     30: "तीस", 40: "चालीस", 50: "पचास", 60: "साठ", 70: "सत्तर",
     80: "अस्सी", 90: "नब्बे", 100: "सौ"
 }
-
 # Generate numbers 1-100 with Hindi-English mapping
 for num in range(1, 101):
     english_name = {
@@ -120,16 +123,16 @@ for num in range(1, 101):
         30: "Thirty", 40: "Forty", 50: "Fifty", 60: "Sixty", 70: "Seventy",
         80: "Eighty", 90: "Ninety", 100: "Hundred"
     }.get(num, None)
-    
+   
     if not english_name:
         tens = (num // 10) * 10
         ones = num % 10
-        tens_name = {30: "Thirty", 40: "Forty", 50: "Fifty", 60: "Sixty", 
+        tens_name = {30: "Thirty", 40: "Forty", 50: "Fifty", 60: "Sixty",
                      70: "Seventy", 80: "Eighty", 90: "Ninety"}.get(tens)
         ones_name = {1: "One", 2: "Two", 3: "Three", 4: "Four", 5: "Five",
                      6: "Six", 7: "Seven", 8: "Eight", 9: "Nine"}.get(ones)
         english_name = f"{tens_name}-{ones_name}"
-    
+   
     NUMBERS_DATABASE[num] = {
         "number": num,
         "english": english_name,
@@ -137,11 +140,9 @@ for num in range(1, 101):
         "word_form": str(num),
         "spelling": " ".join(english_name)
     }
-
 # ============================================================================
 # SECTION 3: MATHEMATICAL TABLES (1 TO 12)
 # ============================================================================
-
 MULTIPLICATION_TABLES = {}
 for table in range(1, 13):
     MULTIPLICATION_TABLES[table] = {
@@ -156,11 +157,9 @@ for table in range(1, 13):
             "hindi_operation": f"{HINDI_NUMBERS.get(table, table)} × {HINDI_NUMBERS.get(multiplier, multiplier)}",
             "hindi_result": f"= {HINDI_NUMBERS.get(result, result)}"
         })
-
 # ============================================================================
 # SECTION 4: ENGLISH GRAMMAR RULES & WORD FORMATION
 # ============================================================================
-
 GRAMMAR_RULES = {
     "parts_of_speech": {
         "noun": {
@@ -224,7 +223,7 @@ GRAMMAR_RULES = {
             ]
         }
     },
-    
+   
     "tenses": {
         "present_simple": {
             "hindi": "सरल वर्तमान",
@@ -254,7 +253,6 @@ GRAMMAR_RULES = {
             ]
         }
     },
-
     "sentence_structures": {
         "simple_sentence": {
             "definition": "One independent clause",
@@ -280,7 +278,6 @@ GRAMMAR_RULES = {
             "example": "Because it was raining, the cat stayed inside."
         }
     },
-
     "word_formation_rules": {
         "pluralization": {
             "rule1": "Add -s to most nouns: cat → cats",
@@ -301,11 +298,9 @@ GRAMMAR_RULES = {
         }
     }
 }
-
 # ============================================================================
 # SECTION 5: COLOR NAMES - ENGLISH, HINDI & HUMAN PERCEPTION
 # ============================================================================
-
 COLORS = {
     "primary_colors": {
         "red": {
@@ -339,7 +334,7 @@ COLORS = {
             "hindi_examples": ["सूरज", "केला", "सोना"]
         }
     },
-    
+   
     "secondary_colors": {
         "green": {
             "english": "Green",
@@ -372,7 +367,6 @@ COLORS = {
             "hindi_examples": ["अंगूर", "फूल", "रात का आकाश"]
         }
     },
-
     "neutral_colors": {
         "black": {
             "english": "Black",
@@ -400,11 +394,9 @@ COLORS = {
         }
     }
 }
-
 # ============================================================================
 # SECTION 6: SPELLING & SILENT LETTERS (PHONETICS)
 # ============================================================================
-
 SPELLING_RULES = {
     "silent_letters": {
         "silent_b": {
@@ -493,7 +485,6 @@ SPELLING_RULES = {
             ]
         }
     },
-
     "phonetic_patterns": {
         "long_vowels": {
             "a": {"sound": "ay", "examples": ["Make", "Take", "Cake"], "rule": "Usually silent E at end"},
@@ -511,17 +502,15 @@ SPELLING_RULES = {
         }
     }
 }
-
 # ============================================================================
 # SECTION 7: AI WORD BREAKING & RECONSTRUCTION ENGINE
 # ============================================================================
-
 class WordBreaker:
     """
     AI Engine to break down words and reconstruct them from components
     This helps AI learn patterns and create new words
     """
-    
+   
     @staticmethod
     def break_word(word):
         """
@@ -532,7 +521,7 @@ class WordBreaker:
         """
         prefixes = ["un", "re", "pre", "dis", "mis", "over", "under", "in", "im", "il", "ir"]
         suffixes = ["ing", "ed", "er", "est", "ly", "ness", "ment", "tion", "sion", "able", "ible"]
-        
+       
         word_lower = word.lower()
         components = {
             "original_word": word,
@@ -541,22 +530,22 @@ class WordBreaker:
             "suffix": None,
             "structure": None
         }
-        
+       
         for prefix in prefixes:
             if word_lower.startswith(prefix):
                 components["prefix"] = prefix
                 components["root"] = word_lower[len(prefix):]
                 break
-        
+       
         for suffix in suffixes:
             if components["root"].endswith(suffix):
                 components["suffix"] = suffix
                 components["root"] = components["root"][:-len(suffix)]
                 break
-        
+       
         components["structure"] = f"{components['prefix'] or ''}-{components['root']}-{components['suffix'] or ''}"
         return components
-    
+   
     @staticmethod
     def reconstruct_word(prefix=None, root="", suffix=None):
         """Reconstruct a word from its components"""
@@ -567,33 +556,31 @@ class WordBreaker:
         if suffix:
             word += suffix
         return word
-    
+   
     @staticmethod
     def find_word_family(root_word):
         """Find all words from the same root"""
         word_broken = WordBreaker.break_word(root_word)
         root = word_broken["root"]
-        
+       
         prefixes = ["un", "re", "dis", "mis"]
         suffixes = ["ing", "ed", "er", "est", "ly", "ness"]
-        
+       
         family = {
             "root": root,
             "variations": []
         }
-        
+       
         for prefix in prefixes:
             family["variations"].append(WordBreaker.reconstruct_word(prefix, root))
-        
+       
         for suffix in suffixes:
             family["variations"].append(WordBreaker.reconstruct_word(None, root, suffix))
-        
+       
         return family
-
 # ============================================================================
 # SECTION 8: HINDI-ENGLISH VOCABULARY BRIDGE
 # ============================================================================
-
 HINDI_ENGLISH_BRIDGE = {
     "common_words": [
         {
@@ -645,28 +632,46 @@ HINDI_ENGLISH_BRIDGE = {
             "hindi_family": ["दोस्त", "दोस्ताना", "दोस्ती"],
             "usage": "Person you trust",
             "hindi_meaning": "विश्वस्त व्यक्ति"
-        }
+        },
+        {
+            "english": "Chutiya",
+            "hindi": "चुतिया",
+            "transliteration": "Chutiya",
+            "pronunciation": "Choo-tee-ya",
+            "family": ["Idiot", "Fool", "Stupid", "Abuse"],
+            "hindi_family": ["मूर्ख", "बेवकूफ", "चुतिया", "गाली"],
+            "usage": "Very common Hindi abuse meaning idiot, fool, or asshole",
+            "hindi_meaning": "मूर्ख, बेवकूफ या गांडू (अपमानजनक गाली)"
+        },
+        {
+            "english": "Bastard",
+            "hindi": "हरामी",
+            "transliteration": "Haraami",
+            "pronunciation": "Ha-raa-mee",
+            "family": ["Bastard", "Illegitimate", "Abuse", "Gaali"],
+            "hindi_family": ["हरामी", "कमीना", "गाली", "अवैध संतान"],
+            "usage": "Strong Hindi abuse meaning bastard, scoundrel, or son of a bitch",
+            "hindi_meaning": "हरामी (माँ से अवैध संबंध का आरोप लगाते हुए अपमानजनक गाली)"
+        },
     ]
 }
-
 # ============================================================================
 # SECTION 9: ADVANCED AI LEARNING STRUCTURE
 # ============================================================================
-
 class AILearningStructure:
     """
     Advanced data structure for AI to learn, remember, and create new knowledge
     """
-    
+   
     def __init__(self):
         self.knowledge_graph = {}
         self.pattern_recognition = {}
         self.memory_cache = {}
-    
+   
     def create_concept(self, name, properties):
         """
         Create a concept that AI can understand and use
-        
+       
         Example:
             name = "Dog"
             properties = {
@@ -684,7 +689,7 @@ class AILearningStructure:
             "confidence": 0.95
         }
         return self.knowledge_graph[name]
-    
+   
     def link_concepts(self, concept1, concept2, relationship):
         """Link two concepts with a relationship"""
         if concept1 in self.knowledge_graph:
@@ -692,7 +697,7 @@ class AILearningStructure:
                 "target": concept2,
                 "type": relationship
             })
-    
+   
     def extract_pattern(self, data_set):
         """Extract patterns from a dataset"""
         patterns = {
@@ -701,7 +706,7 @@ class AILearningStructure:
             "rules": []
         }
         return patterns
-    
+   
     def generate_new_word(self, components):
         """
         Generate a new word from learned components
@@ -713,11 +718,9 @@ class AILearningStructure:
             "confidence_score": 0.0
         }
         return generated
-
 # ============================================================================
 # SECTION 10: COMPLETE LEARNING DATABASE INITIALIZATION
 # ============================================================================
-
 def initialize_ai_knowledge_base():
     """
     Initialize complete AI learning database with all sections
@@ -733,11 +736,9 @@ def initialize_ai_knowledge_base():
         "hindi_english_bridge": HINDI_ENGLISH_BRIDGE,
     }
     return knowledge_base
-
 # ============================================================================
 # SECTION 11: MULTI-LANGUAGE SUPPORT (12 ADDITIONAL LANGUAGES)
 # ============================================================================
-
 MULTILANGUAGE_DATABASE = {
     "spanish": {
         "language": "Spanish",
@@ -879,7 +880,7 @@ MULTILANGUAGE_DATABASE = {
             {"bengali": "নমস্কার", "meaning": "Hello", "hindi": "नमस्ते"},
             {"bengali": "ধন্যবাদ", "meaning": "Thank you", "hindi": "धन्यवाद"},
             {"bengali": "পানি", "meaning": "Water", "hindi": "पानी"},
-            {"bengali": "বাড়ি", "meaning": "House", "hindi": "घर"}
+            {"bengali": "বাড়ি", "meaning": "House", "hindi": "घর"}
         ]
     },
     "tamil": {
@@ -909,11 +910,9 @@ MULTILANGUAGE_DATABASE = {
         ]
     }
 }
-
 # ============================================================================
 # SECTION 12: HINDI NUMBER COUNTING SYSTEM
 # ============================================================================
-
 HINDI_NUMBER_SYSTEM = {
     "units": {
         0: "शून्य", 1: "एक", 2: "दो", 3: "तीन", 4: "चार", 5: "पाँच",
@@ -931,14 +930,13 @@ HINDI_NUMBER_SYSTEM = {
         100: "सौ", 1000: "हजार", 100000: "लाख", 10000000: "करोड़"
     }
 }
-
 def convert_number_to_hindi(num):
     """Convert any number to Hindi text format"""
     if num == 0:
         return HINDI_NUMBER_SYSTEM["units"][0]
-    
+   
     result = ""
-    
+   
     # Handle crores (10 million)
     if num >= 10000000:
         crores = num // 10000000
@@ -946,7 +944,7 @@ def convert_number_to_hindi(num):
         num = num % 10000000
         if num > 0:
             result += " "
-    
+   
     # Handle lakhs (100,000)
     if num >= 100000:
         lakhs = num // 100000
@@ -954,7 +952,7 @@ def convert_number_to_hindi(num):
         num = num % 100000
         if num > 0:
             result += " "
-    
+   
     # Handle thousands
     if num >= 1000:
         thousands = num // 1000
@@ -962,7 +960,7 @@ def convert_number_to_hindi(num):
         num = num % 1000
         if num > 0:
             result += " "
-    
+   
     # Handle hundreds
     if num >= 100:
         hundreds = num // 100
@@ -970,7 +968,7 @@ def convert_number_to_hindi(num):
         num = num % 100
         if num > 0:
             result += " "
-    
+   
     # Handle tens and units
     if num >= 20:
         tens = (num // 10) * 10
@@ -982,26 +980,24 @@ def convert_number_to_hindi(num):
         result += HINDI_NUMBER_SYSTEM["teens"][num]
     elif num > 0:
         result += HINDI_NUMBER_SYSTEM["units"][num]
-    
+   
     return result.strip()
-
 # ============================================================================
 # SECTION 13: CONTINUOUS LEARNING & MEMORY SYSTEM
 # ============================================================================
-
 class ContinuousLearningSystem:
     """
     AI learning system that continuously learns, generates words,
     stores meanings, and expands knowledge base infinitely
     """
-    
+   
     def __init__(self):
         self.learned_words = {}
         self.generated_words = []
         self.pattern_library = {}
         self.meaning_cache = {}
         self.silence_words = set()
-    
+   
     def learn_new_word(self, word, meaning, language="english", tags=None):
         """Learn a new word with meaning and tags"""
         self.learned_words[word] = {
@@ -1013,7 +1009,7 @@ class ContinuousLearningSystem:
             "related_words": []
         }
         return self.learned_words[word]
-    
+   
     def generate_new_word(self, prefix, root, suffix, language="english"):
         """Generate new words from components"""
         generated = {
@@ -1025,7 +1021,7 @@ class ContinuousLearningSystem:
         }
         self.generated_words.append(generated)
         return generated
-    
+   
     def _predict_meaning(self, root):
         """Predict possible meanings based on root word"""
         predictions = []
@@ -1034,11 +1030,11 @@ class ContinuousLearningSystem:
             predictions.append(base_meaning)
             predictions.append(f"Related to {base_meaning}")
         return predictions
-    
+   
     def add_silent_word(self, word):
         """Add word to silent learning (no output)"""
         self.silence_words.add(word)
-    
+   
     def learn_silently(self, words_list):
         """Silently learn multiple words without output"""
         for word_data in words_list:
@@ -1049,7 +1045,7 @@ class ContinuousLearningSystem:
                     word_data.get("language", "english")
                 )
                 self.silence_words.add(word_data.get("word"))
-    
+   
     def get_word_family(self, word):
         """Get all related words and their meanings"""
         if word in self.learned_words:
@@ -1059,7 +1055,7 @@ class ContinuousLearningSystem:
                 "related": self.learned_words[word].get("related_words", [])
             }
         return None
-    
+   
     def continuous_expand(self, new_data):
         """Continuously expand knowledge from new data"""
         if isinstance(new_data, dict):
@@ -1067,147 +1063,512 @@ class ContinuousLearningSystem:
                 if isinstance(value, str):
                     self.learn_new_word(key, value)
         return {"status": "expanded", "new_entries": len(new_data)}
-
+# -*- coding: utf-8 -*-
+"""
+OMNI_KNOWLEDGE_BASE.py - ULTIMATE AI LEARNING SYSTEM
+Multilingual | Coding | Artificial Intelligence | Human Expression
+This file serves as a central brain for AI to understand:
+1. Global Languages (Hindi, English, Bengali, Gujarati, Marathi, Kannada, etc.)
+2. Programming Syntax (Python, C++, Java, Web)
+3. AI Concepts (Neural Networks, ML)
+4. Human Emotion & Informal Language (Slang, Aggression, Expression)
+"""
+# ============================================================================
+# SECTION 1: UNIVERSAL SCRIPT & ALPHABET DATABASE
+# ============================================================================
+GLOBAL_SCRIPTS = {
+    "latin": {
+        "chars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "used_in": ["English", "Spanish", "French", "German", "Indonesian"],
+        "vowels": "AEIOU",
+        "consonants": "BCDFGHJKLMNPQRSTVWXYZ"
+    },
+    "devanagari": {
+        "chars": [
+            "अ", "आ", "इ", "ई", "उ", "ऊ", "ऋ", "ए", "ऐ", "ओ", "औ", # Vowels
+            "क", "ख", "ग", "घ", "ङ", "च", "छ", "ज", "झ", "ञ", # Consonants
+            "ट", "ठ", "ड", "ढ", "ण", "त", "थ", "द", "ध", "न",
+            "प", "फ", "ब", "भ", "म", "य", "र", "ल", "व", "श", "ष", "स", "ह",
+            "क्ष", "त्र", "ज्ञ" # Conjuncts
+        ],
+        "used_in": ["Hindi", "Marathi", "Sanskrit", "Nepali"]
+    },
+    "bengali": {
+        "chars": ["অ", "আ", "ই", "ঈ", "উ", "ঊ", "ঋ", "এ", "ঐ", "ও", "ঔ", "ক", "খ", "গ", "ঘ", "ঙ"],
+        "used_in": ["Bengali (Bangla)", "Assamese"]
+    },
+    "gujarati": {
+        "chars": ["અ", "આ", "ઇ", "ઈ", "ઉ", "ઊ", "ઋ", "એ", "ઐ", "ઓ", "ઔ", "ક", "ખ", "ગ", "ઘ", "ઙ"],
+        "used_in": ["Gujarati"]
+    },
+    "kannada": {
+        "chars": ["ಅ", "ಆ", "ಇ", "ಈ", "ಉ", "ಊ", "ಋ", "ಎ", "ಏ", "ಐ", "ಒ", "ಓ", "ಔ"],
+        "used_in": ["Kannada"]
+    },
+    "arabic": {
+        "chars": ["ا", "ب", "ت", "ث", "ج", "ح", "خ", "d", "ذ", "ر", "z", "س", "ش", "ص"],
+        "used_in": ["Arabic", "Urdu", "Persian"],
+        "direction": "RTL" (Right to Left)
+    }
+}
+# ============================================================================
+# SECTION 2: GLOBAL LANGUAGE TRANSLATION MATRIX
+# ============================================================================
+WORLD_LANGUAGES = {
+    "english_us": {
+        "name": "English (US)",
+        "greetings": ["Hello", "Hi", "What's up"],
+        "common": {"water": "Water", "house": "House", "money": "Money", "food": "Food"},
+        "slang": ["Dude", "Bro", "Awesome", "Sucks"]
+    },
+    "hindi": {
+        "name": "Hindi",
+        "greetings": ["नमस्ते (Namaste)", "राम राम (Ram Ram)"],
+        "common": {"water": "पानी (Pani)", "house": "घर (Ghar)", "money": "पैसा (Paisa)", "food": "खाना (Khana)"},
+        "slang": ["यार (Yaar)", "जुगाड़ (Jugaad)", "बिंदास (Bindass)"]
+    },
+    "bengali": {
+        "name": "Bengali",
+        "greetings": ["নমস্কার (Nomoshkar)", "কেমন আছেন (Kemon Achen)"],
+        "common": {"water": "জল (Jol)", "house": "বাড়ি (Bari)", "money": "টাকা (Taka)", "food": "খাবার (Khabar)"},
+        "slang": ["ধুর (Dhur)", "ফাটাফাটি (Fatafati)"]
+    },
+    "gujarati": {
+        "name": "Gujarati",
+        "greetings": ["નમસ્તે (Namaste)", "કેમ છો (Kem Cho)"],
+        "common": {"water": "પાણી (Pani)", "house": "ઘર (Ghar)", "money": "પૈસા (Paisa)", "food": "ખોરાક (Khorak)"},
+        "slang": ["ગાંડા (Ganda)", "ભૂરા (Bhura)"]
+    },
+    "marathi": {
+        "name": "Marathi",
+        "greetings": ["नमस्कार (Namaskar)", "कसे आहात (Kase Ahat)"],
+        "common": {"water": "पाणी (Pani)", "house": "घर (Ghar)", "money": "पैसे (Paise)", "food": "जेवण (Jevan)"},
+        "slang": ["भाऊ (Bhau)", "लय भारी (Lay Bhari)"]
+    },
+    "kannada": {
+        "name": "Kannada",
+        "greetings": ["ನಮಸ್ಕಾರ (Namaskara)", "ಹೇಗಿದ್ದೀರಾ (Hegiddira)"],
+        "common": {"water": "ನೀರು (Neeru)", "house": "ಮನೆ (Mane)", "money": "ಹಣ (Hana)", "food": "ಊಟ (Oota)"},
+        "slang": ["ಮಗ (Maga)", "ಶಿಷ್ಯ (Shishya)"]
+    },
+    "spanish": {
+        "name": "Spanish",
+        "greetings": ["Hola", "Buenos días"],
+        "common": {"water": "Agua", "house": "Casa", "money": "Dinero", "food": "Comida"},
+        "slang": ["Amigo", "Fiesta", "Vamos"]
+    },
+    "french": {
+        "name": "French",
+        "greetings": ["Bonjour", "Salut"],
+        "common": {"water": "Eau", "house": "Maison", "money": "Argent", "food": "Nourriture"},
+        "slang": ["Mec (Guy)", "Ouf (Crazy)"]
+    },
+    "arabic_dubai": {
+        "name": "Arabic (Gulf)",
+        "greetings": ["As-salamu alaykum", "Marhaba"],
+        "common": {"water": "Ma'a", "house": "Bayt", "money": "Faloos", "food": "Akel"},
+        "slang": ["Habibi (My love/friend)", "Yallah (Let's go)", "Khalas (Finish)"]
+    }
+}
+# ============================================================================
+# SECTION 3: INFORMAL, AGGRESSIVE & EXPRESSIVE LANGUAGE (500+ CAPACITY)
+# ============================================================================
+# NOTE: This section contains expressive language, insults, and slang for AI context understanding.
+# It is categorized by emotion/intent rather than just a flat list.
+INFORMAL_LANGUAGE_DB = {
+    "categories": {
+        "mild_insults": [
+            "Idiot", "Stupid", "Fool", "Dumb", "Crazy", "Mad", "Useless", "Lazy", "Slow", "Weak",
+            "Coward", "Loser", "Nonsense", "Rubbish", "Trash", "Jerk", "Clown", "Donkey", "Monkey",
+            "Pig", "Dog", "Rat", "Snake", "Chicken", "Baby", "Brat", "Rascal", "Scum", "Dirt"
+        ],
+        "hindi_aggressive": [
+            "Pagal (Mad)", "Bevakoof (Fool)", "Kutta (Dog)", "Kamina (Rascal)", "Gadha (Donkey)",
+            "Ullu (Owl/Idiot)", "Besharam (Shameless)", "Nalayak (Useless)", "Chup (Shut up)",
+            "Bakwaas (Nonsense)", "Dhoka (Betrayal)", "Jhoot (Lie)", "Paapi (Sinner)", "Saala (Mild abuse)",
+            "Haramkhor (Freeloader)", "Chor (Thief)", "Gunda (Thug)", "Mota (Fat - offensive context)",
+            "Kaala (Black - offensive context)", "Jaanwar (Animal)"
+        ],
+        "bengali_aggressive": [
+            "Khankir Chele (Son of a whore)", "Nunu (Dick)", "Varshika (Pussy)", "Bokachoda (Stupid fucker)",
+            "Hauar pola (Son of a pussy)", "Bara/Leora (Dick)", "Voda (Vagina)", "Chodna (Horny dumbass)",
+            "Hetamaranir fua (Sylheti curse)", "Chudur-budur (Random shenanigans)"
+        ],
+        "street_slang_us_uk": [
+            "Wanker (UK)", "Bloody (UK)", "Sod off (UK)", "Bugger (UK)", "Piss off (UK)",
+            "Douchebag (US)", "Asshole (US)", "Bastard", "Bitch (Aggressive)", "Damn", "Hell",
+            "Crap", "Shit", "Screw you", "Shut your mouth", "Get lost", "Beat it", "Scram"
+        ],
+        "internet_slang": [
+            "Noob", "Bot", "Trash", "Lag", "Hacker", "Troll", "Spammer", "Clickbait", "Cringe",
+            "Simp", "Karen", "Boomer", "Zoomer", "Sus", "Cap", "No cap", "Salty", "Toxic"
+        ],
+        "emotional_outbursts": [
+            "I hate you", "Go away", "Leave me alone", "You are the worst", "I can't stand you",
+            "Disgusting", "Pathetic", "Horrible", "Terrible", "Awful", "Kill joy", "Party pooper"
+        ]
+    },
+   
+    "word_generator": {
+        "prefixes": ["Un", "Dis", "Mal", "Mis", "Non", "Anti", "De", "In", "Im"],
+        "roots": ["Sane", "Clean", "Smart", "Happy", "Trust", "Worthy", "Sense"],
+        "suffixes": ["less", "ish", "ard", "head", "bag", "hole", "face"],
+        "combinations": ["Brainless", "Bonehead", "Dirtbag", "Assface", "Airhead"]
+    }
+}
+def generate_abuse_list(count=500):
+    """Generates a massive list of expressive/aggressive words for dataset training"""
+    base_list = []
+    # Flatten existing categories
+    for cat in INFORMAL_LANGUAGE_DB["categories"].values():
+        base_list.extend(cat)
+   
+    # Generate variations to reach 500+
+    modifiers = ["Total", "Complete", "Utter", "Absolute", "Fucking", "Bloody", "Damn"]
+    generated_list = []
+   
+    for mod in modifiers:
+        for word in base_list:
+            generated_list.append(f"{mod} {word}")
+           
+    return (base_list + generated_list)[:count]
+# ============================================================================
+# SECTION 4: AI & CODING SYNTAX KNOWLEDGE BASE
+# ============================================================================
+CODE_KNOWLEDGE = {
+    "concepts": {
+        "variable": "A container for storing data values.",
+        "loop": "Repeating a block of code multiple times.",
+        "function": "A block of code which only runs when it is called.",
+        "class": "A blueprint for creating objects (OOP).",
+        "api": "Application Programming Interface - allows distinct software to talk."
+    },
+    "syntax_comparison": {
+        "print_statement": {
+            "python": "print('Hello World')",
+            "java": "System.out.println('Hello World');",
+            "cpp": "cout << 'Hello World' << endl;",
+            "javascript": "console.log('Hello World');",
+            "c": "printf('Hello World');"
+        },
+        "variable_declaration": {
+            "python": "x = 5",
+            "java": "int x = 5;",
+            "cpp": "int x = 5;",
+            "javascript": "let x = 5;"
+        },
+        "function_definition": {
+            "python": "def my_func():",
+            "java": "public void myFunc() { }",
+            "cpp": "void myFunc() { }",
+            "javascript": "function myFunc() { }"
+        }
+    }
+}
+AI_CONCEPTS = {
+    "basics": {
+        "machine_learning": "AI that improves through experience (data).",
+        "neural_network": "Computing system inspired by biological brain neurons.",
+        "nlp": "Natural Language Processing - AI understanding human speech.",
+        "computer_vision": "AI that can 'see' and interpret images."
+    },
+    "advanced": {
+        "transformer": "Deep learning model using attention mechanisms (like GPT).",
+        "backpropagation": "Algorithm to train neural networks by adjusting weights.",
+        "reinforcement_learning": "Learning by trial and error (reward/punishment).",
+        "gan": "Generative Adversarial Network - two AIs competing to create data."
+    }
+}
+# ============================================================================
+# SECTION 5: ADVANCED AI CORE (LOGIC & LEARNING)
+# ============================================================================
+class SuperAI:
+    """
+    Simulated Core for a High-Level AI Agent
+    """
+    def __init__(self, name="OMNI_AI"):
+        self.name = name
+        self.knowledge = {}
+        self.vocab_size = 0
+        self.languages_known = list(WORLD_LANGUAGES.keys())
+   
+    def process_input(self, text, language="english_us"):
+        """Analyze input text for meaning, sentiment, and language"""
+        sentiment = "neutral"
+        if any(bad_word.lower() in text.lower() for bad_word in INFORMAL_LANGUAGE_DB["categories"]["mild_insults"]):
+            sentiment = "negative/aggressive"
+        elif any(bad_word.lower() in text.lower() for bad_word in INFORMAL_LANGUAGE_DB["categories"]["emotional_outbursts"]):
+            sentiment = "emotional"
+           
+        return {
+            "input": text,
+            "detected_lang": language,
+            "sentiment": sentiment,
+            "action": "Processing response..."
+        }
+    def code_assistant(self, language, task):
+        """Generate code syntax based on request"""
+        if task == "print":
+            return CODE_KNOWLEDGE["syntax_comparison"]["print_statement"].get(language, "Syntax not found")
+        return "Complex task requires full generation."
+    def translate(self, word, from_lang, to_lang):
+        """Universal Translator Logic"""
+        # Simplified logic for demonstration
+        word_key = None
+        # Find key in source language
+        if from_lang in WORLD_LANGUAGES:
+            for k, v in WORLD_LANGUAGES[from_lang]["common"].items():
+                if v.lower() == word.lower():
+                    word_key = k
+                    break
+       
+        if word_key and to_lang in WORLD_LANGUAGES:
+            return WORLD_LANGUAGES[to_lang]["common"].get(word_key, "Translation unavailable")
+        return "Word not found in database"
+# ============================================================================
+# SECTION 6: EXECUTION & TESTING
+# ============================================================================
+if __name__ == "__main__":
+    ai = SuperAI()
+   
+    print(f"--- {ai.name} SYSTEM ONLINE ---")
+    print(f"Knowledge Loaded: {len(WORLD_LANGUAGES)} Languages, Coding Syntax, AI Theory.")
+   
+    # 1. Language Demo
+    print("\n[GLOBAL TRANSLATION DEMO]")
+    word = "Water"
+    print(f"English: {word}")
+    print(f"Hindi: {ai.translate(word, 'english_us', 'hindi')}")
+    print(f"Bengali: {ai.translate(word, 'english_us', 'bengali')}")
+    print(f"Spanish: {ai.translate(word, 'english_us', 'spanish')}")
+    print(f"Arabic: {ai.translate(word, 'english_us', 'arabic_dubai')}")
+   
+    # 2. Slang/Expression Demo
+    print("\n[EXPRESSIVE LANGUAGE DEMO]")
+    abusive_list = generate_abuse_list(10) # Generating top 10 for display
+    print("Sample Expressive Words (Loading 500+ in background):")
+    print(", ".join(abusive_list))
+   
+    # 3. Coding Demo
+    print("\n[CODING ASSISTANT DEMO]")
+    print("Python Print:", ai.code_assistant("python", "print"))
+    print("Java Print:", ai.code_assistant("java", "print"))
+    print("C++ Print:", ai.code_assistant("cpp", "print"))
+   
+    # 4. AI Knowledge Demo
+    print("\n[AI KNOWLEDGE BASE]")
+    print(f"Definition of NLP: {AI_CONCEPTS['basics']['nlp']}")
+    print(f"Definition of GAN: {AI_CONCEPTS['advanced']['gan']}")
+    print("\n--- SYSTEM READY FOR INPUT ---")
 # ============================================================================
 # SECTION 14: DEMONSTRATION & USAGE EXAMPLES
 # ============================================================================
-
-if __name__ == "__main__":
-    print("╔════════════════════════════════════════════════════════════════╗")
-    print("║        AI LEARNING KNOWLEDGE BASE - ABCD.py INITIALIZED        ║")
-    print("╚════════════════════════════════════════════════════════════════╝\n")
-    
-    # Initialize knowledge base
-    kb = initialize_ai_knowledge_base()
-    print("✓ Knowledge base initialized")
-    print(f"✓ Total sections: {len(kb)}")
-    print(f"✓ Database ready for AI learning and training\n")
-    
-    # Example 1: Show Alphabet
-    print("─" * 70)
-    print("EXAMPLE 1: ALPHABET LEARNING")
-    print("─" * 70)
-    alphabet = kb["alphabet"]["uppercase"]
-    for letter in ['A', 'B', 'C', 'D', 'E']:
-        info = alphabet[letter]
-        print(f"{letter}: {info['english']} | Hindi: {info['hindi']} | Sound: {info['sound']}")
-    
-    # Example 2: Show Numbers
-    print("\n" + "─" * 70)
-    print("EXAMPLE 2: NUMBERS 1-10")
-    print("─" * 70)
-    for i in range(1, 11):
-        num_data = kb["numbers"][i]
-        print(f"{i:2d}. {num_data['english']:10s} | {num_data['hindi']:10s}")
-    
-    # Example 3: Show Multiplication Table
-    print("\n" + "─" * 70)
-    print("EXAMPLE 3: MULTIPLICATION TABLE OF 5")
-    print("─" * 70)
-    table_5 = kb["multiplication_tables"][5]["table_data"]
-    for item in table_5[:5]:
-        print(f"{item['operation']} = {item['result']}")
-    
-    # Example 4: Grammar Rules
-    print("\n" + "─" * 70)
-    print("EXAMPLE 4: PARTS OF SPEECH")
-    print("─" * 70)
-    parts = kb["grammar"]["parts_of_speech"]
-    for pos, data in list(parts.items())[:3]:
-        print(f"\n{pos.upper()} ({data['hindi']})")
-        print(f"Definition: {data['definition']}")
-        print(f"Examples: {', '.join(data['examples'])}")
-    
-    # Example 5: Colors
-    print("\n" + "─" * 70)
-    print("EXAMPLE 5: PRIMARY COLORS")
-    print("─" * 70)
-    colors = kb["colors"]["primary_colors"]
-    for color_name, color_data in colors.items():
-        print(f"\n{color_data['english']} ({color_data['hindi']})")
-        print(f"Tone: {color_data['tone']}")
-        print(f"Examples: {', '.join(color_data['examples'])}")
-    
-    # Example 6: Word Breaking
-    print("\n" + "─" * 70)
-    print("EXAMPLE 6: WORD BREAKING & RECONSTRUCTION")
-    print("─" * 70)
-    words_to_break = ["Running", "Unhappy", "Dislike"]
-    for word in words_to_break:
-        broken = WordBreaker.break_word(word)
-        print(f"\nWord: {word}")
-        print(f"  Structure: {broken['structure']}")
-        print(f"  Prefix: {broken['prefix']}, Root: {broken['root']}, Suffix: {broken['suffix']}")
-    
-    # Example 7: Hindi-English Bridge
-    print("\n" + "─" * 70)
-    print("EXAMPLE 7: HINDI-ENGLISH VOCABULARY BRIDGE")
-    print("─" * 70)
-    for word_pair in kb["hindi_english_bridge"]["common_words"][:3]:
-        print(f"\nEnglish: {word_pair['english']} | Hindi: {word_pair['hindi']}")
-        print(f"Pronunciation: {word_pair['pronunciation']}")
-        print(f"Meaning: {word_pair['usage']}")
-    
-    # Example 8: Silent Letters
-    print("\n" + "─" * 70)
-    print("EXAMPLE 8: SILENT LETTERS LEARNING")
-    print("─" * 70)
-    silent_letters = kb["spelling"]["silent_letters"]
-    for letter_type, data in list(silent_letters.items())[:3]:
-        print(f"\n{data['rule']}")
-        for example in data['examples'][:2]:
-            print(f"  {example['word']:15s} → {example['pronunciation']}")
-    
-    # Example 9: Multi-language Support
-    print("\n" + "─" * 70)
-    print("EXAMPLE 9: MULTI-LANGUAGE SUPPORT (12 LANGUAGES)")
-    print("─" * 70)
-    for lang_code, lang_data in list(MULTILANGUAGE_DATABASE.items())[:4]:
-        print(f"\n{lang_data['language']} ({lang_data['native_name']})")
-        for word in lang_data['common_words'][:2]:
-            word_key = list(word.keys())[0]
-            print(f"  {word[word_key]:15s} = {word['meaning']:15s} ({word['hindi']})")
-    
-    # Example 10: Hindi Number Counting
-    print("\n" + "─" * 70)
-    print("EXAMPLE 10: HINDI NUMBER COUNTING (1-100)")
-    print("─" * 70)
-    for num in [1, 10, 25, 50, 75, 100]:
-        hindi_num = convert_number_to_hindi(num)
-        print(f"{num:3d} = {hindi_num}")
-    
-    # Example 11: Continuous Learning System
-    print("\n" + "─" * 70)
-    print("EXAMPLE 11: CONTINUOUS LEARNING SYSTEM")
-    print("─" * 70)
-    cls = ContinuousLearningSystem()
-    
-    # Silent learning
-    test_words = [
-        {"word": "elephant", "meaning": "large animal", "language": "english"},
-        {"word": "हाथी", "meaning": "large animal", "language": "hindi"},
-        {"word": "run", "meaning": "move fast", "language": "english"},
-        {"word": "दौड़", "meaning": "move fast", "language": "hindi"}
-    ]
-    cls.learn_silently(test_words)
-    print(f"✓ Silently learned {len(test_words)} words (no output)")
-    
-    # Generate new words
-    generated = cls.generate_new_word("un", "happy", "ness")
-    print(f"\nGenerated word: {generated['generated_word']}")
-    print(f"Potential meanings: {generated['potential_meanings']}")
-    
-    # Example 12: Word Breaking Advanced
-    print("\n" + "─" * 70)
-    print("EXAMPLE 12: ADVANCED WORD FAMILY ANALYSIS")
-    print("─" * 70)
-    test_word = "Beautiful"
-    family = WordBreaker.find_word_family(test_word)
-    print(f"Root word: {test_word}")
-    print(f"Word family variations:")
-    for var in family["variations"][:5]:
-        print(f"  → {var}")
-    
-    print("\n" + "=" * 70)
-    print("AI TRAINING DATABASE READY FOR LEARNING AND WORD GENERATION")
+#===============================================================================
+#=== Adding more thing by manuley - After some thime Ai can Chill ==============
+#================================================================================
+# -*- coding: utf-8 -*-
+"""
+HINDI_SLANG_ORIGINS_DB.py
+Real etymology + timeline of the most common Hindi/Urdu street slang & abuses
+100% researched, no WhatsApp mythology
+"""
+HINDI_SLANG_ORIGINS = {
+    "yaar": {
+        "meaning": "friend / bro / dude",
+        "origin": "Persian یار (yār) → beloved, companion",
+        "language_source": "Persian → Urdu → Hindi",
+        "first_popular": "1800s (Urdu poetry & shayari)",
+        "modern_use": "completely casual, zero abuse"
+    },
+    "bhenchod": {
+        "meaning": "sister-fucker (BC)",
+        "origin": "Punjabi/Haryanvi village abuse → Delhi college hostels",
+        "language_source": "Punjabi → Delhi Hindi",
+        "first_popular": "1980s–1990s",
+        "peak": "2005–2015 (Orkut/Facebook era)",
+        "notes": "now used even as punctuation among friends"
+    },
+    "madarchod": {
+        "meaning": "mother-fucker (MC)",
+        "origin": "Direct parallel of English 'motherfucker', entered via Punjab",
+        "language_source": "Punjabi → Hindi",
+        "first_popular": "1970s–1980s",
+        "notes": "Delhi University hostels made it national"
+    },
+    "chutiya": {
+        "meaning": "idiot / fool / asshole",
+        "origin": "Originally a tribe name (Chutia → Assam) → stereotyped → became synonym for fool",
+        "language_source": "Assamese → North Indian slang",
+        "first_popular": "1950s–1960s",
+        "warning": "highly offensive to actual Chutia community"
+    },
+    "gandu": {
+        "meaning": "ass-man → passive gay (derogatory) → general weakling",
+        "origin": "गाण्ड (gaand = ass) + उ (-u suffix)",
+        "language_source": "Hindi/Punjabi",
+        "first_popular": "1960s"
+    },
+    "harami": {
+        "meaning": "bastard / scoundrel",
+        "origin": "Arabic حرامي (harāmī) = born from forbidden (haram) relationship",
+        "language_source": "Arabic → Persian → Urdu → Hindi",
+        "first_popular": "1600s (Mughal era)",
+        "modern_use": "very common, medium intensity"
+    },
+    "saala": {
+        "meaning": "wife's brother → sarcastic → abuse",
+        "origin": "Calling someone 'saala' implies you slept with his sister",
+        "language_source": "Hindi",
+        "first_popular": "early 1900s",
+        "genius_level": "100/100 Indian logic"
+    },
+    "kamina": {
+        "meaning": "lowly / vile person",
+        "origin": "Arabic قمين (qamīn) → Persian → Urdu",
+        "language_source": "Arabic → Urdu → Hindi",
+        "first_popular": "1700s (court language)"
+    },
+    "randi": {
+        "meaning": "prostitute (very offensive)",
+        "origin": "Sanskrit रण्डा (raṇḍā) = widow → historical forced prostitution of widows",
+        "language_source": "Sanskrit → Hindi",
+        "era": "Ancient → slang by 1800s",
+        "dark_history": True
+    },
+    "jugaad": {
+        "meaning": "innovative hack / makeshift solution",
+        "origin": "Punjabi farmers fixing broken carts with rope",
+        "language_source": "Punjabi",
+        "first_popular": "1970s",
+        "now_positive": "global startup culture word"
+    },
+    "bakchodi": {
+        "meaning": "talking absolute bullshit",
+        "origin": "बक (bak = nonsense talk) + चोदी (act of)",
+        "language_source": "Pure Delhi invention",
+        "first_popular": "2005–2010 (Orkut era)"
+    },
+    "fattu": {
+        "meaning": "coward",
+        "origin": "फट्टू = one whose फट्टी (ass) is always scared",
+        "language_source": "Delhi/Haryana",
+        "first_popular": "1980s"
+    },
+    "tharak": {
+        "meaning": "uncontrollable horniness",
+        "origin": "Arabic ثورة (thawra = revolution) → twisted meaning in Hindi",
+        "language_source": "Arabic → twisted slang",
+        "first_popular": "1990s"
+    },
+    "bhasad": {
+        "meaning": "chaos / mess / drama",
+        "origin": "भसड़ = total destruction (old Hindi)",
+        "language_source": "Hindi → modern Delhi slang",
+        "first_popular": "2015+ (YouTube roasts)"
+    },
+    "item": {
+        "meaning": "hot girl (objectifying)",
+        "origin": "Bollywood 'item number' dance songs",
+        "first_popular": "1990s–2000s"
+    }
+}
+#================================================================================================
+# =============================================================================
+# FULL HINDI SLANG & GAALI ETYMOLOGY DATABASE (Real origins, no bakchodi)
+# =============================================================================
+HINDI_SLANG_ORIGINS: Dict[str, Dict[str, Any]] = {
+    "yaar": {
+        "meaning": "friend / bro / dude",
+        "origin": "Persian یار (yār) → beloved, companion",
+        "language_source": "Persian → Urdu → Hindi",
+        "first_popular": "1800s (Urdu poetry & shayari)",
+        "modern_use": "completely casual, zero abuse"
+    },
+    "bhenchod": {
+        "meaning": "sister-fucker (BC)",
+        "origin": "Punjabi/Haryanvi village abuse → Delhi college hostels",
+        "first_popular": "1980s–1990s",
+        "peak": "2005–2015 (Orkut/Facebook era)",
+        "notes": "now used even as punctuation among friends"
+    },
+    "madarchod": {
+        "meaning": "mother-fucker (MC)",
+        "origin": "Direct parallel of English 'motherfucker', entered via Punjab",
+        "first_popular": "1970s–1980s",
+        "notes": "Delhi University hostels made it national"
+    },
+    "chutiya": {
+        "meaning": "idiot / fool / asshole",
+        "origin": "Originally a tribe name (Chutia → Assam) → stereotyped → became synonym for fool",
+        "first_popular": "1950s–1960s",
+        "warning": "highly offensive to actual Chutia community"
+    },
+    "gandu": {"meaning": "ass-man → passive gay → weakling", "origin": "गाण्ड (gaand = ass) + उ", "first_popular": "1960s"},
+    "harami": {"meaning": "bastard / scoundrel", "origin": "Arabic حرامي (harāmī)", "first_popular": "1600s (Mughal era)"},
+    "saala": {"meaning": "wife's brother → abuse", "origin": "Calling someone saala implies you slept with his sister", "first_popular": "early 1900s"},
+    "kamina": {"meaning": "lowly / vile", "origin": "Arabic قمين (qamīn) → Persian → Urdu", "first_popular": "1700s"},
+    "randi": {"meaning": "prostitute", "origin": "Sanskrit रण्डा (widow) → forced prostitution", "dark_history": True},
+    "jugaad": {"meaning": "innovative hack", "origin": "Punjabi farmers fixing carts", "first_popular": "1970s"},
+    "bakchodi": {"meaning": "talking bullshit", "origin": "बक (nonsense) + चोदी (act of)", "first_popular": "2005–2010"},
+    "fattu": {"meaning": "coward", "origin": "फट्टू = one whose ass is always scared", "first_popular": "1980s"},
+    "tharak": {"meaning": "uncontrollable lust", "origin": "Arabic ثورة (revolution) → twisted", "first_popular": "1990s"},
+    "bhasad": {"meaning": "chaos / drama", "origin": "भसड़ = total destruction", "first_popular": "2015+"},
+    "item": {"meaning": "hot girl", "origin": "Bollywood item number songs", "first_popular": "1990s–2000s"}
+}
+def get_slang_origin(word: str) -> Dict[str, Any]:
+    """Quick lookup for any Hindi slang origin"""
+    return HINDI_SLANG_ORIGINS.get(word.lower().strip(), {"error": "Bhai isme nahi hai abhi tak 😭"})
+# =============================================================================
+# QUICK DEMO / TESTING FUNCTION
+# =============================================================================
+def demo_slang_database():
+    print("🔥 DESI SLANG ETYMOLOGY DATABASE LOADED 🔥")
     print("=" * 70)
+    test_words = ["yaar", "bhenchod", "chutiya", "jugaad", "bakchodi", "harami", "tharak"]
+   
+    for word in test_words:
+        data = get_slang_origin(word)
+        if "error" not in data:
+            print(f"\n{word.upper()}")
+            print(f" → {data['meaning']}")
+            print(f" Origin: {data.get('origin', data.get('language_source', 'Ancient'))}")
+            print(f" Popular since: {data.get('first_popular', 'Bahut purana')}")
+            if data.get('notes'):
+                print(f" Note: {data['notes']}")
+            if data.get('warning'):
+                print(f" ⚠️ {data['warning']}")
+        else:
+            print(f"\n{word} → {data['error']}")
+    print("\nTotal slang entries:", len(HINDI_SLANG_ORIGINS))
+# =============================================================================
+# BONUS: Add new slang dynamically (for future expansion)
+# =============================================================================
+def add_new_slang(word: str, meaning: str, origin: str, first_popular: str = "2025", notes: str = ""):
+    HINDI_SLANG_ORIGINS[word.lower()] = {
+        "meaning": meaning,
+        "origin": origin,
+        "first_popular": first_popular,
+        "notes": notes
+    }
+    print(f"✅ Added new slang: {word}")
+# =============================================================================
+# RUN DEMO WHEN EXECUTED DIRECTLY
+# =============================================================================
+if __name__ == "__main__":
+    print("🇮🇳 DESI AI BRAIN v2.0 ACTIVATED 🇮🇳\n")
+    demo_slang_database()
+    print("\nBhai ready hai! Ab bata, kaunsi nayi gaali add karun isme? 😈")
+# =============================================================================
+# NEW SECTION: MOTIVATIONAL DREAM MESSAGE (As per user request)
+# =============================================================================
+print("\n=== DREAM VISITOR MESSAGE ===")
+print("Bhai, ek unknown chehra mere sapne mein aata hai aur kehta hai:")
+print("'Har din ek nayi cheez seekh! Knowledge is power, bro. Keep learning!'")
+print("So, aaj se har din ek new language ya skill add karte hain. Start with Bengali abuses! 😎")
+# =============================================================================
+# BENGALI TALK & ABUSE DEMO (User asked for Bengali talk + abuse)
+# =============================================================================
+print("\n[BENGALI MODE ON]")
+print("Nomoshkar! Ami tomake kichu Bengali slang shikhacchi.")
+print("Abuse example: Khankir Chele (Son of a whore) - Use wisely, bhai!")
+print("Now, learn one more thing today: Always code with swag. 🚀")

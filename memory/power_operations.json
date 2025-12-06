@@ -6,5 +6,29 @@
     "status": "success",
     "details": "",
     "system": "Windows 10/11 HP Laptop"
+  },
+  {
+    "timestamp": "2025-12-04T01:13:52.951754",
+    "operation": "lock",
+    "command": "rundll32.exe user32.dll,LockWorkStation",
+    "status": "success",
+    "details": "",
+    "system": "Windows 10/11 HP Laptop"
+  },
+  {
+    "timestamp": "2025-12-04T01:15:00.639269",
+    "operation": "lock",
+    "command": "rundll32.exe user32.dll,LockWorkStation",
+    "status": "success",
+    "details": "",
+    "system": "Windows 10/11 HP Laptop"
+  },
+  {
+    "timestamp": "2025-12-04T01:36:38.254787",
+    "operation": "shutdown",
+    "command": "shutdown /s /t 1",
+    "status": "success",
+    "details": "Delay: 1s",
+    "system": "Windows 10/11 HP Laptop"
   }
 ]

@@ -1,0 +1,102 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Landing Page</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #0a0a0a;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        #liquid-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            opacity: 0.6;
+        }
+        .content {
+            z-index: 1;
+            text-align: center;
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        h1 {
+            font-size: 4rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+        }
+        p {
+            margin-top: 1rem;
+            font-size: 1.2rem;
+        }
+        button {
+            margin-top: 2rem;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            font-weight: bold;
+            color: white;
+            background-color: #FF69B4; /* hot-pink */
+            border: none;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background-color: #00BFFF; /* electric-blue */
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="liquid-canvas"></canvas>
+    <div class="content">
+        <h1>UNLEASH THE NOISE</h1>
+        <p>We are the architects of sonic chaos, the masters of riffage, and the bringers of the mosh.</p>
+        <button id="call-agent-btn">Call the Agent</button>
+    </div>
+
+    <script type="module">
+        import LiquidBackground from 'https://cdn.jsdelivr.net/npm/threejs-components@0.0.22/build/backgrounds/liquid1.min.js';
+        const canvas = document.getElementById('liquid-canvas');
+        if (canvas) {
+            const app = LiquidBackground(canvas);
+            app.loadImage('https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=1200&auto=format&fit=crop'); 
+            app.liquidPlane.material.metalness = 0.75;
+            app.liquidPlane.material.roughness = 0.25;
+            app.liquidPlane.uniforms.displacementScale.value = 5;
+            app.setRain(false);
+        }
+
+        document.getElementById('call-agent-btn').addEventListener('click', async () => {
+            try {
+                const response = await fetch('/call-agent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: 'Hello from the frontend!' })
+                });
+                const data = await response.json();
+                alert(`Agent says: ${data.reply}`);
+            } catch (error) {
+                console.error('Error calling agent:', error);
+                alert('Failed to connect to the agent.');
+            }
+        });
+    </script>
+</body>
+</html>
