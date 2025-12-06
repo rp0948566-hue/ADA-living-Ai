@@ -1,0 +1,6 @@
+अभी तक Google Search से मिली जानकारी:
+1. Advice on converting theory from papers into code : r/math (https://www.reddit.com/r/math/comments/11fdwka/advice_on_converting_theory_from_papers_into_code/)
+2. A clear map of mathematical approaches to Artificial Intelligence ... (https://mathoverflow.net/questions/460130/a-clear-map-of-mathematical-approaches-to-artificial-intelligence)
+3. Why can't AI models do complex math? : r/learnmachinelearning (https://www.reddit.com/r/learnmachinelearning/comments/18ck15r/why_cant_ai_models_do_complex_math/)
+
+अगली बार मुझे इस जानकारी को पढ़कर आगे बढ़ना है।
