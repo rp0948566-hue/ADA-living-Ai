@@ -1,0 +1,12 @@
+- [ ] Create memory_manager.py
+- [ ] Create overthink_engine.py
+- [ ] Create prompt_templates.py
+- [ ] Create ada_agent.py
+- [ ] Test the system with example usage
+=======
+- [x] Create emotion_system.py
+- [x] Create memory_manager.py
+- [ ] Create overthink_engine.py
+- [ ] Create prompt_templates.py
+- [ ] Create ada_agent.py
+- [ ] Test the system with example usage

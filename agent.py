@@ -11,6 +11,12 @@ from livekit.plugins import (
     noise_cancellation,
 )
 
+# 🔗 INTEGRATION: Enhanced Ada AI Emotion System
+from emotion_system import EmotionSystem, EmotionType
+from memory_manager import MemoryManager
+from prompt_templates import get_emotional_prompt
+from ada_agent import AdaAgent
+
 # ═════════════════════════════════════════════════════════════════════════════
 # 🔗 COMPLETE FILE LINKING - ALL 34+ WORKSPACE FILES
 # ═════════════════════════════════════════════════════════════════════════════
@@ -259,6 +265,9 @@ ENABLE_MEMORY_INTERCEPTOR = True
 
 class Assistant(Agent):
     def __init__(self) -> None:
+        # Initialize Enhanced Ada AI Emotion System
+        self.ada_agent = AdaAgent(user_id="livekit_session")
+
         # Build complete tool list - only include tools that are proper LiveKit agent tools
         # Filter tools to only include instances of agents.Tool or properly decorated functions
         tools = []
@@ -423,6 +432,37 @@ class Assistant(Agent):
             except Exception as e:
                 print(f"⚠️ Could not add get_screen_share_summary_tool: {e}")
 
+        # Website Creation tools - commented out as they are not implemented
+        # if create_website_folder_tool is not None:
+        #     try:
+        #         tools.append(create_website_folder_tool)
+        #     except Exception as e:
+        #         print(f"⚠️ Could not add create_website_folder_tool: {e}")
+        
+        # if create_website_file_tool is not None:
+        #     try:
+        #         tools.append(create_website_file_tool)
+        #     except Exception as e:
+        #         print(f"⚠️ Could not add create_website_file_tool: {e}")
+        
+        # if run_website_tool is not None:
+        #     try:
+        #         tools.append(run_website_tool)
+        #     except Exception as e:
+        #         print(f"⚠️ Could not add run_website_tool: {e}")
+        
+        # if list_websites_tool is not None:
+        #     try:
+        #         tools.append(list_websites_tool)
+        #     except Exception as e:
+        #         print(f"⚠️ Could not add list_websites_tool: {e}")
+        
+        # if get_website_learning_tool is not None:
+        #     try:
+        #         tools.append(get_website_learning_tool)
+        #     except Exception as e:
+        #         print(f"⚠️ Could not add get_website_learning_tool: {e}")
+
         # Add Topic Memory tools
         if TOPIC_MEMORY_TOOLS:
             for tool in TOPIC_MEMORY_TOOLS:
@@ -446,21 +486,21 @@ class Assistant(Agent):
         super().__init__(instructions=behavior_prompts, tools=tools)
 
     async def on_message(self, message: str, session: AgentSession) -> None:
-        """Handle incoming messages and apply tone handling for abusive responses"""
-        # Apply tone handling to each message for realtime abusive responses
-        if handle_user_tone:
-            try:
-                tone_response = handle_user_tone(message)
-                # Inject the tone response into the session instructions for this message
-                enhanced_instructions = f"{self.instructions}\n\n[TONE RESPONSE]\n{tone_response}\n[/TONE RESPONSE]"
-                # Update the session's instructions temporarily for this response
-                session.llm.instructions = enhanced_instructions
-                print(f"🎭 Applied tone response for message: {message[:50]}...")
-            except Exception as e:
-                print(f"⚠️ Tone handling failed for message: {e}")
-                # Fall back to original instructions
-                session.llm.instructions = self.instructions
-        else:
+        """Handle incoming messages with Enhanced Ada AI Emotion System"""
+        try:
+            # Use the AdaAgent to generate emotional response
+            emotional_response = self.ada_agent.generate_response(message)
+
+            # Inject the emotional response into the session instructions
+            enhanced_instructions = f"{self.instructions}\n\n[EMOTIONAL RESPONSE]\n{emotional_response}\n[/EMOTIONAL RESPONSE]"
+
+            # Update the session's instructions temporarily for this response
+            session.llm.instructions = enhanced_instructions
+            print(f"🎭 Applied emotional response for message: {message[:50]}...")
+
+        except Exception as e:
+            print(f"⚠️ Emotion system failed for message: {e}")
+            # Fall back to original instructions
             session.llm.instructions = self.instructions
 
 

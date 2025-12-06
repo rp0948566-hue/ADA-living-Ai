@@ -8,8 +8,8 @@
       "source": "demo",
       "batch": 1
     },
-    "interactions": 0,
-    "relevance_score": 0.5
+    "interactions": 3,
+    "relevance_score": 0.7
   },
   "9cbb1b90": {
     "id": "9cbb1b90",
@@ -20,8 +20,8 @@
       "source": "demo",
       "batch": 1
     },
-    "interactions": 0,
-    "relevance_score": 0.5
+    "interactions": 3,
+    "relevance_score": 0.7
   },
   "360dbe33": {
     "id": "360dbe33",
@@ -32,8 +32,8 @@
       "source": "demo",
       "batch": 1
     },
-    "interactions": 0,
-    "relevance_score": 0.5
+    "interactions": 3,
+    "relevance_score": 0.7
   },
   "04a3b5d4": {
     "id": "04a3b5d4",
@@ -44,8 +44,8 @@
       "source": "demo",
       "batch": 1
     },
-    "interactions": 0,
-    "relevance_score": 0.5
+    "interactions": 3,
+    "relevance_score": 0.7
   },
   "ed789bee": {
     "id": "ed789bee",
@@ -56,8 +56,8 @@
       "source": "demo",
       "batch": 1
     },
-    "interactions": 0,
-    "relevance_score": 0.5
+    "interactions": 3,
+    "relevance_score": 0.7
   },
   "4d050e91": {
     "id": "4d050e91",
@@ -343,6 +343,306 @@
     "topic": "cities (geography)",
     "timestamp": "2025-12-05T23:54:37.701178",
     "created_date": "2025-12-05",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "ef574435": {
+    "id": "ef574435",
+    "topic": "cricket (sports)",
+    "timestamp": "2025-12-06T00:04:56.260406",
+    "created_date": "2025-12-06",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "19945f8b": {
+    "id": "19945f8b",
+    "topic": "existentialism (philosophy)",
+    "timestamp": "2025-12-06T00:04:56.391937",
+    "created_date": "2025-12-06",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "82e9d281": {
+    "id": "82e9d281",
+    "topic": "logic (philosophy)",
+    "timestamp": "2025-12-06T00:04:56.456011",
+    "created_date": "2025-12-06",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "30a98b54": {
+    "id": "30a98b54",
+    "topic": "medicine (health)",
+    "timestamp": "2025-12-06T00:04:56.522648",
+    "created_date": "2025-12-06",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "8a80d758": {
+    "id": "8a80d758",
+    "topic": "film (arts)",
+    "timestamp": "2025-12-06T00:08:45.535364",
+    "created_date": "2025-12-06",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "9307e5d6": {
+    "id": "9307e5d6",
+    "topic": "blockchain (technology)",
+    "timestamp": "2025-12-06T00:08:45.571354",
+    "created_date": "2025-12-06",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "edec6c3b": {
+    "id": "edec6c3b",
+    "topic": "microservices (technology)",
+    "timestamp": "2025-12-06T00:08:45.625149",
+    "created_date": "2025-12-06",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "8fb00b78": {
+    "id": "8fb00b78",
+    "topic": "startups (business)",
+    "timestamp": "2025-12-06T00:08:45.680926",
+    "created_date": "2025-12-06",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "7b6d5c3e": {
+    "id": "7b6d5c3e",
+    "topic": "thermodynamics (science)",
+    "timestamp": "2025-12-06T00:09:57.379803",
+    "created_date": "2025-12-06",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "777d4431": {
+    "id": "777d4431",
+    "topic": "genetics (science)",
+    "timestamp": "2025-12-06T00:09:57.437716",
+    "created_date": "2025-12-06",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "d29aa9ce": {
+    "id": "d29aa9ce",
+    "topic": "exercise (health)",
+    "timestamp": "2025-12-06T00:50:55.912656",
+    "created_date": "2025-12-06",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "253b008a": {
+    "id": "253b008a",
+    "topic": "artificial intelligence (technology)",
+    "timestamp": "2025-12-06T00:51:55.130294",
+    "created_date": "2025-12-06",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "08e7e5f8": {
+    "id": "08e7e5f8",
+    "topic": "ethics (philosophy)",
+    "timestamp": "2025-12-06T00:51:55.198560",
+    "created_date": "2025-12-06",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "0d1d84a4": {
+    "id": "0d1d84a4",
+    "topic": "quantum mechanics (science)",
+    "timestamp": "2025-12-06T12:24:51.174408",
+    "created_date": "2025-12-06",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "ca458a1d": {
+    "id": "ca458a1d",
+    "topic": "football (sports)",
+    "timestamp": "2025-12-06T12:24:51.278270",
+    "created_date": "2025-12-06",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "0e07d20d": {
+    "id": "0e07d20d",
+    "topic": "photography (arts)",
+    "timestamp": "2025-12-06T12:27:31.791620",
+    "created_date": "2025-12-06",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "666796d3": {
+    "id": "666796d3",
+    "topic": "supply chain (business)",
+    "timestamp": "2025-12-06T12:27:31.827421",
+    "created_date": "2025-12-06",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "fc0f328b": {
+    "id": "fc0f328b",
+    "topic": "esports (sports)",
+    "timestamp": "2025-12-06T12:27:31.883951",
+    "created_date": "2025-12-06",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "d8fc76e9": {
+    "id": "d8fc76e9",
+    "topic": "space race (history)",
+    "timestamp": "2025-12-06T13:26:30.981930",
+    "created_date": "2025-12-06",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "43721d85": {
+    "id": "43721d85",
+    "topic": "nutrition (health)",
+    "timestamp": "2025-12-06T13:26:31.034876",
+    "created_date": "2025-12-06",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "d62c3050": {
+    "id": "d62c3050",
+    "topic": "music (arts)",
+    "timestamp": "2025-12-06T13:26:31.129836",
+    "created_date": "2025-12-06",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "ccd11584": {
+    "id": "ccd11584",
+    "topic": "neural networks (technology)",
+    "timestamp": "2025-12-06T13:48:23.329491",
+    "created_date": "2025-12-06",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "c1047bf3": {
+    "id": "c1047bf3",
+    "topic": "online education (education)",
+    "timestamp": "2025-12-06T14:16:00.987524",
+    "created_date": "2025-12-06",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "378211fe": {
+    "id": "378211fe",
+    "topic": "distributed systems (technology)",
+    "timestamp": "2025-12-06T14:16:01.027166",
+    "created_date": "2025-12-06",
+    "metadata": {
+      "source": "demo",
+      "batch": 1
+    },
+    "interactions": 0,
+    "relevance_score": 0.5
+  },
+  "b05d5a75": {
+    "id": "b05d5a75",
+    "topic": "medieval period (history)",
+    "timestamp": "2025-12-06T14:45:57.589221",
+    "created_date": "2025-12-06",
     "metadata": {
       "source": "demo",
       "batch": 1

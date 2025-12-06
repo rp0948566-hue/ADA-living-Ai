@@ -216,37 +216,37 @@ def _update_stats(action: str) -> None:
 def auto_update_memory() -> Dict:
     """Auto-update memory with optimization and cleanup"""
     index = _load_json_safe(MEMORY_INDEX_FILE, {})
-    
+
     update_report = {
         "timestamp": datetime.datetime.now().isoformat(),
         "topics_optimized": 0,
         "topics_pruned": 0,
         "duplicates_removed": 0
     }
-    
+
     # Remove topics not accessed in 30 days (optional)
     cutoff_date = datetime.datetime.now() - datetime.timedelta(days=30)
-    
+
     for topic_hash, topic_data in list(index.items()):
         try:
             created_date = datetime.datetime.fromisoformat(topic_data["timestamp"])
-            
-            # Auto-increase relevance based on interactions
-            if topic_data.get("interactions", 0) > 5:
-                topic_data["relevance_score"] = min(1.0, topic_data.get("relevance_score", 0.5) + 0.05)
+
+            # Auto-increase relevance based on interactions (lower threshold)
+            if topic_data.get("interactions", 0) > 0:  # Changed from > 5 to > 0
+                topic_data["relevance_score"] = min(1.0, topic_data.get("relevance_score", 0.5) + 0.1)
                 update_report["topics_optimized"] += 1
-            
-            # Optional: Remove stale topics
-            if created_date < cutoff_date and topic_data.get("interactions", 0) == 0:
+
+            # Optional: Remove stale topics (older than 7 days instead of 30)
+            if created_date < (datetime.datetime.now() - datetime.timedelta(days=7)) and topic_data.get("interactions", 0) == 0:
                 del index[topic_hash]
                 update_report["topics_pruned"] += 1
-        
+
         except Exception as e:
             print(f"⚠️ Error updating topic {topic_hash}: {e}")
-    
+
     _save_json_safe(MEMORY_INDEX_FILE, index)
     _save_json_safe(MEMORY_EVOLUTION_FILE, update_report)
-    
+
     return update_report
 
 
