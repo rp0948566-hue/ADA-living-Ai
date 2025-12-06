@@ -1,8 +1,8 @@
-# nova_full_jarvis.py
-# J.A.R.V.I.S HUD — v2.2 (Performance Optimized with Threading)
+# nova_full_ada.py
+# A.D.A HUD — v2.3 (With Dynamic Particle Network)
 # Requirements: PySide6 (required), psutil (optional), opencv-python (optional)
 # Run: pip install PySide6 psutil opencv-python
-# Save as nova_full_jarvis.py and run: python nova_full_jarvis.py
+# Save as nova_full_ada.py and run: python nova_full_ada.py
 
 import sys, math, random, time, os
 from datetime import datetime, timedelta
@@ -31,15 +31,207 @@ def safe_now_str(): return datetime.now().strftime("%Y%m%d_%H%M%S")
 THEMES = {
     "blue": {"bg": (5, 12, 20), "accent": (60, 200, 255), "glow": (60,200,255,180)},
     "red": {"bg": (18, 6, 8), "accent": (255,110,90), "glow": (255,110,90,180)},
-    "green": {"bg": (6, 18, 12), "accent": (80,220,120), "glow": (80,220,120,180)}
+    "green": {"bg": (6, 18, 12), "accent": (80,220,120), "glow": (80,220,120,180)},
+    "purple": {"bg": (12, 6, 18), "accent": (180, 80, 255), "glow": (180,80,255,180)},
+    "cyan": {"bg": (6, 18, 18), "accent": (80, 220, 255), "glow": (80,220,255,180)}
 }
-THEME_ORDER = ["blue","red","green"]
+THEME_ORDER = ["blue","purple","cyan","red","green"]
+
+# --------------------- Particle System ---------------------
+class Particle:
+    """Represents a single particle in the network"""
+    def __init__(self, x, y, vx, vy, size, color, alpha, energy):
+        self.x = x
+        self.y = y
+        self.vx = vx
+        self.vy = vy
+        self.size = size
+        self.color = color
+        self.alpha = alpha
+        self.energy = energy
+        self.birth_time = time.time()
+    
+    def update(self, width, height, dt):
+        """Update particle with random acceleration"""
+        # Random acceleration for organic movement
+        ax = random.uniform(-50, 50)
+        ay = random.uniform(-50, 50)
+        
+        self.vx += ax * dt
+        self.vy += ay * dt
+        
+        # Damping
+        self.vx *= 0.98
+        self.vy *= 0.98
+        
+        # Speed limit
+        max_speed = 80
+        speed = math.sqrt(self.vx**2 + self.vy**2)
+        if speed > max_speed:
+            self.vx = (self.vx / speed) * max_speed
+            self.vy = (self.vy / speed) * max_speed
+        
+        # Update position
+        self.x += self.vx * dt
+        self.y += self.vy * dt
+        
+        # Bounce off edges
+        if self.x < 0 or self.x > width:
+            self.vx = -self.vx * random.uniform(0.7, 1.0)
+            self.x = max(0, min(width, self.x))
+        
+        if self.y < 0 or self.y > height:
+            self.vy = -self.vy * random.uniform(0.7, 1.0)
+            self.y = max(0, min(height, self.y))
+        
+        # Pulsating energy
+        age = time.time() - self.birth_time
+        self.energy = 0.5 + 0.5 * math.sin(age * 2.0 + self.x * 0.01)
+
+class ParticleNetworkCore(QWidget):
+    """Dynamic particle network - the heart of A.D.A"""
+    def __init__(self):
+        super().__init__()
+        self.particles = []
+        self.num_particles = 80
+        self.connection_distance = 100
+        self.speed = 1.0
+        self.theme = THEMES['blue']
+        self.last_time = time.time()
+        
+        self.setMinimumSize(420, 420)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        
+        self._initialize_particles()
+    
+    def _initialize_particles(self):
+        """Create particles with theme colors"""
+        self.particles.clear()
+        
+        # Get colors based on current theme
+        base_color = self.theme['accent']
+        colors = [
+            base_color,
+            (min(255, base_color[0] + 40), min(255, base_color[1] + 40), min(255, base_color[2] + 40)),
+            (max(0, base_color[0] - 40), max(0, base_color[1] - 40), max(0, base_color[2] - 40))
+        ]
+        
+        w, h = self.width(), self.height()
+        for _ in range(self.num_particles):
+            x = random.uniform(0, w)
+            y = random.uniform(0, h)
+            vx = random.uniform(-30, 30)
+            vy = random.uniform(-30, 30)
+            size = random.uniform(2, 5)
+            color = random.choice(colors)
+            alpha = random.randint(150, 255)
+            energy = random.uniform(0, 1)
+            
+            self.particles.append(Particle(x, y, vx, vy, size, color, alpha, energy))
+    
+    def set_theme(self, k):
+        """Update theme and reinitialize particles"""
+        self.theme = THEMES.get(k, self.theme)
+        self._initialize_particles()
+        self.update()
+    
+    def set_speed(self, v):
+        self.speed = max(0.1, float(v))
+    
+    def set_particles(self, n):
+        self.num_particles = clamp(int(n), 10, 200)
+        self._initialize_particles()
+    
+    def set_connection_distance(self, d):
+        self.connection_distance = clamp(int(d), 50, 200)
+    
+    def animate_step(self, dt=0.016):
+        """Update all particles"""
+        current_time = time.time()
+        actual_dt = (current_time - self.last_time) * self.speed
+        self.last_time = current_time
+        
+        w, h = self.width(), self.height()
+        for particle in self.particles:
+            particle.update(w, h, min(actual_dt, 0.05))
+        
+        self.update()
+    
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing, True)
+        
+        rect = self.rect()
+        w, h = rect.width(), rect.height()
+        cx, cy = w // 2, h // 2
+        
+        # Background gradient
+        bg = QRadialGradient(QPointF(cx, cy), min(w, h) * 0.5)
+        bg.setColorAt(0.0, QColor(12, 16, 22))
+        bg.setColorAt(1.0, QColor(6, 8, 12, 0))
+        painter.fillRect(rect, bg)
+        
+        # Draw connections between nearby particles
+        painter.setPen(Qt.NoPen)
+        for i, p1 in enumerate(self.particles):
+            for p2 in self.particles[i+1:]:
+                dist = math.sqrt((p1.x - p2.x)**2 + (p1.y - p2.y)**2)
+                
+                if dist < self.connection_distance:
+                    # Line opacity based on distance
+                    opacity = int(255 * (1 - dist / self.connection_distance) * 0.3)
+                    
+                    # Blend colors
+                    color = QColor(
+                        (p1.color[0] + p2.color[0]) // 2,
+                        (p1.color[1] + p2.color[1]) // 2,
+                        (p1.color[2] + p2.color[2]) // 2,
+                        opacity
+                    )
+                    
+                    pen = QPen(color, 1)
+                    painter.setPen(pen)
+                    painter.drawLine(QPointF(p1.x, p1.y), QPointF(p2.x, p2.y))
+        
+        # Draw particles with glow
+        painter.setPen(Qt.NoPen)
+        for particle in self.particles:
+            x, y = particle.x, particle.y
+            
+            # Glow layers
+            for i in range(3):
+                glow_size = particle.size * (4 - i) * particle.energy
+                glow_alpha = int(40 * particle.energy / (i + 1))
+                
+                glow_color = QColor(*particle.color, glow_alpha)
+                painter.setBrush(QBrush(glow_color))
+                painter.drawEllipse(QPointF(x, y), glow_size, glow_size)
+            
+            # Core particle
+            core_alpha = int(particle.alpha * (0.7 + 0.3 * particle.energy))
+            core_color = QColor(*particle.color, core_alpha)
+            painter.setBrush(QBrush(core_color))
+            painter.drawEllipse(QPointF(x, y), particle.size, particle.size)
+            
+            # Bright center
+            center_size = max(1.0, particle.size * 0.5)
+            center_color = QColor(
+                min(255, particle.color[0] + 100),
+                min(255, particle.color[1] + 100),
+                min(255, particle.color[2] + 100)
+            )
+            painter.setBrush(QBrush(center_color))
+            painter.drawEllipse(QPointF(x, y), center_size, center_size)
+        
+        # Draw A.D.A text
+        painter.setPen(QColor(220, 240, 255))
+        font_name = "Orbitron" if QFontInfo(QFont("Orbitron")).family().lower() == "orbitron" else "Segoe UI"
+        painter.setFont(QFont(font_name, 32, QFont.Black))
+        painter.drawText(rect, Qt.AlignCenter, "A.D.A")
 
 # --------------------- Background Worker for Performance ---------------------
 class SystemWorker(QObject):
-    """
-    Runs all blocking psutil calls in a separate thread to prevent GUI stutter.
-    """
+    """Runs all blocking psutil calls in a separate thread"""
     stats_updated = Signal(dict)
     network_updated = Signal(dict)
     processes_updated = Signal(list, str)
@@ -55,7 +247,6 @@ class SystemWorker(QObject):
 
     def run(self):
         if not psutil:
-            # Fallback data if psutil is not installed
             while self._is_running:
                 stats = {
                     'cpu': random.uniform(5, 80),
@@ -78,17 +269,14 @@ class SystemWorker(QObject):
                 time.sleep(1)
             return
 
-        # Main loop with psutil
         counter = 0
         while self._is_running:
-            # General stats every 1 second
             stats = self._get_system_stats()
             self.stats_updated.emit(stats)
             
             net = self._get_network_stats()
             self.network_updated.emit(net)
             
-            # Heavier process list every 3 seconds
             if counter % 3 == 0:
                 processes, uptime = self._get_process_list()
                 self.processes_updated.emit(processes, uptime)
@@ -148,7 +336,7 @@ class SystemWorker(QObject):
         except (psutil.NoSuchProcess, psutil.AccessDenied):
             return [], "Uptime: N/A"
 
-# --------------------- UI Components (Largely Unchanged) ---------------------
+# --------------------- UI Components ---------------------
 class SectionTitle(QLabel):
     def __init__(self, text):
         super().__init__(text.upper())
@@ -225,7 +413,6 @@ class ProcessListWidget(QFrame):
         if not psutil: self.list_widget.addItem("psutil not installed")
 
 class WeatherWidget(QFrame):
-    # (Unchanged)
     def __init__(self):
         super().__init__()
         self.conditions = [("☀️", "Clear Sky"), ("☁️", "Cloudy"), ("⛅", "Partly Cloudy"), ("🌧️", "Light Rain"), ("💨", "Windy")]
@@ -247,7 +434,6 @@ class WeatherWidget(QFrame):
         self.icon_label.setText(icon); self.condition_label.setText(text)
 
 class NeonBar(QWidget):
-    # (Unchanged)
     def __init__(self, title, init=0.0, style='rainbow'):
         super().__init__()
         self.title=title; self.value=float(init); self.style=style
@@ -267,37 +453,7 @@ class NeonBar(QWidget):
         p.setBrush(grad); p.drawRoundedRect(fill,6,6)
         p.setPen(QColor(230,240,255)); p.setFont(QFont("Consolas",10,QFont.DemiBold)); p.drawText(r,Qt.AlignRight|Qt.AlignVCenter,f"{int(self.value)}%")
 
-class EnergyCore(QWidget):
-    # (Unchanged)
-    def __init__(self):
-        super().__init__(); self.phase=0.0; self.rings=5; self.speed=1.0; self.glow_intensity=1.0; self.theme=THEMES['blue']
-        self.setMinimumSize(420,420); self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-    def set_theme(self, k): self.theme=THEMES.get(k,self.theme); self.update()
-    def set_speed(self, v): self.speed=max(0.1,float(v))
-    def set_glow(self, v): self.glow_intensity=clamp(float(v),0.1,3.0)
-    def set_rings(self, v): self.rings=clamp(int(v),1,10)
-    def paintEvent(self, event):
-        p=QPainter(self); p.setRenderHint(QPainter.Antialiasing,True); rect=self.rect(); cx,cy=rect.center().x(),rect.center().y()
-        base_radius=min(rect.width(),rect.height())*0.18; bg=QRadialGradient(QPointF(cx,cy),base_radius*3.0)
-        bg.setColorAt(0.0,QColor(8,10,14)); bg.setColorAt(1.0,QColor(6,8,12,0)); p.fillRect(rect,bg)
-        glow_col=self.theme['glow']
-        for i in range(6):
-            alpha=int((60*math.exp(-i*0.6))*self.glow_intensity); rads=base_radius*(0.6+i*0.8+0.06*math.sin(self.phase*6+i))
-            p.setBrush(QBrush(QColor(glow_col[0],glow_col[1],glow_col[2],clamp(alpha,0,255)))); p.setPen(Qt.NoPen); p.drawEllipse(QPointF(cx,cy),rads,rads)
-        t=self.phase*2.0*self.speed
-        for i in range(self.rings):
-            prog=(t+i*(1.0/self.rings))%1.0; radius=base_radius+prog*base_radius*3.2; thickness=6*(1.0-prog)+1.0
-            alpha=int(220*(1.0-prog)*self.glow_intensity); c1=QColor(self.theme['accent'][0],self.theme['accent'][1],self.theme['accent'][2],clamp(alpha,0,255))
-            pen=QPen(c1,thickness); pen.setCapStyle(Qt.RoundCap); p.setPen(pen)
-            rectf=QRectF(cx-radius,cy-radius,radius*2,radius*2); span=int(180*16+math.sin(self.phase*6+i)*30*16); start=int((self.phase*360+i*40)*16)
-            p.drawArc(rectf,-start,-span)
-        p.setPen(QColor(220,240,255))
-        font_name="Orbitron" if QFontInfo(QFont("Orbitron")).family().lower()=="orbitron" else "Segoe UI"
-        p.setFont(QFont(font_name,28,QFont.Black)); p.drawText(rect,Qt.AlignCenter,"J.A.R.V.I.S")
-    def animate_step(self, dt=0.016): self.phase=(self.phase+dt*0.12*self.speed)%10.0; self.update()
-
 class AnimatedGridBackground(QWidget):
-    # (Unchanged)
     def __init__(self,theme_key='blue'):
         super().__init__(); self.offset=0.0; self.num_particles=18; self.grid_spacing=40; self.grid_opacity=18
         self.particles=[(random.random(),random.random(),random.random()*2+0.2) for _ in range(self.num_particles)]
@@ -324,7 +480,6 @@ class AnimatedGridBackground(QWidget):
             p.setBrush(QColor(*theme['accent'],int(120*s))); p.setPen(Qt.NoPen); p.drawEllipse(QPointF(x*w,y*h),int(1+s*3),int(1+s*3))
 
 class TitleBar(QFrame):
-    # (Unchanged)
     def __init__(self, title, on_theme, on_console, on_voice, on_settings):
         super().__init__()
         self.setStyleSheet("QFrame{background:rgba(8,12,16,200);border-bottom:1px solid rgba(100,140,200,20);}QLabel{color:#DDEFFB;}")
@@ -338,67 +493,20 @@ class TitleBar(QFrame):
 class SettingsDialog(QDialog):
     def __init__(self, parent=None, config=None):
         super().__init__(parent)
-        self.setWindowTitle("HUD Settings")
+        self.setWindowTitle("A.D.A Settings")
         self.setModal(True)
-        self.setFixedSize(380, 320)
+        self.setFixedSize(400, 420)
         self.config = config or {}
 
-        # --- HOJA DE ESTILOS FINAL ---
-        # Corregido el estilo del QSpinBox para que el campo de texto sea visible.
         stylesheet = """
-            QDialog {
-                background-color: rgb(10, 14, 20);
-                border: 1px solid rgba(60, 200, 255, 100);
-                font-family: Segoe UI, sans-serif;
-            }
-            
-            /* ESTILO CORREGIDO Y SEGURO PARA QSPINBOX */
-            QSpinBox {
-                background-color: rgb(20, 30, 45);
-                border: 1px solid rgb(60, 120, 180);
-                border-radius: 4px;
-                color: #EAF6FF;
-                font-size: 12px;
-                min-height: 24px; /* Altura mínima para asegurar el dibujado */
-                padding-left: 8px; /* Solo padding izquierdo para el texto, es más seguro */
-            }
-            QSpinBox:hover {
-                border-color: rgb(100, 220, 255);
-            }
-            
-            /* Estilo para el Slider */
-            QSlider::groove:horizontal {
-                background: rgb(24, 30, 40);
-                border: 1px solid rgb(60, 120, 180);
-                height: 6px;
-                border-radius: 3px;
-            }
-            QSlider::handle:horizontal {
-                background: rgb(60, 200, 255);
-                border: 1px solid rgb(100, 220, 255);
-                width: 16px;
-                height: 16px;
-                margin: -6px 0;
-                border-radius: 8px;
-            }
-
-            /* Estilo para los botones */
-            QPushButton {
-                background-color: rgba(25, 45, 70, 200);
-                border: 1px solid rgb(60, 200, 255);
-                border-radius: 5px;
-                padding: 6px 12px;
-                font-weight: bold;
-                color: #EAF6FF;
-            }
-            QPushButton:hover {
-                background-color: rgb(40, 80, 120);
-                border: 1px solid white;
-            }
-            QPushButton:pressed {
-                background-color: rgb(60, 200, 255);
-                color: rgb(10, 14, 20);
-            }
+            QDialog { background-color: rgb(10, 14, 20); border: 1px solid rgba(60, 200, 255, 100); font-family: Segoe UI, sans-serif; }
+            QSpinBox { background-color: rgb(20, 30, 45); border: 1px solid rgb(60, 120, 180); border-radius: 4px; color: #EAF6FF; font-size: 12px; min-height: 24px; padding-left: 8px; }
+            QSpinBox:hover { border-color: rgb(100, 220, 255); }
+            QSlider::groove:horizontal { background: rgb(24, 30, 40); border: 1px solid rgb(60, 120, 180); height: 6px; border-radius: 3px; }
+            QSlider::handle:horizontal { background: rgb(60, 200, 255); border: 1px solid rgb(100, 220, 255); width: 16px; height: 16px; margin: -6px 0; border-radius: 8px; }
+            QPushButton { background-color: rgba(25, 45, 70, 200); border: 1px solid rgb(60, 200, 255); border-radius: 5px; padding: 6px 12px; font-weight: bold; color: #EAF6FF; }
+            QPushButton:hover { background-color: rgb(40, 80, 120); border: 1px solid white; }
+            QPushButton:pressed { background-color: rgb(60, 200, 255); color: rgb(10, 14, 20); }
         """
         self.setStyleSheet(stylesheet)
         
@@ -414,25 +522,25 @@ class SettingsDialog(QDialog):
         
         label_style = "color: #A0C0E0; font-size: 11px;"
 
-        # --- SECCIÓN 1: Core Animation ---
-        layout.addRow(SectionTitle("CORE ANIMATION"))
+        # Particle Network Settings
+        layout.addRow(SectionTitle("PARTICLE NETWORK"))
         self.spin_speed = QSpinBox(); self.spin_speed.setRange(1, 300); self.spin_speed.setValue(int(self.config.get('speed', 1.0) * 10))
         anim_speed_label = QLabel("Anim Speed (x0.1):"); anim_speed_label.setStyleSheet(label_style)
         layout.addRow(anim_speed_label, self.spin_speed)
 
-        self.spin_glow = QSpinBox(); self.spin_glow.setRange(1, 30); self.spin_glow.setValue(int(self.config.get('glow', 1.0) * 10))
-        glow_intensity_label = QLabel("Glow Intensity (x0.1):"); glow_intensity_label.setStyleSheet(label_style)
-        layout.addRow(glow_intensity_label, self.spin_glow)
+        self.spin_particle_count = QSpinBox(); self.spin_particle_count.setRange(10, 200); self.spin_particle_count.setValue(self.config.get('particle_count', 80))
+        particle_count_label = QLabel("Particle Count:"); particle_count_label.setStyleSheet(label_style)
+        layout.addRow(particle_count_label, self.spin_particle_count)
 
-        self.spin_rings = QSpinBox(); self.spin_rings.setRange(1, 10); self.spin_rings.setValue(self.config.get('rings', 5))
-        rings_label = QLabel("Rings:"); rings_label.setStyleSheet(label_style)
-        layout.addRow(rings_label, self.spin_rings)
+        self.spin_connection_dist = QSpinBox(); self.spin_connection_dist.setRange(50, 200); self.spin_connection_dist.setValue(self.config.get('connection_dist', 100))
+        connection_dist_label = QLabel("Connection Distance:"); connection_dist_label.setStyleSheet(label_style)
+        layout.addRow(connection_dist_label, self.spin_connection_dist)
 
-        # --- SECCIÓN 2: Background Animation ---
+        # Background Animation
         layout.addRow(SectionTitle("BACKGROUND ANIMATION"))
-        self.spin_particles = QSpinBox(); self.spin_particles.setRange(0, 100); self.spin_particles.setValue(self.config.get('particles', 18))
-        particles_label = QLabel("Particles:"); particles_label.setStyleSheet(label_style)
-        layout.addRow(particles_label, self.spin_particles)
+        self.spin_bg_particles = QSpinBox(); self.spin_bg_particles.setRange(0, 100); self.spin_bg_particles.setValue(self.config.get('bg_particles', 18))
+        bg_particles_label = QLabel("BG Particles:"); bg_particles_label.setStyleSheet(label_style)
+        layout.addRow(bg_particles_label, self.spin_bg_particles)
 
         self.spin_grid_space = QSpinBox(); self.spin_grid_space.setRange(10, 100); self.spin_grid_space.setValue(self.config.get('grid_spacing', 40))
         grid_spacing_label = QLabel("Grid Spacing:"); grid_spacing_label.setStyleSheet(label_style)
@@ -455,31 +563,42 @@ class SettingsDialog(QDialog):
         main_layout.addLayout(btn_box)
 
     def get_values(self):
-        return {"speed":self.spin_speed.value()/10.0,"glow":self.spin_glow.value()/10.0,"rings":self.spin_rings.value(),
-                "particles":self.spin_particles.value(),"grid_spacing":self.spin_grid_space.value(),"grid_opacity":self.slider_opacity.value()}
+        return {
+            "speed": self.spin_speed.value()/10.0,
+            "particle_count": self.spin_particle_count.value(),
+            "connection_dist": self.spin_connection_dist.value(),
+            "bg_particles": self.spin_bg_particles.value(),
+            "grid_spacing": self.spin_grid_space.value(),
+            "grid_opacity": self.slider_opacity.value()
+        }
 
     def reset_defaults(self):
-        self.spin_speed.setValue(10); self.spin_glow.setValue(10); self.spin_rings.setValue(5)
-        self.spin_particles.setValue(18); self.spin_grid_space.setValue(40); self.slider_opacity.setValue(18)
-# --------------------- Main HUD (Modified for Threading) ---------------------
+        self.spin_speed.setValue(10)
+        self.spin_particle_count.setValue(80)
+        self.spin_connection_dist.setValue(100)
+        self.spin_bg_particles.setValue(18)
+        self.spin_grid_space.setValue(40)
+        self.slider_opacity.setValue(18)
+
+# --------------------- Main HUD ---------------------
 class NovaHUD(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("A.D.A HUD — v2.2")
+        self.setWindowTitle("A.D.A HUD — v2.3")
         self.resize(1280, 800)
-        self.settings = {"speed":1.0,"glow":1.0,"rings":5,"particles":18,"grid_spacing":40,"grid_opacity":18}
+        self.settings = {"speed":1.0,"particle_count":80,"connection_dist":100,"bg_particles":18,"grid_spacing":40,"grid_opacity":18}
         self.theme_index=0; self.theme_key=THEME_ORDER[self.theme_index]
         
         self.setup_ui()
         self.setup_timers_and_threads()
         
         self.apply_settings(self.settings)
-        self.append_console("[JARVIS] Systems online. Welcome back, sir.")
+        self.append_console("[A.D.A] Systems online. Ready to assist.")
 
     def setup_ui(self):
         central = QWidget(); self.setCentralWidget(central)
         root = QVBoxLayout(central); root.setContentsMargins(6,6,6,6); root.setSpacing(8)
-        title = TitleBar("J.A.R.V.I.S VISION INTERFACE 2.2", self.cycle_theme, self.toggle_console, self.fake_voice, self.open_settings)
+        title = TitleBar("A.D.A VISION INTERFACE 2.3", self.cycle_theme, self.toggle_console, self.fake_voice, self.open_settings)
         root.addWidget(title)
         self.bg_widget = AnimatedGridBackground(self.theme_key); self.bg_widget.setParent(central); self.bg_widget.lower()
         body = QGridLayout(); body.setSpacing(10); root.addLayout(body,1)
@@ -490,8 +609,8 @@ class NovaHUD(QMainWindow):
         self.cpu_temp=NeonBar("CPU TEMPERATURE"); left_layout.addWidget(self.cpu_temp); self.battery=NeonBar("BATTERY"); left_layout.addWidget(self.battery)
         self.process_list=ProcessListWidget(); left_layout.addWidget(self.process_list,1); self.camera=CameraWidget(); left_layout.addWidget(self.camera,0); body.addWidget(left_card,0,0,2,1)
         
-        # Center
-        self.energy = EnergyCore(); body.addWidget(self.energy,0,1,2,1)
+        # Center - Particle Network
+        self.particle_core = ParticleNetworkCore(); body.addWidget(self.particle_core,0,1,2,1)
 
         # Right Side
         right_top=QFrame(); right_top.setStyleSheet("QFrame{background:rgba(10,14,20,220);border-radius:10px;}"); rt_layout=QVBoxLayout(right_top); rt_layout.setContentsMargins(8,8,8,8)
@@ -505,19 +624,15 @@ class NovaHUD(QMainWindow):
         right_bottom=QFrame(); rb_layout=QVBoxLayout(right_bottom); rb_layout.setContentsMargins(8,8,8,8); rb_layout.addWidget(SectionTitle("ACTIONS"))
         self.btn_cam_toggle=QPushButton("Start Camera"); self.btn_cam_toggle.clicked.connect(self.toggle_camera); self.btn_snapshot=QPushButton("Snapshot"); self.btn_snapshot.clicked.connect(self.camera_snapshot)
         self.btn_screenshot=QPushButton("HUD Screenshot"); self.btn_screenshot.clicked.connect(self.save_screenshot)
-        self.btn_screen_share=QPushButton("🔍 Screen Vision"); self.btn_screen_share.clicked.connect(self.open_screen_share)
-        self.btn_chatbot=QPushButton("💬 AI Chatbot"); self.btn_chatbot.clicked.connect(self.open_chatbot)
-        for b in (self.btn_cam_toggle,self.btn_snapshot,self.btn_screenshot,self.btn_screen_share,self.btn_chatbot): b.setFixedHeight(34); rb_layout.addWidget(b)
+        for b in (self.btn_cam_toggle,self.btn_snapshot,self.btn_screenshot): b.setFixedHeight(34); rb_layout.addWidget(b)
         body.addWidget(right_bottom,1,2,1,1)
 
         body.setColumnStretch(0,1); body.setColumnStretch(1,2); body.setColumnStretch(2,1); body.setRowStretch(0,2); body.setRowStretch(1,1)
 
     def setup_timers_and_threads(self):
-        # Animation timer remains on main thread
-        self.anim_timer = QTimer(self); self.anim_timer.timeout.connect(self.energy.animate_step); self.anim_timer.start(16)
+        self.anim_timer = QTimer(self); self.anim_timer.timeout.connect(self.particle_core.animate_step); self.anim_timer.start(16)
         self.clock_timer = QTimer(self); self.clock_timer.timeout.connect(self.tick); self.clock_timer.start(1000)
 
-        # System stats worker on a background thread
         self.thread = QThread()
         self.worker = SystemWorker()
         self.worker.moveToThread(self.thread)
@@ -540,87 +655,60 @@ class NovaHUD(QMainWindow):
     def tick(self):
         self.clockLbl.setText(datetime.now().strftime("%H:%M:%S"))
         if random.random() < 0.05:
-            self.append_console("[JARVIS] " + random.choice(["Monitoring systems.","All subsystems nominal."]))
+            self.append_console("[A.D.A] " + random.choice(["Monitoring systems.","All subsystems nominal.","Network stable."]))
 
-    # ---------------- UI Controls & Actions ----------------
     def apply_settings(self, s):
-        self.settings=s; self.energy.set_speed(s['speed']); self.energy.set_glow(s['glow']); self.energy.set_rings(s['rings'])
-        self.bg_widget.set_particles(s['particles']); self.bg_widget.set_grid_spacing(s['grid_spacing']); self.bg_widget.set_grid_opacity(s['grid_opacity'])
+        self.settings=s
+        self.particle_core.set_speed(s['speed'])
+        self.particle_core.set_particles(s['particle_count'])
+        self.particle_core.set_connection_distance(s['connection_dist'])
+        self.bg_widget.set_particles(s['bg_particles'])
+        self.bg_widget.set_grid_spacing(s['grid_spacing'])
+        self.bg_widget.set_grid_opacity(s['grid_opacity'])
 
     def open_settings(self):
         dlg = SettingsDialog(self, config=self.settings)
-        if dlg.exec(): self.apply_settings(dlg.get_values()); self.append_console("[JARVIS] Settings applied.")
+        if dlg.exec(): self.apply_settings(dlg.get_values()); self.append_console("[A.D.A] Settings applied.")
 
     def cycle_theme(self):
         self.theme_index = (self.theme_index + 1) % len(THEME_ORDER); self.theme_key = THEME_ORDER[self.theme_index]
-        self.energy.set_theme(self.theme_key); self.bg_widget.set_theme(self.theme_key); self.append_console(f"[JARVIS] Theme set to {self.theme_key.upper()}.")
+        self.particle_core.set_theme(self.theme_key); self.bg_widget.set_theme(self.theme_key); self.append_console(f"[A.D.A] Theme set to {self.theme_key.upper()}.")
 
     def toggle_console(self):
-        self.console.setVisible(not self.console.isVisible()); self.append_console(f"[JARVIS] Console {'visible' if self.console.isVisible() else 'hidden'}.")
+        self.console.setVisible(not self.console.isVisible()); self.append_console(f"[A.D.A] Console {'visible' if self.console.isVisible() else 'hidden'}.")
 
     def fake_voice(self):
-        self.append_console("[JARVIS] Voice mode activated — listening..."); self.energy.set_speed(self.settings['speed']*2.6); self.energy.set_glow(2.4)
-        QTimer.singleShot(2200, lambda: (self.energy.set_speed(self.settings['speed']), self.energy.set_glow(self.settings['glow']), self.append_console("[JARVIS] Voice mode idle.")))
+        self.append_console("[A.D.A] Voice mode activated — listening...")
+        self.particle_core.set_speed(self.settings['speed']*2.5)
+        QTimer.singleShot(2200, lambda: (self.particle_core.set_speed(self.settings['speed']), self.append_console("[A.D.A] Voice mode idle.")))
 
     def toggle_camera(self):
         self.camera_running = getattr(self.camera.capture, 'isOpened', lambda: False)()
         if not self.camera_running:
-            if self.camera.start_camera(): self.btn_cam_toggle.setText("Stop Camera"); self.append_console("[JARVIS] Camera started.")
-            else: QMessageBox.warning(self, "Camera", "Unable to start camera."); self.append_console("[JARVIS] Camera start failed.")
-        else: self.camera.stop_camera(); self.btn_cam_toggle.setText("Start Camera"); self.append_console("[JARVIS] Camera stopped.")
+            if self.camera.start_camera(): self.btn_cam_toggle.setText("Stop Camera"); self.append_console("[A.D.A] Camera started.")
+            else: QMessageBox.warning(self, "Camera", "Unable to start camera."); self.append_console("[A.D.A] Camera start failed.")
+        else: self.camera.stop_camera(); self.btn_cam_toggle.setText("Start Camera"); self.append_console("[A.D.A] Camera stopped.")
 
     def camera_snapshot(self):
         if not getattr(self.camera.capture, 'isOpened', lambda: False)(): QMessageBox.information(self, "Snapshot", "Camera is not running."); return
         path, _ = QFileDialog.getSaveFileName(self, "Save Snapshot", f"snapshot_{safe_now_str()}.png", "PNG Files (*.png)")
-        if path and self.camera.snapshot(path): self.append_console(f"[ADA] Snapshot saved."); QMessageBox.information(self, "Snapshot", "Saved.")
-        elif path: self.append_console("[ADA] Snapshot failed."); QMessageBox.warning(self, "Snapshot", "Failed to save.")
+        if path and self.camera.snapshot(path): self.append_console(f"[A.D.A] Snapshot saved."); QMessageBox.information(self, "Snapshot", "Saved.")
+        elif path: self.append_console("[A.D.A] Snapshot failed."); QMessageBox.warning(self, "Snapshot", "Failed to save.")
 
     def save_screenshot(self):
         path, _ = QFileDialog.getSaveFileName(self, "Save HUD Screenshot", f"hud_{safe_now_str()}.png", "PNG Files (*.png)")
         if path:
-            try: self.grab().save(path); self.append_console(f"[ADA] Screenshot saved."); QMessageBox.information(self, "Screenshot", "Saved.")
-            except Exception as e: self.append_console(f"[ADA] Screenshot failed: {e}"); QMessageBox.warning(self, "Screenshot", "Failed to save.")
-
-    def open_screen_share(self):
-        """Open Screen Vision window"""
-        try:
-            import subprocess
-            import sys
-            script_path = os.path.join(os.path.dirname(__file__), "jarvis_gui_screen_share.py")
-            if os.path.exists(script_path):
-                subprocess.Popen([sys.executable, script_path])
-                self.append_console("[JARVIS] Screen Vision window opened.")
-            else:
-                QMessageBox.warning(self, "Screen Vision", "jarvis_gui_screen_share.py not found!")
-                self.append_console("[JARVIS] Screen Vision file not found.")
-        except Exception as e:
-            QMessageBox.warning(self, "Screen Vision", f"Error: {str(e)}")
-            self.append_console(f"[ADA] Screen Vision error: {e}")
-
-    def open_chatbot(self):
-        """Open AI Chatbot window"""
-        try:
-            import subprocess
-            import sys
-            script_path = os.path.join(os.path.dirname(__file__), "jarvis_chatbot_gui.py")
-            if os.path.exists(script_path):
-                subprocess.Popen([sys.executable, script_path])
-                self.append_console("[JARVIS] AI Chatbot window opened.")
-            else:
-                QMessageBox.warning(self, "AI Chatbot", "jarvis_chatbot_gui.py not found!")
-                self.append_console("[JARVIS] AI Chatbot file not found.")
-        except Exception as e:
-            QMessageBox.warning(self, "AI Chatbot", f"Error: {str(e)}")
-            self.append_console(f"[ADA] AI Chatbot error: {e}")
+            try: self.grab().save(path); self.append_console(f"[A.D.A] Screenshot saved."); QMessageBox.information(self, "Screenshot", "Saved.")
+            except Exception as e: self.append_console(f"[A.D.A] Screenshot failed: {e}"); QMessageBox.warning(self, "Screenshot", "Failed to save.")
 
     def resizeEvent(self, event): self.bg_widget.setGeometry(self.centralWidget().rect()); super().resizeEvent(event)
     def append_console(self, text): self.console.append(f"[{datetime.now().strftime('%H:%M:%S')}] {text}")
     def closeEvent(self, event):
-        self.append_console("[JARVIS] Shutting down...")
+        self.append_console("[A.D.A] Shutting down...")
         self.camera.stop_camera()
         self.worker.stop()
         self.thread.quit()
-        self.thread.wait() # Wait for thread to finish cleanly
+        self.thread.wait()
         super().closeEvent(event)
 
 # --------------------- Run ---------------------
