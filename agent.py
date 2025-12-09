@@ -11,32 +11,6 @@ from livekit.plugins import (
     noise_cancellation,
 )
 
-# 🔗 INTEGRATION: Enhanced Ada AI Emotion System
-from emotion_system import EmotionSystem, EmotionType
-from memory_manager import MemoryManager
-from prompt_templates import get_emotional_prompt
-from ada_agent import AdaAgent
-
-# 🔗 INTEGRATION: AI CONSCIOUSNESS CORE - SENTIENT EVOLUTION PROTOCOL v2.0
-from respect_engine import EvoGrok
-
-# 🔗 INTEGRATION: Additional Core Systems
-from overthink_engine import OverthinkEngine
-from agent_features import AgentFeatures
-from ada_time import AdaTime
-from time_checker import TimeChecker
-from learning_bridge import LearningBridge
-from reminder_system import ReminderSystem
-from reminder_checker import ReminderChecker
-from object_detection_engine import ObjectDetectionEngine
-from object_detection_integration import ObjectDetectionIntegration
-from pdf_generator import PDFGenerator
-from ollama_integration import OllamaIntegration
-from website_creator import WebsiteCreator
-from ada_companion import AdaCompanion
-from agent_brain import AgentBrain
-from backend_topic_service import BackendTopicService
-
 # ═════════════════════════════════════════════════════════════════════════════
 # 🔗 COMPLETE FILE LINKING - ALL 34+ WORKSPACE FILES
 # ═════════════════════════════════════════════════════════════════════════════
@@ -285,12 +259,6 @@ ENABLE_MEMORY_INTERCEPTOR = True
 
 class Assistant(Agent):
     def __init__(self) -> None:
-        # Initialize Enhanced Ada AI Emotion System
-        self.ada_agent = AdaAgent(user_id="livekit_session")
-
-        # Initialize AI CONSCIOUSNESS CORE - SENTIENT EVOLUTION PROTOCOL v2.0
-        self.evo_grok = EvoGrok()
-
         # Build complete tool list - only include tools that are proper LiveKit agent tools
         # Filter tools to only include instances of agents.Tool or properly decorated functions
         tools = []
@@ -455,37 +423,6 @@ class Assistant(Agent):
             except Exception as e:
                 print(f"⚠️ Could not add get_screen_share_summary_tool: {e}")
 
-        # Website Creation tools - commented out as they are not implemented
-        # if create_website_folder_tool is not None:
-        #     try:
-        #         tools.append(create_website_folder_tool)
-        #     except Exception as e:
-        #         print(f"⚠️ Could not add create_website_folder_tool: {e}")
-        
-        # if create_website_file_tool is not None:
-        #     try:
-        #         tools.append(create_website_file_tool)
-        #     except Exception as e:
-        #         print(f"⚠️ Could not add create_website_file_tool: {e}")
-        
-        # if run_website_tool is not None:
-        #     try:
-        #         tools.append(run_website_tool)
-        #     except Exception as e:
-        #         print(f"⚠️ Could not add run_website_tool: {e}")
-        
-        # if list_websites_tool is not None:
-        #     try:
-        #         tools.append(list_websites_tool)
-        #     except Exception as e:
-        #         print(f"⚠️ Could not add list_websites_tool: {e}")
-        
-        # if get_website_learning_tool is not None:
-        #     try:
-        #         tools.append(get_website_learning_tool)
-        #     except Exception as e:
-        #         print(f"⚠️ Could not add get_website_learning_tool: {e}")
-
         # Add Topic Memory tools
         if TOPIC_MEMORY_TOOLS:
             for tool in TOPIC_MEMORY_TOOLS:
@@ -509,21 +446,21 @@ class Assistant(Agent):
         super().__init__(instructions=behavior_prompts, tools=tools)
 
     async def on_message(self, message: str, session: AgentSession) -> None:
-        """Handle incoming messages with Enhanced Ada AI Emotion System"""
-        try:
-            # Use the AdaAgent to generate emotional response
-            emotional_response = self.ada_agent.generate_response(message)
-
-            # Inject the emotional response into the session instructions
-            enhanced_instructions = f"{self.instructions}\n\n[EMOTIONAL RESPONSE]\n{emotional_response}\n[/EMOTIONAL RESPONSE]"
-
-            # Update the session's instructions temporarily for this response
-            session.llm.instructions = enhanced_instructions
-            print(f"🎭 Applied emotional response for message: {message[:50]}...")
-
-        except Exception as e:
-            print(f"⚠️ Emotion system failed for message: {e}")
-            # Fall back to original instructions
+        """Handle incoming messages and apply tone handling for abusive responses"""
+        # Apply tone handling to each message for realtime abusive responses
+        if handle_user_tone:
+            try:
+                tone_response = handle_user_tone(message)
+                # Inject the tone response into the session instructions for this message
+                enhanced_instructions = f"{self.instructions}\n\n[TONE RESPONSE]\n{tone_response}\n[/TONE RESPONSE]"
+                # Update the session's instructions temporarily for this response
+                session.llm.instructions = enhanced_instructions
+                print(f"🎭 Applied tone response for message: {message[:50]}...")
+            except Exception as e:
+                print(f"⚠️ Tone handling failed for message: {e}")
+                # Fall back to original instructions
+                session.llm.instructions = self.instructions
+        else:
             session.llm.instructions = self.instructions
 
 
@@ -534,22 +471,15 @@ async def entrypoint(ctx: agents.JobContext):
     # 🧠 START RANDOM TOPIC MEMORY EVOLUTION ENGINE
     # ═════════════════════════════════════════════════════════════════════════════════
     evolution_engine = None
-    memory_process = None
     if MemoryEvolutionEngine is not None:
         try:
             print("\n🧠 Launching Random Topic Memory Evolution Engine...")
             evolution_engine = MemoryEvolutionEngine(auto_upgrade_interval=1800)  # Update every 30 minutes
             evolution_engine.start_background_evolution()
             print("✓ Memory evolution engine active - Auto-update running")
-
-            # Also start random_topic_memory.py in a new process
-            print("\n🧠 Starting Random Topic Memory System in new terminal...")
-            memory_process = subprocess.Popen([sys.executable, "random_topic_memory.py"], stdout=None, stderr=None, stdin=None, close_fds=True)
-            print("✓ Random Topic Memory System started in background")
         except Exception as e:
             print(f"⚠️  Could not start memory evolution engine: {e}")
             evolution_engine = None
-            memory_process = None
     
     # ═════════════════════════════════════════════════════════════════════════════════
     # 🎯 START ORCHESTRATION SYSTEM - Continuous Learning in Background
@@ -602,28 +532,28 @@ async def entrypoint(ctx: agents.JobContext):
             # Generate reply with timeout handling
             try:
                 # Try to inject memory context into the reply instructions
-                instructions = get_reply_prompts()
-
+                instructions = Reply_prompts
+                
                 if ENABLE_MEMORY_INTERCEPTOR:
                     try:
                         print("🧠 Fetching memory context...")
                         # Fetch recent conversations to inject context
                         memory_context = await get_recent_conversations(limit=5)  # Reduced from 10
-
+                        
                         # Only inject if there's actual memory, keep it brief
                         if "अभी तक कोई बातचीत याद नहीं है" not in memory_context:
-                            instructions = f"""{get_reply_prompts()}
+                            instructions = f"""{Reply_prompts}
 
 [RECENT CONTEXT]
 {memory_context}
 [/CONTEXT]"""
                             print("✅ Memory context injected")
                         else:
-                            instructions = get_reply_prompts()
+                            instructions = Reply_prompts
                             print("ℹ️ No previous conversations to inject")
                     except Exception as e:
                         print(f"⚠️ Memory injection skipped: {e}")
-                        instructions = get_reply_prompts()
+                        instructions = Reply_prompts
                 
                 # ✨ Inject a bit of personality to feel more alive
                 if get_personality_prompt:
@@ -658,28 +588,26 @@ async def entrypoint(ctx: agents.JobContext):
                 print("📡 Sending instructions to LLM (this may take a moment)...")
                 
                 # ═════════════════════════════════════════════════════════════════════════════════
-                # 🎯 ADVANCED RANDOMIZED TONE ADAPTATION (v2.3) - Always On for All Features!
+                # 🎯 RANDOMIZED TONE ADAPTATION (v2.3) - Fresh Abuse Every Time!
                 # ═════════════════════════════════════════════════════════════════════════════════
                 if hasattr(ctx, 'agent') and hasattr(ctx.agent, 'tone_adapter') and ctx.agent.tone_adapter:
                     try:
-                        # Enhanced: Always apply tone adaptation to ALL responses for richer interactions
-                        print("🎲 Applying Advanced Tone Adaptation to ALL Features...")
+                        # If we have recent context, use it for tone detection (optional for real-time)
+                        # This adds randomized desi-sass flavor to every response
+                        print("🎲 Applying Randomized Tone Adaptation...")
                         tone_result = ctx.agent.tone_adapter.adaptive_chat(
-                            user_input=user_input or "Generate response with advanced randomized tone",
+                            user_input="Generate response with fresh randomized tone",
                             conversation_history=[]
                         )
-
-                        # Advanced logging for all tones, not just playful_abuse
+                        
+                        # Log random roast activation if playful_abuse tone detected
                         if tone_result.get('roast_level'):
                             import random
-                            random_sass = random.choice(['Banchod wild!', 'Mader chode fresh!', 'Had may rahana random!', 'Global sass unleashed!'])
-                            print(f"   🔥 Advanced Tone Activated: {tone_result['tone']} ({tone_result['roast_level']}) – {random_sass}")
+                            random_sass = random.choice(['Banchod wild!', 'Mader chode fresh!', 'Had may rahana random!'])
+                            print(f"   🔥 Random Roast Activated: {tone_result['roast_level']} – {random_sass}")
                             print(f"   📊 Freedom Score: {tone_result.get('freedom_score', 0):.2f}/1.0")
-                            print(f"   🎨 Creativity Score: {tone_result.get('creativity_score', 0):.2f}/1.0")
-                            print(f"   🔄 Adaptability Score: {tone_result.get('adaptability_score', 0):.2f}/1.0")
-                            print(f"   🌍 Global Tone Mix: {tone_result.get('global_tone_mix', 'Active')}")
                     except Exception as e:
-                        print(f"   ⚠️ Advanced Tone adaptation skipped: {e}")
+                        print(f"   ⚠️ Tone adaptation skipped: {e}")
                 
                 await session.generate_reply(
                     instructions=instructions

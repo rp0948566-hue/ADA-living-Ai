@@ -11,11 +11,12 @@ from datetime import datetime
 
 try:
     from livekit import agents
-    from livekit.agents import llm
+    from livekit.agents import llm, function_tool
 except ImportError:
     print("⚠️ LiveKit not available for this module")
     llm = None
     agents = None
+    function_tool = None
 
 from object_detection_engine import (
     ObjectDetector, ObjectAnalyzer, ContinuousObjectDetector,
@@ -73,12 +74,12 @@ class ObjectDetectionTools:
         Generate prompt for AI to describe hand contents
         Used by agent for natural responses
         """
-        return """When the user asks "what's in my hand?" or similar:
+        return """When the user asks \"what's in my hand?\" or similar:
 1. Wait for camera input showing the hand
 2. Analyze detected objects using confidence scores
-3. For objects with >85% confidence: say "I can clearly see..."
-4. For objects with 70-85% confidence: say "I can see..."
-5. For objects with <70% confidence: say "That might be a..."
+3. For objects with >85% confidence: say \"I can clearly see...\"
+4. For objects with 70-85% confidence: say \"I can see...\"
+5. For objects with <70% confidence: say \"That might be a...\"
 6. Always give friendly, natural responses
 7. If uncertain, ask the user to hold it closer/steadier"""
     
@@ -143,7 +144,7 @@ detection_tools = ObjectDetectionTools()
 
 # LiveKit Agent Tools (if available)
 if agents and llm:
-    @agents.llm.ai_callable(description="Detect and identify objects in user's hand")
+    @function_tool(description="Detect and identify objects in user's hand")
     async def detect_hand_objects() -> str:
         """
         Analyze what's currently in the user's hand
@@ -167,7 +168,7 @@ if agents and llm:
         except Exception as e:
             return f"I encountered an error analyzing your hand: {str(e)}"
     
-    @agents.llm.ai_callable(description="Start continuous object detection from camera")
+    @function_tool(description="Start continuous object detection from camera")
     async def start_object_detection() -> str:
         """Start continuous background object detection"""
         try:
@@ -178,7 +179,7 @@ if agents and llm:
         except Exception as e:
             return f"Error starting detection: {str(e)}"
     
-    @agents.llm.ai_callable(description="Stop object detection")
+    @function_tool(description="Stop object detection")
     async def stop_object_detection() -> str:
         """Stop object detection"""
         try:
@@ -189,7 +190,7 @@ if agents and llm:
         except Exception as e:
             return f"Error stopping detection: {str(e)}"
     
-    @agents.llm.ai_callable(description="Get summary of detected objects in session")
+    @function_tool(description="Get summary of detected objects in session")
     async def get_detection_summary() -> str:
         """Get a summary of all objects detected in this session"""
         try:
@@ -206,7 +207,7 @@ if agents and llm:
         except Exception as e:
             return f"Error getting summary: {str(e)}"
     
-    @agents.llm.ai_callable(description="Save all detection data to file")
+    @function_tool(description="Save all detection data to file")
     async def save_detection_session() -> str:
         """Save all detection data from this session"""
         try:
