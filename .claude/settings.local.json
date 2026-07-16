@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -c \"Get-Content -Encoding Unicode 'C:\\\\Users\\\\codew\\\\AppData\\\\Local\\\\Temp\\\\hermes_gateway2.log'\")",
+      "Bash(curl -s -m 5 http://127.0.0.1:8642/health)",
+      "Bash(curl -s -m 30 -X POST http://127.0.0.1:8642/v1/chat/completions -H 'Authorization: Bearer 88ba7aa744194a9b92a989673eda832d' -H 'Content-Type: application/json' -d '{\"model\":\"hermes-agent\",\"messages\":[{\"role\":\"user\",\"content\":\"Tum kaun ho, ek line mein batao\"}]}')",
+      "Bash(powershell -c \"Stop-Process -Id 31044 -Force -ErrorAction SilentlyContinue\")",
+      "Bash(curl -s -m 60 -X POST http://127.0.0.1:8642/v1/chat/completions -H 'Authorization: Bearer 88ba7aa744194a9b92a989673eda832d' -H 'Content-Type: application/json' -d '{\"model\":\"hermes-agent\",\"messages\":[{\"role\":\"user\",\"content\":\"Tum kaun ho, ek line mein batao\"}]}')",
+      "Bash(powershell -c \"Stop-Process -Id 12628 -Force -ErrorAction SilentlyContinue\")",
+      "Bash(powershell -c \"Get-Content -Encoding Unicode 'C:\\\\Users\\\\codew\\\\AppData\\\\Local\\\\Temp\\\\jarvis_gui.log'\")",
+      "Bash(powershell -c \"Stop-Process -Id 20672,27768 -Force -ErrorAction SilentlyContinue\")",
+      "Bash(powershell -c \"Get-CimInstance Win32_Process -Filter \\\\\"Name='pythonw.exe'\\\\\" | Select-Object ProcessId,CommandLine\")",
+      "Bash(powershell -c \"Get-CimInstance Win32_Process -Filter \\\\\"Name='pythonw.exe'\\\\\" | Select-Object -ExpandProperty ProcessId\")",
+      "Bash(powershell -c \"Stop-Process -Name pythonw -Force -ErrorAction SilentlyContinue\")",
+      "Bash(\".venv/Scripts/python.exe\" -c \"import ast; ast.parse\\(open\\('jarvis_gui.py', encoding='utf-8'\\).read\\(\\)\\); print\\('syntax OK'\\)\")",
+      "Bash(\".venv/Scripts/python.exe\" -c \"import ast; ast.parse\\(open\\('jarvis_gui.py', encoding='utf-8'\\).read\\(\\)\\); ast.parse\\(open\\('agent.py', encoding='utf-8'\\).read\\(\\)\\); print\\('both syntax OK'\\)\")",
+      "Bash(curl -s -m 10 http://127.0.0.1:8642/health)",
+      "Bash(curl -s -m 90 -X POST http://127.0.0.1:8642/v1/chat/completions -H 'Authorization: Bearer 88ba7aa744194a9b92a989673eda832d' -H 'Content-Type: application/json' -d '{\"model\":\"hermes-agent\",\"messages\":[{\"role\":\"user\",\"content\":\"Tum kaun ho? Ek line mein Hindi mein batao.\"}]}')",
+      "Bash(curl -s -m 120 -X POST http://127.0.0.1:8642/v1/chat/completions -H 'Authorization: Bearer 88ba7aa744194a9b92a989673eda832d' -H 'Content-Type: application/json' -d '{\"model\":\"hermes-agent\",\"messages\":[{\"role\":\"user\",\"content\":\"Tum kaun ho? Ek line mein Hindi mein batao.\"}]}')",
+      "Bash(curl -s -m 180 -X POST http://127.0.0.1:8642/v1/chat/completions -H 'Authorization: Bearer 88ba7aa744194a9b92a989673eda832d' -H 'X-Hermes-Session-Key: vikash-jarvis-desktop' -H 'Content-Type: application/json' -d '{\"model\":\"hermes-agent\",\"messages\":[{\"role\":\"user\",\"content\":\"Jarvis, notepad kholo\"}]}')"
+    ]
+  }
+}

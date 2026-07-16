@@ -1,0 +1,9 @@
+{
+  "sad": "Aap thoda udaas lag rahe hain. Kya aap batayenge ki aap kyun udaas hain?",
+  "happy": "Aap khush dikh rahe hain! Kya aap kuch achha share karna chahenge?",
+  "neutral": "Aap bilkul theek lag rahe hain. Kya main aapki madad kar sakta hoon?",
+  "angry": "Aap gusse mein lag rahe hain. Kya aap batayenge ki kya hua?",
+  "surprise": "Aap pareshaan ya chakit dikh rahe hain. Kya sab theek hai?",
+  "working": "Aap kaam mein vyast lag rahe hain — aap kya kar rahe hain abhi?",
+  "generic": "Maine aapka mood '{mood}' detect kiya. Kya aap kuch share karna chahenge?"
+}
