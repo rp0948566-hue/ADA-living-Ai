@@ -8,24 +8,131 @@
 #           (AI mode triggers when jarvis_data/ai_speaking.flag is touched;
 #            agent.py's TTS hook can touch that file while speaking.)
 
+import json
 import math
 import os
 import sys
 import time
+import uuid
 
 import numpy as np
+import requests
 
-from PySide6.QtCore import Qt, QTimer, QPointF
-from PySide6.QtGui import QColor, QPainter, QPen
-from PySide6.QtWidgets import QApplication, QMainWindow, QWidget
+from PySide6.QtCore import Qt, QTimer, QPointF, QThread, Signal
+from PySide6.QtGui import QColor, QPainter, QPen, QFont
+from PySide6.QtWidgets import (
+    QApplication, QMainWindow, QWidget, QLineEdit, QPushButton,
+    QLabel, QVBoxLayout, QHBoxLayout, QSizePolicy, QTextEdit,
+    QListWidget, QListWidgetItem, QFrame,
+)
 
 try:
     import sounddevice as sd
 except Exception:
     sd = None
 
+from dotenv import load_dotenv
+load_dotenv()
+
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 AI_FLAG = os.path.join(PROJECT_DIR, "jarvis_data", "ai_speaking.flag")
+
+# Hermes brain — same local API server agent.py talks to.
+HERMES_API_BASE_URL = os.getenv("HERMES_API_BASE_URL", "http://127.0.0.1:8642/v1")
+HERMES_API_KEY = os.getenv("API_SERVER_KEY", "")
+HERMES_SESSION_KEY = os.getenv("HERMES_SESSION_KEY", "vikash-jarvis-desktop")
+
+
+def touch_ai_flag():
+    try:
+        os.makedirs(os.path.dirname(AI_FLAG), exist_ok=True)
+        with open(AI_FLAG, "w") as f:
+            f.write(str(time.time()))
+    except Exception:
+        pass
+
+
+HISTORY_PATH = os.path.join(PROJECT_DIR, "jarvis_data", "gui_chat_history.json")
+
+
+class ChatHistoryStore:
+    """Local GUI-side chat history (separate from Hermes's own long-term
+    memory) — lets the sidebar list and reopen previous conversations."""
+
+    def __init__(self, path=HISTORY_PATH):
+        self.path = path
+        self.chats = self._load()
+
+    def _load(self):
+        try:
+            with open(self.path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return []
+
+    def _save(self):
+        try:
+            os.makedirs(os.path.dirname(self.path), exist_ok=True)
+            with open(self.path, "w", encoding="utf-8") as f:
+                json.dump(self.chats, f, ensure_ascii=False, indent=2)
+        except Exception:
+            pass
+
+    def new_chat(self):
+        chat = {"id": str(uuid.uuid4()), "title": "New chat", "messages": []}
+        self.chats.insert(0, chat)
+        self._save()
+        return chat
+
+    def append(self, chat, role, text):
+        chat["messages"].append({"role": role, "text": text})
+        if role == "user" and chat["title"] == "New chat":
+            chat["title"] = text[:42] + ("…" if len(text) > 42 else "")
+        # keep this chat newest-first
+        if chat in self.chats:
+            self.chats.remove(chat)
+        self.chats.insert(0, chat)
+        self._save()
+
+    def get(self, chat_id):
+        for c in self.chats:
+            if c["id"] == chat_id:
+                return c
+        return None
+
+
+class HermesWorker(QThread):
+    """Sends one message to Hermes's local API server and reports back the
+    reply on the Qt thread via a signal (chat completions call is blocking,
+    so it must not run on the UI thread)."""
+
+    reply_ready = Signal(str)
+    failed = Signal(str)
+
+    def __init__(self, text: str, parent=None):
+        super().__init__(parent)
+        self.text = text
+
+    def run(self):
+        try:
+            resp = requests.post(
+                f"{HERMES_API_BASE_URL}/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {HERMES_API_KEY}",
+                    "X-Hermes-Session-Key": HERMES_SESSION_KEY,
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "model": "hermes-agent",
+                    "messages": [{"role": "user", "content": self.text}],
+                },
+                timeout=90,
+            )
+            data = resp.json()
+            msg = data["choices"][0]["message"]["content"]
+            self.reply_ready.emit(msg)
+        except Exception as e:
+            self.failed.emit(str(e))
 
 # (core color, rim color) per mode
 PALETTES = {
@@ -236,28 +343,239 @@ class ParticleOrb(QWidget):
         event.accept()
 
 
+class ChatBar(QWidget):
+    """Conversation transcript + compact typing bar. Talks to Hermes
+    directly over HTTP so the AI is usable without the voice pipeline.
+    Persists every exchange to ChatHistoryStore for the sidebar."""
+
+    chat_updated = Signal()  # tell the sidebar to refresh its list
+
+    def __init__(self, history: ChatHistoryStore, parent=None):
+        super().__init__(parent)
+        self.history = history
+        self.chat = None  # active chat dict from the history store
+        self._worker = None
+
+        outer = QVBoxLayout(self)
+        outer.setContentsMargins(0, 0, 0, 0)
+        outer.setSpacing(8)
+
+        self.transcript = QTextEdit()
+        self.transcript.setReadOnly(True)
+        self.transcript.setFrameShape(QFrame.NoFrame)
+        self.transcript.setStyleSheet(
+            "QTextEdit { background:transparent; color:#CFCFCF; font-size:13px; }"
+        )
+        self.transcript.setMaximumHeight(160)
+        outer.addWidget(self.transcript)
+
+        box = QWidget()
+        box.setObjectName("chatbox")
+        box.setStyleSheet(
+            "#chatbox { background:#1a1a1e; border:1px solid #2c2c32; border-radius:14px; }"
+        )
+        box.setFixedHeight(64)  # shrunk down from the original 110px
+        row = QHBoxLayout(box)
+        row.setContentsMargins(18, 0, 10, 0)
+        row.setSpacing(8)
+
+        self.input = QLineEdit()
+        self.input.setPlaceholderText("Ask Jarvis anything...")
+        self.input.setStyleSheet(
+            "QLineEdit { background:transparent; border:none; color:#E8E8EC;"
+            " font-size:14px; }"
+        )
+        self.input.returnPressed.connect(self._send)
+        row.addWidget(self.input, 1, Qt.AlignVCenter)
+
+        self.send_btn = QPushButton("↑")
+        self.send_btn.setFixedSize(30, 30)
+        self.send_btn.setCursor(Qt.PointingHandCursor)
+        self.send_btn.setStyleSheet(
+            "QPushButton { background:#3a3a42; color:white; border-radius:15px;"
+            " font-size:14px; font-weight:bold; }"
+            "QPushButton:hover { background:#4a4a54; }"
+        )
+        self.send_btn.clicked.connect(self._send)
+        row.addWidget(self.send_btn, 0, Qt.AlignVCenter)
+
+        outer.addWidget(box)
+
+    def start_new_chat(self):
+        self.chat = self.history.new_chat()
+        self.transcript.clear()
+        self.chat_updated.emit()
+
+    def load_chat(self, chat_id: str):
+        chat = self.history.get(chat_id)
+        if not chat:
+            return
+        self.chat = chat
+        self.transcript.clear()
+        for m in chat["messages"]:
+            self._append_line(m["role"], m["text"])
+
+    def _append_line(self, role: str, text: str):
+        who = "You" if role == "user" else "Jarvis"
+        color = "#8FD3FF" if role == "user" else "#D9B8FF"
+        self.transcript.append(f'<b style="color:{color}">{who}:</b> {text}')
+
+    def _send(self):
+        text = self.input.text().strip()
+        if not text or self._worker is not None:
+            return
+        if self.chat is None:
+            self.start_new_chat()
+
+        self.input.clear()
+        self.input.setEnabled(False)
+        self.send_btn.setEnabled(False)
+        self._append_line("user", text)
+        self.history.append(self.chat, "user", text)
+        self.chat_updated.emit()
+        self._thinking_line = "Jarvis is thinking..."
+        self.transcript.append(f'<i style="color:#888">{self._thinking_line}</i>')
+
+        self._worker = HermesWorker(text, self)
+        self._worker.reply_ready.connect(self._on_reply)
+        self._worker.failed.connect(self._on_failed)
+        self._worker.finished.connect(self._cleanup)
+        self._worker.start()
+
+    def _replace_thinking(self, html: str):
+        # drop the trailing "thinking..." placeholder line, then append reply
+        cursor = self.transcript.textCursor()
+        cursor.movePosition(cursor.End)
+        cursor.select(cursor.BlockUnderCursor)
+        cursor.removeSelectedText()
+        self.transcript.append(html)
+
+    def _on_reply(self, msg: str):
+        self._replace_thinking(f'<b style="color:#D9B8FF">Jarvis:</b> {msg}')
+        self.history.append(self.chat, "assistant", msg)
+        self.chat_updated.emit()
+        touch_ai_flag()  # let the orb react like Jarvis is "speaking"
+
+    def _on_failed(self, err: str):
+        self._replace_thinking(f'<span style="color:#FF8080">⚠ Could not reach Jarvis: {err}</span>')
+
+    def _cleanup(self):
+        self.input.setEnabled(True)
+        self.send_btn.setEnabled(True)
+        self.input.setFocus()
+        self._worker = None
+
+
+class Sidebar(QFrame):
+    """Left panel — new-chat button + list of previous conversations."""
+
+    new_chat_clicked = Signal()
+    chat_selected = Signal(str)
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setFixedWidth(240)
+        self.setStyleSheet(
+            "background:#131315; border-right:1px solid #232327;"
+        )
+
+        lay = QVBoxLayout(self)
+        lay.setContentsMargins(14, 18, 14, 14)
+        lay.setSpacing(12)
+
+        title = QLabel("J.A.R.V.I.S")
+        title.setStyleSheet("color:#E8E8EC; font-size:16px; font-weight:700; letter-spacing:1px;")
+        lay.addWidget(title)
+
+        new_btn = QPushButton("+  New chat")
+        new_btn.setCursor(Qt.PointingHandCursor)
+        new_btn.setStyleSheet(
+            "QPushButton { background:#1f1f24; color:#E8E8EC; border:1px solid #2c2c32;"
+            " border-radius:10px; padding:8px; text-align:left; font-size:13px; }"
+            "QPushButton:hover { background:#27272d; }"
+        )
+        new_btn.clicked.connect(self.new_chat_clicked.emit)
+        lay.addWidget(new_btn)
+
+        hist_label = QLabel("PREVIOUS CHATS")
+        hist_label.setStyleSheet("color:#6b6b72; font-size:10px; font-weight:600; letter-spacing:1px;")
+        lay.addWidget(hist_label)
+
+        self.list = QListWidget()
+        self.list.setStyleSheet(
+            "QListWidget { background:transparent; border:none; color:#C9C9CF; font-size:12px; }"
+            "QListWidget::item { padding:8px 6px; border-radius:8px; }"
+            "QListWidget::item:selected { background:#24242b; color:#fff; }"
+            "QListWidget::item:hover { background:#1c1c21; }"
+        )
+        self.list.itemClicked.connect(self._on_item_clicked)
+        lay.addWidget(self.list, 1)
+
+    def _on_item_clicked(self, item: QListWidgetItem):
+        self.chat_selected.emit(item.data(Qt.UserRole))
+
+    def refresh(self, chats):
+        self.list.clear()
+        for c in chats:
+            item = QListWidgetItem(c["title"] or "New chat")
+            item.setData(Qt.UserRole, c["id"])
+            self.list.addItem(item)
+
+
 class NovaHUD(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("J.A.R.V.I.S HUD")
-        self.resize(1200, 720)
+        self.resize(1280, 760)
         self.setStyleSheet("background-color: #171717;")
 
-        canvas = QWidget()
-        self.setCentralWidget(canvas)
-        self.orb = ParticleOrb(canvas)
-        self._place_orb()
+        self.history = ChatHistoryStore()
 
-    def _place_orb(self):
-        s = int(max(180, min(320, min(self.width(), self.height()) * 0.30)))
+        root = QWidget()
+        self.setCentralWidget(root)
+        root_lay = QHBoxLayout(root)
+        root_lay.setContentsMargins(0, 0, 0, 0)
+        root_lay.setSpacing(0)
+
+        self.sidebar = Sidebar(root)
+        self.sidebar.new_chat_clicked.connect(self._new_chat)
+        self.sidebar.chat_selected.connect(self._select_chat)
+        root_lay.addWidget(self.sidebar)
+
+        self.canvas = QWidget(root)
+        root_lay.addWidget(self.canvas, 1)
+
+        self.orb = ParticleOrb(self.canvas)
+        self.chatbar = ChatBar(self.history, self.canvas)
+        self.chatbar.chat_updated.connect(self._refresh_sidebar)
+
+        self._refresh_sidebar()
+        self._place_widgets()
+
+    def _new_chat(self):
+        self.chatbar.start_new_chat()
+
+    def _select_chat(self, chat_id: str):
+        self.chatbar.load_chat(chat_id)
+
+    def _refresh_sidebar(self):
+        self.sidebar.refresh(self.history.chats)
+
+    def _place_widgets(self):
+        w, h = self.canvas.width(), self.canvas.height()
+        s = int(max(180, min(320, min(w, h) * 0.30)))
         margin = 18
-        self.orb.setGeometry(
-            self.width() - s - margin, self.height() - s - margin, s, s
-        )
+        self.orb.setGeometry(w - s - margin, h - s - margin, s, s)
+
+        bar_w = int(min(900, w * 0.78))
+        bar_h = 240
+        bx = (w - bar_w) // 2
+        by = (h - bar_h) // 2
+        self.chatbar.setGeometry(bx, by, bar_w, bar_h)
 
     def resizeEvent(self, event):
-        self._place_orb()
         super().resizeEvent(event)
+        self._place_widgets()
 
 
 def main():

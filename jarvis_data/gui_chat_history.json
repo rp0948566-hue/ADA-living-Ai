@@ -1,0 +1,17 @@
+[
+  {
+    "id": "7156a6ed-88ad-461c-a233-635fc5d36e60",
+    "title": "Hello i am rudra",
+    "messages": [
+      {
+        "role": "user",
+        "text": "Hello i am rudra"
+      }
+    ]
+  },
+  {
+    "id": "258f4441-1218-48b0-94ec-f41ede0fe309",
+    "title": "New chat",
+    "messages": []
+  }
+]

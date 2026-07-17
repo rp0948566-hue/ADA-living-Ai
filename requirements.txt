@@ -13,3 +13,11 @@ pynput
 python-Levenshtein
 pywin32
 livekit
+mcp
+scrapling[fetchers]
+curl_cffi
+PySide6
+opencv-python
+psutil
+sounddevice
+numpy

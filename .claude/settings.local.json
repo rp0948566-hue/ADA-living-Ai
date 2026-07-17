@@ -17,7 +17,22 @@
       "Bash(curl -s -m 10 http://127.0.0.1:8642/health)",
       "Bash(curl -s -m 90 -X POST http://127.0.0.1:8642/v1/chat/completions -H 'Authorization: Bearer 88ba7aa744194a9b92a989673eda832d' -H 'Content-Type: application/json' -d '{\"model\":\"hermes-agent\",\"messages\":[{\"role\":\"user\",\"content\":\"Tum kaun ho? Ek line mein Hindi mein batao.\"}]}')",
       "Bash(curl -s -m 120 -X POST http://127.0.0.1:8642/v1/chat/completions -H 'Authorization: Bearer 88ba7aa744194a9b92a989673eda832d' -H 'Content-Type: application/json' -d '{\"model\":\"hermes-agent\",\"messages\":[{\"role\":\"user\",\"content\":\"Tum kaun ho? Ek line mein Hindi mein batao.\"}]}')",
-      "Bash(curl -s -m 180 -X POST http://127.0.0.1:8642/v1/chat/completions -H 'Authorization: Bearer 88ba7aa744194a9b92a989673eda832d' -H 'X-Hermes-Session-Key: vikash-jarvis-desktop' -H 'Content-Type: application/json' -d '{\"model\":\"hermes-agent\",\"messages\":[{\"role\":\"user\",\"content\":\"Jarvis, notepad kholo\"}]}')"
+      "Bash(curl -s -m 180 -X POST http://127.0.0.1:8642/v1/chat/completions -H 'Authorization: Bearer 88ba7aa744194a9b92a989673eda832d' -H 'X-Hermes-Session-Key: vikash-jarvis-desktop' -H 'Content-Type: application/json' -d '{\"model\":\"hermes-agent\",\"messages\":[{\"role\":\"user\",\"content\":\"Jarvis, notepad kholo\"}]}')",
+      "Bash(curl -s -m 60 -X POST http://127.0.0.1:8642/v1/chat/completions -H 'Authorization: Bearer 88ba7aa744194a9b92a989673eda832d' -H 'X-Hermes-Session-Key: vikash-jarvis-desktop' -H 'Content-Type: application/json' -d '{\"model\":\"hermes-agent\",\"messages\":[{\"role\":\"user\",\"content\":\"Tum kaun ho? Ek line mein Hindi mein batao.\"}]}')",
+      "Bash(curl -s -m 15 \"https://generativelanguage.googleapis.com/v1beta/models?key=AQ.Ab8RN6Jh3lXp-aEjrOrCOeSYBuJuuxEdvm_6VfE_VaWIESXR-g\")",
+      "Bash(curl -s -m 60 -X POST http://127.0.0.1:8642/v1/chat/completions -H 'Authorization: Bearer 88ba7aa744194a9b92a989673eda832d' -H 'X-Hermes-Session-Key: vikash-jarvis-desktop' -H 'Content-Type: application/json' -d '{\"model\":\"hermes-agent\",\"messages\":[{\"role\":\"user\",\"content\":\"Namaste Jarvis, aaj mausam kaisa hai?\"}]}')",
+      "Bash(curl -s -m 8 http://127.0.0.1:8642/health)",
+      "Bash(\".venv/Scripts/python.exe\" -c \"import scrapling; print\\('scrapling', scrapling.__version__\\)\")",
+      "Bash(.venv/Scripts/python.exe -c ' *)",
+      "Bash(./.venv/Scripts/hermes.exe mcp *)",
+      "Bash(curl -s -m 120 -X POST http://127.0.0.1:8642/v1/chat/completions -H 'Authorization: Bearer 88ba7aa744194a9b92a989673eda832d' -H 'X-Hermes-Session-Key: vikash-jarvis-desktop' -H 'Content-Type: application/json' -d '{\"model\":\"hermes-agent\",\"messages\":[{\"role\":\"user\",\"content\":\"Terminal mein yeh command chalao: echo Jarvis terminal test. Uska output batao.\"}]}')",
+      "Bash(\".venv/Scripts/python.exe\" -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(d['choices'][0]['message']['content']\\)\")",
+      "Bash(curl -s -m 120 -X POST http://127.0.0.1:8642/v1/chat/completions -H 'Authorization: Bearer 88ba7aa744194a9b92a989673eda832d' -H 'X-Hermes-Session-Key: vikash-jarvis-desktop' -H 'Content-Type: application/json' -d '{\"model\":\"hermes-agent\",\"messages\":[{\"role\":\"user\",\"content\":\"example.com website ko scrape karke uska text batao\"}]}')",
+      "Bash(curl -s -m 120 -X POST http://127.0.0.1:8642/v1/chat/completions -H 'Authorization: Bearer 88ba7aa744194a9b92a989673eda832d' -H 'X-Hermes-Session-Key: vikash-jarvis-desktop' -H 'Content-Type: application/json' -d '{\"model\":\"hermes-agent\",\"messages\":[{\"role\":\"user\",\"content\":\"Scrape example.com and tell me its text\"}]}')",
+      "Bash(./.venv/Scripts/hermes.exe tools *)",
+      "Bash(rm -f jarvis_data/graph_memory.db jarvis_data/graph_memory.db-wal jarvis_data/graph_memory.db-shm)",
+      "Bash(powershell -c \"Stop-Process -Name hermes,pythonw -Force -ErrorAction SilentlyContinue\")",
+      "Bash(powershell -c \"Get-Process hermes,pythonw -ErrorAction SilentlyContinue | Select-Object Id,ProcessName\")"
     ]
   }
 }
