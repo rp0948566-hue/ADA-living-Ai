@@ -1,11 +1,11 @@
-# jarvis_gui.py
-# J.A.R.V.I.S HUD — rebuilding step by step.
+# iris_gui.py
+# I.R.I.S HUD — rebuilding step by step.
 # Step 1: blank canvas, background #171717.
 # Step 2: particle-sphere orb (dotted wavy energy ball) anchored bottom-right.
 #         - idle       : purple core / orange rim, slow organic waves
 #         - user speaks: deep blue / bright cyan, ripples follow mic loudness
 #         - AI speaks  : violet / white-gold, fast rhythmic pulsing
-#           (AI mode triggers when jarvis_data/ai_speaking.flag is touched;
+#           (AI mode triggers when iris_data/ai_speaking.flag is touched;
 #            agent.py's TTS hook can touch that file while speaking.)
 
 import json
@@ -19,12 +19,15 @@ import numpy as np
 import requests
 
 from PySide6.QtCore import Qt, QTimer, QPointF, QThread, Signal
-from PySide6.QtGui import QColor, QPainter, QPen, QFont
+from PySide6.QtGui import QColor, QPainter, QPen, QFont, QTextCursor
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QLineEdit, QPushButton,
     QLabel, QVBoxLayout, QHBoxLayout, QSizePolicy, QTextEdit,
-    QListWidget, QListWidgetItem, QFrame,
+    QListWidget, QListWidgetItem, QFrame, QComboBox,
 )
+
+import iris_model_config
+import iris_voice
 
 try:
     import sounddevice as sd
@@ -35,7 +38,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
-AI_FLAG = os.path.join(PROJECT_DIR, "jarvis_data", "ai_speaking.flag")
+AI_FLAG = os.path.join(PROJECT_DIR, "iris_data", "ai_speaking.flag")
 
 # Hermes brain — same local API server agent.py talks to.
 HERMES_API_BASE_URL = os.getenv("HERMES_API_BASE_URL", "http://127.0.0.1:8642/v1")
@@ -52,7 +55,7 @@ def touch_ai_flag():
         pass
 
 
-HISTORY_PATH = os.path.join(PROJECT_DIR, "jarvis_data", "gui_chat_history.json")
+HISTORY_PATH = os.path.join(PROJECT_DIR, "iris_data", "gui_chat_history.json")
 
 
 class ChatHistoryStore:
@@ -134,6 +137,78 @@ class HermesWorker(QThread):
         except Exception as e:
             self.failed.emit(str(e))
 
+class SpeakWorker(QThread):
+    """Speaks a reply out loud (offline, pyttsx3) without blocking the UI."""
+
+    def __init__(self, text: str, parent=None):
+        super().__init__(parent)
+        self.text = text
+
+    def run(self):
+        iris_voice.speak(self.text)
+
+
+class ListenWorker(QThread):
+    """Captures one utterance from the mic and transcribes it, off the UI thread."""
+
+    heard = Signal(str)
+
+    def run(self):
+        text = iris_voice.listen()
+        self.heard.emit(text)
+
+
+class WakeListenerThread(QThread):
+    """Always-on background listener — no button, no wake word needed.
+    Keeps capturing short utterances and reports anything heard back to the
+    UI thread, which forwards it to Iris; she decides for herself whether
+    it's directed at her and worth acting on."""
+
+    heard = Signal(str)
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._stop = False
+        self._paused = False
+
+    def stop(self):
+        self._stop = True
+
+    def pause(self):
+        self._paused = True
+
+    def resume(self):
+        self._paused = False
+
+    def run(self):
+        while not self._stop:
+            if self._paused:
+                time.sleep(0.2)
+                continue
+            text = iris_voice.listen(timeout=5, phrase_time_limit=8)
+            if self._stop:
+                return
+            if text and not self._paused:
+                self.heard.emit(text)
+                time.sleep(0.3)  # beat for the main thread to pause us for a one-shot capture
+
+
+class AutoStartWorker(QThread):
+    """Runs iris_model_config.auto_start_if_needed() off the UI thread on
+    launch: auto-detects whether any AI mode is already running and, if
+    not, turns the last-configured one on — plus makes sure the AI Command
+    Terminal exists."""
+
+    done = Signal(str)
+
+    def run(self):
+        try:
+            msg = iris_model_config.auto_start_if_needed()
+        except Exception as e:
+            msg = f"auto-start failed: {e}"
+        self.done.emit(msg)
+
+
 # (core color, rim color) per mode
 PALETTES = {
     "idle": ((95, 60, 200), (255, 128, 40)),     # purple -> orange (reference image)
@@ -147,6 +222,8 @@ class ParticleOrb(QWidget):
     """Dotted particle sphere with flowing wave displacement, like a living
     ball of energy. Rows of dots (lat/long grid) so the surface reads as
     flowing dotted lines, matching the reference image."""
+
+    activate_requested = Signal()  # 2+ claps in quick succession -> "start listening"
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -188,6 +265,7 @@ class ParticleOrb(QWidget):
         self._mic = 0.0
         self._rms_slow = 0.01   # slow-moving baseline of ambient loudness
         self._clap_time = 0.0   # when the last clap/snap was detected
+        self._clap_times = []   # rolling window for 2+ claps = "activate" gesture
         self._stream = None
         if sd is not None:
             try:
@@ -196,7 +274,12 @@ class ParticleOrb(QWidget):
                     self._mic = max(rms, self._mic * 0.82)
                     # sharp transient well above ambient baseline = clap/snap
                     if rms > max(0.10, self._rms_slow * 5.0):
-                        self._clap_time = time.time()
+                        now = time.time()
+                        self._clap_time = now
+                        self._clap_times = [t2 for t2 in self._clap_times if now - t2 < 1.5] + [now]
+                        if len(self._clap_times) >= 2:
+                            self._clap_times = []
+                            self.activate_requested.emit()
                     self._rms_slow = 0.95 * self._rms_slow + 0.05 * rms
                 self._stream = sd.InputStream(
                     samplerate=16000, channels=1, blocksize=1024, callback=_cb
@@ -355,6 +438,8 @@ class ChatBar(QWidget):
         self.history = history
         self.chat = None  # active chat dict from the history store
         self._worker = None
+        self._listen_worker = None
+        self._speak_worker = None
 
         outer = QVBoxLayout(self)
         outer.setContentsMargins(0, 0, 0, 0)
@@ -380,7 +465,7 @@ class ChatBar(QWidget):
         row.setSpacing(8)
 
         self.input = QLineEdit()
-        self.input.setPlaceholderText("Ask Jarvis anything...")
+        self.input.setPlaceholderText("Ask Iris anything...")
         self.input.setStyleSheet(
             "QLineEdit { background:transparent; border:none; color:#E8E8EC;"
             " font-size:14px; }"
@@ -401,6 +486,13 @@ class ChatBar(QWidget):
 
         outer.addWidget(box)
 
+        # always-on listening — no button to click, just say "Iris ..." or
+        # clap twice. Typing still works too.
+        self.input.setPlaceholderText("Listening... just talk, or clap twice, or type here...")
+        self._wake_thread = WakeListenerThread(self)
+        self._wake_thread.heard.connect(self._on_wake_heard)
+        self._wake_thread.start()
+
     def start_new_chat(self):
         self.chat = self.history.new_chat()
         self.transcript.clear()
@@ -416,13 +508,34 @@ class ChatBar(QWidget):
             self._append_line(m["role"], m["text"])
 
     def _append_line(self, role: str, text: str):
-        who = "You" if role == "user" else "Jarvis"
+        who = "You" if role == "user" else "Iris"
         color = "#8FD3FF" if role == "user" else "#D9B8FF"
         self.transcript.append(f'<b style="color:{color}">{who}:</b> {text}')
 
     def _send(self):
         text = self.input.text().strip()
-        if not text or self._worker is not None:
+        if not text:
+            return
+        self._dispatch(text, text)
+
+    def _send_ambient(self, heard_text: str):
+        """Continuously-overheard speech — no wake word required. Iris
+        decides for herself whether it's directed at her and whether she
+        can help; if not, she says nothing (see SOUL.md's NO_RESPONSE rule)."""
+        if not heard_text:
+            return
+        payload = (
+            "[This was picked up from continuous background listening — it "
+            "may or may not be directed at you, and may just be ambient talk. "
+            "Decide: is this actually meant for you, and can you help? If yes, "
+            "go ahead and do it, then tell me what you did. If it's not "
+            "directed at you or you can't help, reply with exactly the single "
+            "word NO_RESPONSE and nothing else.] " + heard_text
+        )
+        self._dispatch(heard_text, payload)
+
+    def _dispatch(self, display_text: str, payload_text: str):
+        if self._worker is not None:
             return
         if self.chat is None:
             self.start_new_chat()
@@ -430,40 +543,79 @@ class ChatBar(QWidget):
         self.input.clear()
         self.input.setEnabled(False)
         self.send_btn.setEnabled(False)
-        self._append_line("user", text)
-        self.history.append(self.chat, "user", text)
+        self._append_line("user", display_text)
+        self.history.append(self.chat, "user", display_text)
         self.chat_updated.emit()
-        self._thinking_line = "Jarvis is thinking..."
+        self._thinking_line = "Iris is thinking..."
         self.transcript.append(f'<i style="color:#888">{self._thinking_line}</i>')
 
-        self._worker = HermesWorker(text, self)
+        self._worker = HermesWorker(payload_text, self)
         self._worker.reply_ready.connect(self._on_reply)
         self._worker.failed.connect(self._on_failed)
         self._worker.finished.connect(self._cleanup)
         self._worker.start()
 
+    def _remove_thinking_line(self):
+        cursor = self.transcript.textCursor()
+        cursor.movePosition(QTextCursor.MoveOperation.End)
+        cursor.select(QTextCursor.SelectionType.BlockUnderCursor)
+        cursor.removeSelectedText()
+
     def _replace_thinking(self, html: str):
         # drop the trailing "thinking..." placeholder line, then append reply
-        cursor = self.transcript.textCursor()
-        cursor.movePosition(cursor.End)
-        cursor.select(cursor.BlockUnderCursor)
-        cursor.removeSelectedText()
+        self._remove_thinking_line()
         self.transcript.append(html)
 
     def _on_reply(self, msg: str):
-        self._replace_thinking(f'<b style="color:#D9B8FF">Jarvis:</b> {msg}')
+        if msg.strip().upper() == "NO_RESPONSE":
+            # not directed at her / nothing she can help with — stay quiet
+            self._remove_thinking_line()
+            return
+        self._replace_thinking(f'<b style="color:#D9B8FF">Iris:</b> {msg}')
         self.history.append(self.chat, "assistant", msg)
         self.chat_updated.emit()
-        touch_ai_flag()  # let the orb react like Jarvis is "speaking"
+        touch_ai_flag()  # let the orb react like Iris is "speaking"
+        self._speak_worker = SpeakWorker(msg, self)
+        self._speak_worker.start()
 
     def _on_failed(self, err: str):
-        self._replace_thinking(f'<span style="color:#FF8080">⚠ Could not reach Jarvis: {err}</span>')
+        self._replace_thinking(f'<span style="color:#FF8080">⚠ Could not reach Iris: {err}</span>')
 
     def _cleanup(self):
         self.input.setEnabled(True)
         self.send_btn.setEnabled(True)
         self.input.setFocus()
         self._worker = None
+
+    def _on_wake_heard(self, text: str):
+        """Fired continuously by WakeListenerThread with anything picked up.
+        No wake word required anymore — everything heard goes to Iris, and
+        she herself decides whether it's directed at her / worth acting on."""
+        self._send_ambient(text)
+
+    def trigger_listen(self):
+        """One-shot capture, used for the clap-twice gesture and for a bare
+        wake-word with no command attached."""
+        if self._listen_worker is not None:
+            return
+        self._wake_thread.pause()  # don't fight the one-shot capture for the mic
+        self.input.setPlaceholderText("Listening...")
+        self._listen_worker = ListenWorker(self)
+        self._listen_worker.heard.connect(self._on_capture_heard)
+        self._listen_worker.finished.connect(self._listen_cleanup)
+        self._listen_worker.start()
+
+    def _on_capture_heard(self, text: str):
+        if text:
+            self.input.setText(text)
+            self._send()
+        else:
+            self.input.setPlaceholderText("Didn't catch that — try again or clap twice")
+
+    def _listen_cleanup(self):
+        self.input.setPlaceholderText("Listening... just talk, or clap twice, or type here...")
+        self._listen_worker = None
+        self._wake_thread.resume()
 
 
 class Sidebar(QFrame):
@@ -483,9 +635,29 @@ class Sidebar(QFrame):
         lay.setContentsMargins(14, 18, 14, 14)
         lay.setSpacing(12)
 
-        title = QLabel("J.A.R.V.I.S")
+        title = QLabel("I.R.I.S")
         title.setStyleSheet("color:#E8E8EC; font-size:16px; font-weight:700; letter-spacing:1px;")
         lay.addWidget(title)
+
+        model_label = QLabel("BRAIN MODEL")
+        model_label.setStyleSheet("color:#6b6b72; font-size:10px; font-weight:600; letter-spacing:1px;")
+        lay.addWidget(model_label)
+
+        self.model_combo = QComboBox()
+        self.model_combo.setStyleSheet(
+            "QComboBox { background:#1f1f24; color:#E8E8EC; border:1px solid #2c2c32;"
+            " border-radius:8px; padding:6px 8px; font-size:12px; }"
+            "QComboBox QAbstractItemView { background:#1f1f24; color:#E8E8EC;"
+            " selection-background-color:#3a3a42; }"
+        )
+        self._populate_models()
+        self.model_combo.activated.connect(self._on_model_picked)
+        lay.addWidget(self.model_combo)
+
+        self.model_status = QLabel("")
+        self.model_status.setWordWrap(True)
+        self.model_status.setStyleSheet("color:#7fd48a; font-size:10px;")
+        lay.addWidget(self.model_status)
 
         new_btn = QPushButton("+  New chat")
         new_btn.setCursor(Qt.PointingHandCursor)
@@ -514,6 +686,43 @@ class Sidebar(QFrame):
     def _on_item_clicked(self, item: QListWidgetItem):
         self.chat_selected.emit(item.data(Qt.UserRole))
 
+    def _populate_models(self):
+        """Auto-detect installed Ollama models + mark whichever Hermes is
+        currently pointed at (local or cloud) as the selected entry."""
+        self.model_combo.blockSignals(True)
+        self.model_combo.clear()
+        local_models = iris_model_config.list_ollama_models()
+        current = iris_model_config.get_current_model()
+        current_default = current.get("default")
+        current_is_local = current.get("provider") in ("ollama", "custom", "vllm", "llamacpp")
+
+        for m in local_models:
+            self.model_combo.addItem(f"🖥 {m} (local)", ("local", m))
+        cloud_label = f"☁ {current_default} (cloud)" if not current_is_local and current_default else "☁ cloud (current)"
+        self.model_combo.addItem(cloud_label, ("cloud", current_default or ""))
+
+        # pre-select whatever is actually active right now
+        target = ("local", current_default) if current_is_local else ("cloud", current_default)
+        for i in range(self.model_combo.count()):
+            if self.model_combo.itemData(i) == target:
+                self.model_combo.setCurrentIndex(i)
+                break
+        self.model_combo.blockSignals(False)
+
+    def _on_model_picked(self, index: int):
+        kind, model_name = self.model_combo.itemData(index)
+        if kind != "local" or not model_name:
+            return  # only local switches are driven from this dropdown
+        self.model_combo.setEnabled(False)
+        self.model_status.setText(f"Switching to local model '{model_name}'... (old mode turning off)")
+        try:
+            msg = iris_model_config.switch_local_model(model_name)
+            self.model_status.setText(f"✅ {msg}")
+        except Exception as e:
+            self.model_status.setText(f"⚠ Model switch failed: {e}")
+        finally:
+            self.model_combo.setEnabled(True)
+
     def refresh(self, chats):
         self.list.clear()
         for c in chats:
@@ -525,7 +734,7 @@ class Sidebar(QFrame):
 class NovaHUD(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("J.A.R.V.I.S HUD")
+        self.setWindowTitle("I.R.I.S HUD")
         self.resize(1280, 760)
         self.setStyleSheet("background-color: #171717;")
 
@@ -548,9 +757,17 @@ class NovaHUD(QMainWindow):
         self.orb = ParticleOrb(self.canvas)
         self.chatbar = ChatBar(self.history, self.canvas)
         self.chatbar.chat_updated.connect(self._refresh_sidebar)
+        self.orb.activate_requested.connect(self.chatbar.trigger_listen)  # clap twice -> listen
 
         self._refresh_sidebar()
         self._place_widgets()
+
+        # auto-detect if any AI mode is already running; if not, turn the
+        # last-selected one on automatically — and stand up the AI Command
+        # Terminal — without blocking the UI thread.
+        self._autostart = AutoStartWorker(self)
+        self._autostart.done.connect(lambda msg: print(f"[iris] {msg}"))
+        self._autostart.start()
 
     def _new_chat(self):
         self.chatbar.start_new_chat()
@@ -563,19 +780,26 @@ class NovaHUD(QMainWindow):
 
     def _place_widgets(self):
         w, h = self.canvas.width(), self.canvas.height()
-        s = int(max(180, min(320, min(w, h) * 0.30)))
-        margin = 18
-        self.orb.setGeometry(w - s - margin, h - s - margin, s, s)
 
+        # orb: big, centered
+        s = int(max(260, min(560, min(w, h) * 0.55)))
+        self.orb.setGeometry((w - s) // 2, (h - s) // 2, s, s)
+
+        # chat bar: docked at the bottom
         bar_w = int(min(900, w * 0.78))
-        bar_h = 240
+        bar_h = 220
         bx = (w - bar_w) // 2
-        by = (h - bar_h) // 2
+        margin_bottom = 28
+        by = h - bar_h - margin_bottom
         self.chatbar.setGeometry(bx, by, bar_w, bar_h)
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
         self._place_widgets()
+
+    def closeEvent(self, event):
+        self.chatbar._wake_thread.stop()
+        self.orb.closeEvent(event)
 
 
 def main():
