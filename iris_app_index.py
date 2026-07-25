@@ -28,7 +28,7 @@ try:
 except Exception:
     winreg = None
 
-_CACHE_PATH = os.path.join(os.getcwd(), "jarvis_data", "app_index.json")
+_CACHE_PATH = os.path.join(os.getcwd(), "iris_data", "app_index.json")
 _CACHE_TTL = 3600  # rescan at most once an hour
 _mem_cache = {"ts": 0, "apps": {}}
 
