@@ -1,6 +1,6 @@
-"""Simple persistent memory for Jarvis.
+"""Simple persistent memory for Iris.
 
-Stores messages (user and assistant) in a SQLite database under jarvis_data/
+Stores messages (user and assistant) in a SQLite database under iris_data/
 Provides helpers to save conversations, recall recent history, search, summarize,
 and prune old entries according to retention policy.
 
@@ -13,12 +13,12 @@ import json
 import time
 from typing import List, Dict, Optional
 
-DB_FILENAME = 'jarvis_memory.db'
+DB_FILENAME = 'iris_memory.db'
 DEFAULT_RETENTION_DAYS: Optional[int] = None  # None == keep forever
 
 
 def _db_path() -> str:
-    d = os.path.join(os.getcwd(), 'jarvis_data')
+    d = os.path.join(os.getcwd(), 'iris_data')
     os.makedirs(d, exist_ok=True)
     return os.path.join(d, DB_FILENAME)
 
@@ -26,7 +26,7 @@ def _db_path() -> str:
 def _data_dir_path() -> str:
     """Return the project-level `data/` folder path (user requested).
 
-    This is separate from `jarvis_data/` and will contain a human-readable
+    This is separate from `iris_data/` and will contain a human-readable
     JSONL memory file so the user can open it easily.
     """
     d = os.path.join(os.getcwd(), 'data')
@@ -146,7 +146,7 @@ def summarize_recent(n: int = 10) -> str:
     parts = []
     # oldest first for readability
     for m in reversed(msgs):
-        sender = 'You' if m['sender'] == 'user' else 'Jarvis'
+        sender = 'You' if m['sender'] == 'user' else 'Iris'
         ts = time.strftime('%Y-%m-%d %H:%M', time.localtime(m['timestamp']))
         parts.append(f"[{ts}] {sender}: {m['text']}")
     return "\n".join(parts)
