@@ -156,7 +156,7 @@ async def send_email_interactive(recipient: str = None, subject: str = None, mes
 
     # write result file for agent compatibility
     try:
-        data_dir = os.path.join(os.path.dirname(__file__), 'jarvis_data')
+        data_dir = os.path.join(os.path.dirname(__file__), 'iris_data')
         os.makedirs(data_dir, exist_ok=True)
         result_path = os.path.join(data_dir, 'email_result.json')
         with open(result_path, 'w', encoding='utf-8') as rf:
@@ -200,7 +200,7 @@ def send_email_direct(recipient_identifier: str, subject: str, message: str) -> 
         result = {"status": "error", "error": str(e), "receiver": receiver, "traceback": tb}
     # write result file for agent compatibility
     try:
-        data_dir = os.path.join(os.path.dirname(__file__), 'jarvis_data')
+        data_dir = os.path.join(os.path.dirname(__file__), 'iris_data')
         os.makedirs(data_dir, exist_ok=True)
         result_path = os.path.join(data_dir, 'email_result.json')
         with open(result_path, 'w', encoding='utf-8') as rf:
