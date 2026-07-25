@@ -13,8 +13,8 @@ import sqlite3
 import time
 from typing import List, Dict, Optional
 
-DB_PATH = os.path.join(os.getcwd(), "jarvis_data", "graph_memory.db")
-HTML_PATH = os.path.join(os.getcwd(), "jarvis_data", "memory_graph.html")
+DB_PATH = os.path.join(os.getcwd(), "iris_data", "graph_memory.db")
+HTML_PATH = os.path.join(os.getcwd(), "iris_data", "memory_graph.html")
 
 # node "kind" -> color, so the visual graph is organized/legible by category
 KIND_COLORS = {
