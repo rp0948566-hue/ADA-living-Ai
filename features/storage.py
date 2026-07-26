@@ -1,6 +1,6 @@
 import os
 
-DATA_DIR_NAME = 'jarvis_data'
+DATA_DIR_NAME = 'iris_data'
 
 def get_data_dir():
     base = os.getcwd()

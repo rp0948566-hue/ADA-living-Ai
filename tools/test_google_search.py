@@ -10,7 +10,7 @@ import asyncio
 from dotenv import load_dotenv
 load_dotenv()
 
-from Jarvis_google_search import google_search
+from Iris_google_search import google_search
 
 async def main():
     if len(sys.argv) > 1:

@@ -1,6 +1,6 @@
 import sys, os
 sys.path.insert(0, os.getcwd())
-from Jarvis_youtube_music import play_youtube_song_sync
+from Iris_youtube_music import play_youtube_song_sync
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:

@@ -22,9 +22,9 @@ class SafeController:
         pyautogui.FAILSAFE = False  # Move mouse to top-left corner to stop script
 
     def log(self, action: str):
-        # write into centralized jarvis_data if possible
+        # write into centralized iris_data if possible
         try:
-            data_dir = os.path.join(os.getcwd(), 'jarvis_data')
+            data_dir = os.path.join(os.getcwd(), 'iris_data')
             os.makedirs(data_dir, exist_ok=True)
             path = os.path.join(data_dir, 'control_log.txt')
             with builtins.open(path, 'a', encoding='utf-8', errors='replace') as f:

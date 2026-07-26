@@ -18,12 +18,12 @@ from livekit.plugins import (
     silero,
     noise_cancellation,
 )
-from Jarvis_prompts import Reply_prompts
+from Iris_prompts import Reply_prompts
 from keyboard_mouse_CTRL import move_cursor_tool, mouse_click_tool, scroll_cursor_tool, type_text_tool, press_key_tool, swipe_gesture_tool, press_hotkey_tool, control_volume_tool
 load_dotenv()
 
 # Hermes Agent — the "brain". Reasoning, memory, skills, and desktop-control
-# tools (via the jarvis-tools MCP server, see tools/jarvis_mcp_server.py)
+# tools (via the iris-tools MCP server, see tools/iris_mcp_server.py)
 # all live in Hermes now; this process only handles voice I/O.
 HERMES_API_BASE_URL = os.getenv("HERMES_API_BASE_URL", "http://127.0.0.1:8642/v1")
 HERMES_API_KEY = os.getenv("API_SERVER_KEY")
@@ -36,11 +36,11 @@ class Assistant(Agent):
             # Persona lives in Hermes's SOUL.md now. Keep this minimal —
             # Hermes builds its own system prompt and treats anything passed
             # here as an ephemeral override layered on top of SOUL.md.
-            instructions="You are Jarvis. Speak concisely.",
+            instructions="You are Iris. Speak concisely.",
             tools=[
                 # Mouse/keyboard/volume stay local for instant response —
                 # everything else (apps, files, email, YouTube, weather,
-                # camera) is handled by Hermes via the jarvis-tools MCP
+                # camera) is handled by Hermes via the iris-tools MCP
                 # bridge, not by LiveKit's own tool-calling loop.
                 move_cursor_tool,
                 mouse_click_tool,
@@ -75,11 +75,11 @@ async def entrypoint(ctx: agents.JobContext):
         tts=openai.TTS(),  # requires OPENAI_API_KEY in .env
     )
 
-    # --- GUI orb sync: touch jarvis_data/ai_speaking.flag while Jarvis talks
+    # --- GUI orb sync: touch iris_data/ai_speaking.flag while Iris talks
     # so the HUD orb switches to its "AI speaking" color/motion mode.
     def _touch_ai_flag():
         try:
-            data_dir = os.path.join(os.getcwd(), 'jarvis_data')
+            data_dir = os.path.join(os.getcwd(), 'iris_data')
             os.makedirs(data_dir, exist_ok=True)
             with builtins.open(os.path.join(data_dir, 'ai_speaking.flag'), 'w') as f:
                 f.write(str(time.time()))
@@ -113,11 +113,11 @@ async def entrypoint(ctx: agents.JobContext):
     await ctx.connect()
 
     async def safe_generate_reply(sess, instructions, retries: int = 3, base_wait: float = 1.0) -> bool:
-        """Try to call sess.generate_reply with retries and log failures to jarvis_data/realtime_errors.log.
+        """Try to call sess.generate_reply with retries and log failures to iris_data/realtime_errors.log.
 
         Returns True on success, False if all retries failed.
         """
-        logdir = os.path.join(os.getcwd(), 'jarvis_data')
+        logdir = os.path.join(os.getcwd(), 'iris_data')
         os.makedirs(logdir, exist_ok=True)
         logpath = os.path.join(logdir, 'realtime_errors.log')
 
@@ -142,13 +142,13 @@ async def entrypoint(ctx: agents.JobContext):
 
     ok = await safe_generate_reply(session, Reply_prompts)
     if not ok:
-        print("Failed to generate initial reply after retries. See jarvis_data/realtime_errors.log for details.")
+        print("Failed to generate initial reply after retries. See iris_data/realtime_errors.log for details.")
 
 if __name__ == "__main__":
     # Best-effort: start the GUI when the agent is launched so the user sees the interface.
     def start_gui_if_needed():
         try:
-            data_dir = os.path.join(os.getcwd(), 'jarvis_data')
+            data_dir = os.path.join(os.getcwd(), 'iris_data')
             os.makedirs(data_dir, exist_ok=True)
             lock_path = os.path.join(data_dir, 'gui_running.lock')
             log_path = os.path.join(data_dir, 'gui_launch.log')
@@ -169,7 +169,7 @@ if __name__ == "__main__":
                 else:
                     pythonw = sys.executable
 
-            gui_script = os.path.join(os.getcwd(), 'jarvis_gui.py')
+            gui_script = os.path.join(os.getcwd(), 'iris_gui.py')
             env = os.environ.copy()
 
             try:

@@ -18,16 +18,17 @@ import uuid
 import numpy as np
 import requests
 
-from PySide6.QtCore import Qt, QTimer, QPointF, QThread, Signal
-from PySide6.QtGui import QColor, QPainter, QPen, QFont, QTextCursor
+from PySide6.QtCore import Qt, QTimer, QPointF, QRectF, QThread, Signal
+from PySide6.QtGui import QColor, QPainter, QPen, QBrush, QFont, QTextCursor, QImage, QPixmap, QPainterPath
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QLineEdit, QPushButton,
     QLabel, QVBoxLayout, QHBoxLayout, QSizePolicy, QTextEdit,
-    QListWidget, QListWidgetItem, QFrame, QComboBox,
+    QListWidget, QListWidgetItem, QFrame, QComboBox, QCheckBox,
 )
 
 import iris_model_config
 import iris_voice
+import iris_vision
 
 try:
     import sounddevice as sd
@@ -103,6 +104,13 @@ class ChatHistoryStore:
                 return c
         return None
 
+    def delete(self, chat_id):
+        chat = self.get(chat_id)
+        if chat is not None:
+            self.chats.remove(chat)
+            self._save()
+        return chat is not None
+
 
 class HermesWorker(QThread):
     """Sends one message to Hermes's local API server and reports back the
@@ -154,7 +162,7 @@ class ListenWorker(QThread):
     heard = Signal(str)
 
     def run(self):
-        text = iris_voice.listen()
+        text = iris_voice.listen_and_translate()
         self.heard.emit(text)
 
 
@@ -185,12 +193,13 @@ class WakeListenerThread(QThread):
             if self._paused:
                 time.sleep(0.2)
                 continue
-            text = iris_voice.listen(timeout=5, phrase_time_limit=8)
+            # short timeout: when nobody's talking, give up fast and loop
+            # right back around instead of sitting there waiting.
+            text = iris_voice.listen_and_translate(timeout=1.5, phrase_time_limit=8)
             if self._stop:
                 return
             if text and not self._paused:
-                self.heard.emit(text)
-                time.sleep(0.3)  # beat for the main thread to pause us for a one-shot capture
+                self.heard.emit(text)  # dispatched immediately, no artificial delay
 
 
 class AutoStartWorker(QThread):
@@ -266,6 +275,7 @@ class ParticleOrb(QWidget):
         self._rms_slow = 0.01   # slow-moving baseline of ambient loudness
         self._clap_time = 0.0   # when the last clap/snap was detected
         self._clap_times = []   # rolling window for 2+ claps = "activate" gesture
+        self.vision_settings = None  # shared dict from VisionEngine — privacy toggle for clap wake
         self._stream = None
         if sd is not None:
             try:
@@ -279,7 +289,8 @@ class ParticleOrb(QWidget):
                         self._clap_times = [t2 for t2 in self._clap_times if now - t2 < 1.5] + [now]
                         if len(self._clap_times) >= 2:
                             self._clap_times = []
-                            self.activate_requested.emit()
+                            if self.vision_settings is None or self.vision_settings.get("clap_detection", True):
+                                self.activate_requested.emit()
                     self._rms_slow = 0.95 * self._rms_slow + 0.05 * rms
                 self._stream = sd.InputStream(
                     samplerate=16000, channels=1, blocksize=1024, callback=_cb
@@ -440,6 +451,7 @@ class ChatBar(QWidget):
         self._worker = None
         self._listen_worker = None
         self._speak_worker = None
+        self._pending = None  # (display_text, payload_text) queued while a reply is in flight
 
         outer = QVBoxLayout(self)
         outer.setContentsMargins(0, 0, 0, 0)
@@ -536,6 +548,11 @@ class ChatBar(QWidget):
 
     def _dispatch(self, display_text: str, payload_text: str):
         if self._worker is not None:
+            # Iris is still replying to the last thing — never drop what was
+            # just said/typed, queue it and it fires the moment she's free.
+            self._pending = (display_text, payload_text)
+            self.input.clear()
+            self.input.setPlaceholderText("Iris is still replying — sending this right after...")
             return
         if self.chat is None:
             self.start_new_chat()
@@ -586,6 +603,11 @@ class ChatBar(QWidget):
         self.send_btn.setEnabled(True)
         self.input.setFocus()
         self._worker = None
+        self._wake_thread.resume()  # only resume ambient listening once this full turn is done
+        if self._pending is not None:
+            display_text, payload_text = self._pending
+            self._pending = None
+            self._dispatch(display_text, payload_text)
 
     def _on_wake_heard(self, text: str):
         """Fired continuously by WakeListenerThread with anything picked up.
@@ -608,14 +630,47 @@ class ChatBar(QWidget):
     def _on_capture_heard(self, text: str):
         if text:
             self.input.setText(text)
-            self._send()
+            self._send()  # _cleanup (fired once the reply finishes) resumes ambient listening
         else:
             self.input.setPlaceholderText("Didn't catch that — try again or clap twice")
+            self._wake_thread.resume()  # nothing dispatched — safe to resume right away
 
     def _listen_cleanup(self):
         self.input.setPlaceholderText("Listening... just talk, or clap twice, or type here...")
         self._listen_worker = None
-        self._wake_thread.resume()
+
+
+class ChatRow(QWidget):
+    """One row in the previous-chats list: title (click to open) + a small
+    ✕ button (click to delete that chat)."""
+
+    clicked = Signal()
+    delete_clicked = Signal()
+
+    def __init__(self, title: str, parent=None):
+        super().__init__(parent)
+        lay = QHBoxLayout(self)
+        lay.setContentsMargins(6, 4, 4, 4)
+        lay.setSpacing(6)
+
+        self.label = QLabel(title)
+        self.label.setStyleSheet("color:#C9C9CF; font-size:12px; background:transparent;")
+        lay.addWidget(self.label, 1)
+
+        del_btn = QPushButton("✕")
+        del_btn.setFixedSize(20, 20)
+        del_btn.setCursor(Qt.PointingHandCursor)
+        del_btn.setToolTip("Delete this chat")
+        del_btn.setStyleSheet(
+            "QPushButton { background:transparent; color:#8a8a90; border:none; font-size:12px; }"
+            "QPushButton:hover { color:#FF8080; }"
+        )
+        del_btn.clicked.connect(self.delete_clicked.emit)
+        lay.addWidget(del_btn, 0)
+
+    def mousePressEvent(self, event):
+        self.clicked.emit()
+        super().mousePressEvent(event)
 
 
 class Sidebar(QFrame):
@@ -623,6 +678,7 @@ class Sidebar(QFrame):
 
     new_chat_clicked = Signal()
     chat_selected = Signal(str)
+    chat_delete_requested = Signal(str)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -680,11 +736,7 @@ class Sidebar(QFrame):
             "QListWidget::item:selected { background:#24242b; color:#fff; }"
             "QListWidget::item:hover { background:#1c1c21; }"
         )
-        self.list.itemClicked.connect(self._on_item_clicked)
         lay.addWidget(self.list, 1)
-
-    def _on_item_clicked(self, item: QListWidgetItem):
-        self.chat_selected.emit(item.data(Qt.UserRole))
 
     def _populate_models(self):
         """Auto-detect installed Ollama models + mark whichever Hermes is
@@ -726,9 +778,180 @@ class Sidebar(QFrame):
     def refresh(self, chats):
         self.list.clear()
         for c in chats:
-            item = QListWidgetItem(c["title"] or "New chat")
-            item.setData(Qt.UserRole, c["id"])
+            chat_id = c["id"]
+            item = QListWidgetItem()
+            item.setData(Qt.UserRole, chat_id)
             self.list.addItem(item)
+
+            row = ChatRow(c["title"] or "New chat")
+            row.clicked.connect(lambda cid=chat_id: self.chat_selected.emit(cid))
+            row.delete_clicked.connect(lambda cid=chat_id: self.chat_delete_requested.emit(cid))
+            item.setSizeHint(row.sizeHint())
+            self.list.setItemWidget(item, row)
+
+
+class CameraWidget(QWidget):
+    """Small circular camera preview, top-right of the HUD. Shows only hand
+    tracking (gesture) — face/body tracking run in the backend but never
+    render here, by design. Click to expand into VisionPanel."""
+
+    clicked = Signal()
+
+    SIZE = 76
+
+    def __init__(self, engine: "iris_vision.VisionEngine", parent=None):
+        super().__init__(parent)
+        self.engine = engine
+        self.setFixedSize(self.SIZE, self.SIZE)
+        self.setCursor(Qt.PointingHandCursor)
+        self._pixmap = None
+        self._t0 = time.time()
+
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self._tick)
+        self.timer.start(90)  # ~11fps — plenty for a small preview
+
+    def _tick(self):
+        jpeg = self.engine.get_last_jpeg() if self.engine.available else None
+        if jpeg:
+            img = QImage.fromData(jpeg, "JPG")
+            if not img.isNull():
+                self._pixmap = QPixmap.fromImage(img)
+        self.update()
+
+    def mousePressEvent(self, event):
+        self.clicked.emit()
+        super().mousePressEvent(event)
+
+    def paintEvent(self, event):
+        s = self.SIZE
+        p = QPainter(self)
+        p.setRenderHint(QPainter.Antialiasing, True)
+
+        clip = QPainterPath()
+        clip.addEllipse(2, 2, s - 4, s - 4)
+        p.setClipPath(clip)
+
+        if self._pixmap is not None and not self._pixmap.isNull():
+            scaled = self._pixmap.scaled(s, s, Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation)
+            x = (scaled.width() - s) // 2
+            y = (scaled.height() - s) // 2
+            p.drawPixmap(-x, -y, scaled)
+        else:
+            p.fillRect(0, 0, s, s, QColor(26, 26, 30, 235))
+            p.setPen(QColor(120, 120, 128))
+            p.setFont(QFont("Segoe UI", 9))
+            p.drawText(QRectF(0, 0, s, s), Qt.AlignCenter, "cam\noff" if not self.engine.available else "…")
+
+        p.setClipping(False)
+
+        # ring border
+        camera_on = self.engine.settings.get("camera_enabled", True) and self.engine.available
+        ring_color = QColor(120, 230, 150) if camera_on else QColor(90, 90, 96)
+        p.setPen(QPen(ring_color, 2))
+        p.setBrush(Qt.NoBrush)
+        p.drawEllipse(QRectF(1, 1, s - 2, s - 2))
+
+        # privacy/status dot, bottom-right — soft pulse while camera is live
+        if camera_on:
+            pulse = 0.55 + 0.45 * abs(math.sin((time.time() - self._t0) * 2.2))
+            dot_color = QColor(255, 90, 90, int(160 + 95 * pulse))
+        else:
+            dot_color = QColor(110, 110, 116)
+        p.setPen(Qt.NoPen)
+        p.setBrush(QBrush(dot_color))
+        p.drawEllipse(QPointF(s - 12, s - 12), 6, 6)
+        p.setPen(QPen(QColor(23, 23, 23), 2))
+        p.setBrush(Qt.NoBrush)
+        p.drawEllipse(QPointF(s - 12, s - 12), 6, 6)
+
+
+class VisionPanel(QFrame):
+    """Expanded vision workspace — larger preview, current hand gesture,
+    and privacy toggles. Opens when the CameraWidget is clicked."""
+
+    closed = Signal()
+
+    def __init__(self, engine: "iris_vision.VisionEngine", parent=None):
+        super().__init__(parent)
+        self.engine = engine
+        self.setFixedWidth(280)
+        self.setStyleSheet(
+            "QFrame { background: rgba(24,24,28,235); border: 1px solid rgba(255,255,255,30);"
+            " border-radius: 16px; }"
+            "QLabel { background: transparent; color: #E8E8EC; }"
+            "QCheckBox { background: transparent; color: #C9C9CF; font-size: 12px; }"
+        )
+
+        lay = QVBoxLayout(self)
+        lay.setContentsMargins(14, 12, 14, 12)
+        lay.setSpacing(10)
+
+        header = QHBoxLayout()
+        title = QLabel("Vision")
+        title.setStyleSheet("font-size:13px; font-weight:700; letter-spacing:0.5px;")
+        header.addWidget(title, 1)
+        close_btn = QPushButton("✕")
+        close_btn.setFixedSize(20, 20)
+        close_btn.setCursor(Qt.PointingHandCursor)
+        close_btn.setStyleSheet(
+            "QPushButton { background:transparent; color:#8a8a90; border:none; }"
+            "QPushButton:hover { color:#fff; }"
+        )
+        close_btn.clicked.connect(self.closed.emit)
+        header.addWidget(close_btn)
+        lay.addLayout(header)
+
+        self.preview = QLabel()
+        self.preview.setFixedSize(252, 189)
+        self.preview.setStyleSheet("background:#101012; border-radius:12px;")
+        self.preview.setAlignment(Qt.AlignCenter)
+        lay.addWidget(self.preview)
+
+        self.gesture_label = QLabel("Hand: none")
+        self.gesture_label.setStyleSheet("color:#8FD3FF; font-size:12px; font-weight:600;")
+        lay.addWidget(self.gesture_label)
+
+        settings_label = QLabel("PRIVACY")
+        settings_label.setStyleSheet("color:#6b6b72; font-size:10px; font-weight:600; letter-spacing:1px;")
+        lay.addWidget(settings_label)
+
+        self._checkboxes = {}
+        for key, label in [
+            ("camera_enabled", "Camera"),
+            ("face_recognition", "Face Recognition"),
+            ("body_tracking", "Body Tracking"),
+            ("hand_tracking", "Hand Tracking"),
+            ("gesture_recognition", "Gesture Recognition"),
+            ("clap_detection", "Clap Detection (wake)"),
+        ]:
+            cb = QCheckBox(label)
+            cb.setChecked(bool(self.engine.settings.get(key, True)))
+            cb.toggled.connect(lambda checked, k=key: self.engine.set_setting(k, checked))
+            lay.addWidget(cb)
+            self._checkboxes[key] = cb
+
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self._tick)
+        self.timer.start(100)
+
+    def _tick(self):
+        jpeg = self.engine.get_last_jpeg() if self.engine.available else None
+        if jpeg:
+            img = QImage.fromData(jpeg, "JPG")
+            if not img.isNull():
+                pm = QPixmap.fromImage(img).scaled(
+                    self.preview.width(), self.preview.height(),
+                    Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation,
+                )
+                self.preview.setPixmap(pm)
+        elif not self.engine.settings.get("camera_enabled", True):
+            self.preview.setText("Camera off")
+            self.preview.setStyleSheet(self.preview.styleSheet() + " color:#8a8a90;")
+
+        hand = self.engine.get_hand_state()
+        gesture = hand.get("gesture", "none") if hand.get("present") else "none"
+        self.gesture_label.setText(f"Hand: {gesture.replace('_', ' ')}")
 
 
 class NovaHUD(QMainWindow):
@@ -749,6 +972,7 @@ class NovaHUD(QMainWindow):
         self.sidebar = Sidebar(root)
         self.sidebar.new_chat_clicked.connect(self._new_chat)
         self.sidebar.chat_selected.connect(self._select_chat)
+        self.sidebar.chat_delete_requested.connect(self._delete_chat)
         root_lay.addWidget(self.sidebar)
 
         self.canvas = QWidget(root)
@@ -758,6 +982,16 @@ class NovaHUD(QMainWindow):
         self.chatbar = ChatBar(self.history, self.canvas)
         self.chatbar.chat_updated.connect(self._refresh_sidebar)
         self.orb.activate_requested.connect(self.chatbar.trigger_listen)  # clap twice -> listen
+
+        # Background vision engine — face/body tracking stay backend-only;
+        # only hand tracking ever renders in the UI, per design.
+        self.vision_engine = iris_vision.VisionEngine(target_fps=8)
+        self.orb.vision_settings = self.vision_engine.settings  # shared dict — clap toggle check
+        self.vision_engine.start()
+
+        self.camera_widget = CameraWidget(self.vision_engine, self.canvas)
+        self.camera_widget.clicked.connect(self._toggle_vision_panel)
+        self.vision_panel = None
 
         self._refresh_sidebar()
         self._place_widgets()
@@ -769,11 +1003,30 @@ class NovaHUD(QMainWindow):
         self._autostart.done.connect(lambda msg: print(f"[iris] {msg}"))
         self._autostart.start()
 
+    def _toggle_vision_panel(self):
+        if self.vision_panel is not None:
+            self.vision_panel.deleteLater()
+            self.vision_panel = None
+            return
+        self.vision_panel = VisionPanel(self.vision_engine, self.canvas)
+        self.vision_panel.closed.connect(self._toggle_vision_panel)
+        self.vision_panel.show()
+        self._place_widgets()
+        self.vision_panel.raise_()
+
     def _new_chat(self):
         self.chatbar.start_new_chat()
 
     def _select_chat(self, chat_id: str):
         self.chatbar.load_chat(chat_id)
+
+    def _delete_chat(self, chat_id: str):
+        was_open = self.chatbar.chat is not None and self.chatbar.chat["id"] == chat_id
+        self.history.delete(chat_id)
+        if was_open:
+            self.chatbar.chat = None
+            self.chatbar.transcript.clear()
+        self._refresh_sidebar()
 
     def _refresh_sidebar(self):
         self.sidebar.refresh(self.history.chats)
@@ -793,12 +1046,20 @@ class NovaHUD(QMainWindow):
         by = h - bar_h - margin_bottom
         self.chatbar.setGeometry(bx, by, bar_w, bar_h)
 
+        # camera widget: small circle, top-right
+        cam_margin = 18
+        self.camera_widget.move(w - CameraWidget.SIZE - cam_margin, cam_margin)
+        if self.vision_panel is not None:
+            self.vision_panel.move(w - self.vision_panel.width() - cam_margin,
+                                    cam_margin + CameraWidget.SIZE + 10)
+
     def resizeEvent(self, event):
         super().resizeEvent(event)
         self._place_widgets()
 
     def closeEvent(self, event):
         self.chatbar._wake_thread.stop()
+        self.vision_engine.stop()
         self.orb.closeEvent(event)
 
 

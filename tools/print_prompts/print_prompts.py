@@ -25,9 +25,9 @@ def main():
     args = parser.parse_args()
 
     try:
-        mod = importlib.import_module('Jarvis_prompts')
+        mod = importlib.import_module('Iris_prompts')
     except Exception as e:
-        print(f"Failed to import Jarvis_prompts: {e}")
+        print(f"Failed to import Iris_prompts: {e}")
         sys.exit(2)
 
     if not (args.reply or args.behavior or args.all):

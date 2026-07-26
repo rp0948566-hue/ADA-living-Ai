@@ -1,13 +1,13 @@
-"""J.A.R.V.I.S — one-command launcher (the whole software in one entry point).
+"""IRIS — one-command launcher (the whole software in one entry point).
 
 Boots everything in order and keeps it running:
   1. Hermes Agent gateway  (the brain + tools + graph memory API @ :8642)
   2. Waits until the brain's health endpoint is live
-  3. The J.A.R.V.I.S HUD GUI (sidebar + chat + voice-reactive orb)
+  3. The IRIS HUD GUI (sidebar + chat + voice-reactive orb)
 
 Run it with:
-    D:\\Jarvis.v3.0-main-main\\.venv\\Scripts\\python.exe start_jarvis.py
-or just double-click  start_jarvis.bat
+    D:\\Jarvis.v3.0-main-main\\.venv\\Scripts\\python.exe start_iris.py
+or just double-click  start_iris.bat
 
 Ctrl+C (or closing the console) shuts the brain back down cleanly.
 """
@@ -67,7 +67,7 @@ def main():
     # 3. GUI (HUD)
     log("Launching the HUD...")
     gui_py = JARVIS_PYW if os.path.exists(JARVIS_PYW) else JARVIS_PY
-    gui_proc = subprocess.Popen([gui_py, os.path.join(ROOT, "jarvis_gui.py")], cwd=ROOT)
+    gui_proc = subprocess.Popen([gui_py, os.path.join(ROOT, "iris_gui.py")], cwd=ROOT)
 
     log("J.A.R.V.I.S is up. Close the HUD window or press Ctrl+C here to stop.")
     try:

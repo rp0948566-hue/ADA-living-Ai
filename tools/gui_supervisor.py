@@ -2,7 +2,7 @@ import subprocess
 import time
 import sys
 
-SCRIPT = 'jarvis_gui.py'
+SCRIPT = 'iris_gui.py'
 
 if __name__ == '__main__':
     while True:

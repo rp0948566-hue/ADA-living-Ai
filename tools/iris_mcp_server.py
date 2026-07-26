@@ -32,6 +32,7 @@ import iris_get_whether
 import iris_app_index
 import iris_graph_memory
 import iris_model_config
+import iris_vision
 
 mcp = FastMCP(
     "iris-tools",
@@ -171,6 +172,30 @@ def camera_view() -> str:
         return "Camera abhi tak initialize nahi hua hai ya GUI running nahi hai."
     with open(path, "r", encoding="utf-8") as f:
         return f.read().strip() or "Camera se koi observation available nahi hai."
+
+
+@mcp.tool()
+def presence_check() -> str:
+    """Check whether Rudra is currently sitting in front of the computer,
+    and his rough posture (sitting / standing / leaning / moving).
+
+    Backend-only vision context — the face/body tracking behind this never
+    renders in the UI (only hand-tracking gestures do); this is purely for
+    situational awareness (e.g. "should I greet him", "has he stepped away").
+    Requires the GUI's vision engine to be running with camera + face
+    recognition + body tracking enabled.
+    """
+    data = iris_vision.read_presence()
+    face = data.get("face", {})
+    body = data.get("body", {})
+    if not face.get("present") and not body.get("present"):
+        return "Rudra abhi camera ke saamne nahi dikh raha — shayad away hai."
+    parts = ["Rudra is present in front of the camera."]
+    if face.get("distance"):
+        parts.append(f"Distance: {face['distance']}.")
+    if body.get("posture"):
+        parts.append(f"Posture: {body['posture']}.")
+    return " ".join(parts)
 
 
 @mcp.tool()
