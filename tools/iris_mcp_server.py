@@ -16,6 +16,7 @@ import json
 import os
 import subprocess
 import sys
+import threading
 import time
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -620,6 +621,53 @@ async def send_whatsapp_message(message: str, phone_number: str = "") -> str:
 
 
 WEBSITES_DIR = os.path.join(PROJECT_ROOT, "iris_data", "websites")
+UI_UX_PRO_MAX_SEARCH = os.path.join(PROJECT_ROOT, ".claude", "skills", "ui-ux-pro-max", "scripts", "search.py")
+DESIGN_RULES_PATH = os.path.join(PROJECT_ROOT, "iris_data", "design_rules.md")
+
+
+@mcp.tool()
+async def generate_design_system(topic: str, project_name: str = "") -> str:
+    """Generate a concrete design system (colors, typography, layout pattern,
+    anti-patterns to avoid) for a website topic, using the ui-ux-pro-max
+    design-intelligence engine (161 industry rules, real hex colors, real
+    Google Font pairings — not invented on the spot).
+
+    Call this before writing any website code — use its colors/fonts/layout
+    pattern as your actual design direction instead of guessing.
+
+    Args:
+        topic: What the site is for (e.g. "coffee shop", "fintech dashboard").
+        project_name: Optional display name for the design system output.
+    """
+    if not os.path.exists(UI_UX_PRO_MAX_SEARCH):
+        return "❌ ui-ux-pro-max skill not installed (expected at .claude/skills/ui-ux-pro-max/)."
+    args = [sys.executable, UI_UX_PRO_MAX_SEARCH, topic, "--design-system", "--json"]
+    if project_name:
+        args += ["-p", project_name]
+    try:
+        proc = await asyncio.create_subprocess_exec(
+            *args, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, cwd=PROJECT_ROOT
+        )
+        out, err = await asyncio.wait_for(proc.communicate(), timeout=30)
+        if proc.returncode != 0:
+            return f"❌ Design system generation failed: {err.decode(errors='replace')[:500]}"
+        return out.decode(errors="replace")
+    except Exception as e:
+        return f"❌ Design system generation failed: {e}"
+
+
+@mcp.tool()
+def read_design_rules() -> str:
+    """Read the condensed anti-AI-slop design checklist (colors/fonts as
+    tokens, no fabricated stats, no fake browser chrome, real responsive
+    breakpoints, no italic headings, real hover/focus states, accessibility
+    floor). Call this once before writing website code and follow it —
+    don't skip straight to generic template patterns.
+    """
+    if not os.path.exists(DESIGN_RULES_PATH):
+        return "⚠ Design rules file not found."
+    with open(DESIGN_RULES_PATH, "r", encoding="utf-8") as f:
+        return f.read()
 
 
 @mcp.tool()
@@ -695,10 +743,16 @@ def generate_design_image(prompt: str, project_path: str, relative_path: str) ->
 
 
 @mcp.tool()
-async def scaffold_website(project_name: str, stack: str = "vite-react-tailwind") -> str:
+def scaffold_website(project_name: str, stack: str = "vite-react-tailwind") -> str:
     """Scaffold a new website project (Vite + React + Tailwind by default) —
     prefer this over a plain static HTML file for anything "AAA level"; it
     gives you real components, hot-reload, and a proper build.
+
+    This starts the scaffold in its own visible PowerShell window and
+    returns immediately — `npm install` genuinely takes longer than a single
+    tool call is allowed to block for (it was hitting the MCP call timeout
+    and failing every time before). Call `check_scaffold_status` after a
+    minute or two to confirm it finished before writing any project files.
 
     Args:
         project_name: Folder/project name (no spaces — use hyphens).
@@ -709,22 +763,101 @@ async def scaffold_website(project_name: str, stack: str = "vite-react-tailwind"
     if os.path.exists(project_path):
         return f"⚠ Project already exists: {project_path}"
 
-    steps = [
-        f'cd "{WEBSITES_DIR}"',
-        f'npm create vite@latest {project_name} -- --template react',
-        f'cd "{project_path}"',
-        'npm install',
-        'npm install -D tailwindcss postcss autoprefixer',
-        'npx tailwindcss init -p',
-    ]
-    log = []
+    log_path = os.path.join(WEBSITES_DIR, f"{project_name}.scaffold.log")
+    done_marker = os.path.join(WEBSITES_DIR, f"{project_name}.scaffold.done")
+    # Tailwind v4 dropped `npx tailwindcss init -p` entirely (no more config
+    # files) in favor of the @tailwindcss/vite plugin — installing that here,
+    # then a background thread below wires it into vite.config.js/index.css
+    # once npm install finishes (plain Python file writes, not PowerShell
+    # string-escaping, since that's what actually breaks on Tailwind's syntax).
+    script = (
+        f'$host.UI.RawUI.WindowTitle = "IRIS - Scaffolding {project_name}"; '
+        f'cd "{WEBSITES_DIR}"; '
+        f'npm create vite@latest {project_name} -- --template react *>> "{log_path}"; '
+        f'cd "{project_path}"; '
+        f'npm install *>> "{log_path}"; '
+        f'npm install tailwindcss @tailwindcss/vite *>> "{log_path}"'
+    )
     with iris_screen_activity.active():
-        for cmd in steps:
-            rc, out = await asyncio.to_thread(iris_model_config.run_in_ai_terminal, cmd, 180)
-            log.append(f"$ {cmd}\n{(out or '(no output / timed out)')[:600]}")
-    ok = os.path.exists(project_path)
-    header = f"{'✅' if ok else '❌'} Scaffolded at {project_path}" if ok else "❌ Scaffold failed — see log below"
-    return header + "\n\n" + "\n\n".join(log)
+        subprocess.Popen(
+            ["powershell.exe", "-NoExit", "-NoProfile", "-Command", script],
+            cwd=WEBSITES_DIR,
+        )
+
+    def _finish_tailwind_setup():
+        tw_pkg = os.path.join(project_path, "node_modules", "@tailwindcss", "vite")
+        for _ in range(180):  # up to ~15 min
+            if os.path.isdir(tw_pkg):
+                break
+            time.sleep(5)
+        else:
+            return  # gave up — check_scaffold_status will just show "still running"
+
+        vite_config = os.path.join(project_path, "vite.config.js")
+        try:
+            with open(vite_config, "r", encoding="utf-8") as f:
+                content = f.read()
+            content = content.replace(
+                "import react from '@vitejs/plugin-react'",
+                "import react from '@vitejs/plugin-react'\nimport tailwindcss from '@tailwindcss/vite'",
+            )
+            content = content.replace("plugins: [react()]", "plugins: [react(), tailwindcss()]")
+            with open(vite_config, "w", encoding="utf-8") as f:
+                f.write(content)
+        except Exception:
+            pass
+
+        css_path = os.path.join(project_path, "src", "index.css")
+        try:
+            existing = ""
+            if os.path.exists(css_path):
+                with open(css_path, "r", encoding="utf-8") as f:
+                    existing = f.read()
+            with open(css_path, "w", encoding="utf-8") as f:
+                f.write('@import "tailwindcss";\n\n' + existing)
+        except Exception:
+            pass
+
+        try:
+            with open(done_marker, "w") as f:
+                f.write(str(time.time()))
+        except Exception:
+            pass
+
+    threading.Thread(target=_finish_tailwind_setup, daemon=True).start()
+
+    return (
+        f"🚀 Scaffolding started in its own window for '{project_name}' "
+        f"(npm install takes a couple minutes — this is running live, not "
+        f"blocking this reply). Project will be at {project_path}. Call "
+        f"check_scaffold_status('{project_name}') and wait for DONE before "
+        f"writing any files to it."
+    )
+
+
+@mcp.tool()
+def check_scaffold_status(project_name: str) -> str:
+    """Check progress of a scaffold_website call that may still be running.
+
+    Args:
+        project_name: The same project_name passed to scaffold_website.
+    """
+    project_path = os.path.join(WEBSITES_DIR, project_name)
+    log_path = os.path.join(WEBSITES_DIR, f"{project_name}.scaffold.log")
+    done_marker = os.path.join(WEBSITES_DIR, f"{project_name}.scaffold.done")
+    if not os.path.exists(log_path):
+        return "⚠ No scaffold log found for that name — did you call scaffold_website first?"
+    # PowerShell's `*>>` redirection writes this file as UTF-16LE, not UTF-8.
+    try:
+        with open(log_path, "r", encoding="utf-16") as f:
+            content = f.read()
+    except UnicodeError:
+        with open(log_path, "r", encoding="utf-8", errors="replace") as f:
+            content = f.read()
+    done = os.path.exists(done_marker)
+    tail = content[-1500:]
+    status = "✅ DONE — safe to write_project_file now" if done else "⏳ still running — wait and check again"
+    return f"{status}\nProject: {project_path}\n\n...{tail}"
 
 
 @mcp.tool()

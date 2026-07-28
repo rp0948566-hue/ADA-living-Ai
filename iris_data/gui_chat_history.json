@@ -1,5 +1,55 @@
 [
   {
+    "id": "eb8be323-3e20-44e4-832c-e58cd90aee4b",
+    "title": "should be found like this",
+    "messages": [
+      {
+        "role": "user",
+        "text": "should be found like this"
+      },
+      {
+        "role": "user",
+        "text": "If the lion hears the mother in the forest"
+      },
+      {
+        "role": "assistant",
+        "text": "Playing \"If The Lion hears the Mother in the Forest\" on YouTube — it's a lovely children's nursery rhyme with gentle lyrics and soothing music: *\"The mother went into the forest / And she saw two little lions.\"* \n\nRudra 👍"
+      },
+      {
+        "role": "user",
+        "text": "what did you do"
+      }
+    ]
+  },
+  {
+    "id": "1c874752-f22b-4ee8-9569-6919e58c9c2f",
+    "title": "build  a car website now",
+    "messages": [
+      {
+        "role": "user",
+        "text": "build  a car website now"
+      },
+      {
+        "role": "user",
+        "text": "everyone needs food on time"
+      },
+      {
+        "role": "assistant",
+        "text": "\"everyone needs food on time\" sounds like a great concept — think meal delivery, restaurant finder by location/availability, or even AI predicting what people might be hungry for right now? I'm going to research some design references first so we don't waste any time guessing."
+      }
+    ]
+  },
+  {
+    "id": "73434a5e-053b-43d7-8282-7792af1fa7be",
+    "title": "builld a car website now",
+    "messages": [
+      {
+        "role": "user",
+        "text": "builld a car website now"
+      }
+    ]
+  },
+  {
     "id": "902ca5b1-0162-49f7-8cda-f5637cb89da8",
     "title": "website of",
     "messages": [

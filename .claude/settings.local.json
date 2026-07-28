@@ -123,7 +123,14 @@
       "Bash(curl -s -m 3 -o /dev/null -w \"health=%{http_code}\\\\n\" http://127.0.0.1:8642/health)",
       "Bash(curl -s http://localhost:11434/api/tags)",
       "Bash(nvidia-smi --query-gpu=name,memory.total,memory.used --format=csv)",
-      "Bash(taskkill //F //IM brave.exe)"
+      "Bash(taskkill //F //IM brave.exe)",
+      "Bash(npx --version)",
+      "Bash(curl -s -m 5 -o /dev/null -w \"github reachable: %{http_code}\\\\n\" https://github.com)",
+      "Bash(npm install *)",
+      "Bash(uipro init *)",
+      "Bash(python3 .claude/skills/ui-ux-pro-max/scripts/search.py \"coffee shop website\" --design-system --json)",
+      "Bash(npx skills *)",
+      "Bash(git clone *)"
     ]
   }
 }
