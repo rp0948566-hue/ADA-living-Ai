@@ -108,7 +108,22 @@
       "Bash(taskkill //F //PID 28500 //T)",
       "Bash(taskkill //F //PID 29840 //T)",
       "Bash(rm -f gui_vision_test.log)",
-      "Bash(.venv/Scripts/python.exe -m py_compile tools/iris_mcp_server.py)"
+      "Bash(.venv/Scripts/python.exe -m py_compile tools/iris_mcp_server.py)",
+      "Bash(.venv/Scripts/python.exe -m py_compile iris_task_queue.py iris_reports.py iris_gui.py tools/iris_mcp_server.py)",
+      "Bash(curl -s http://127.0.0.1:8642/health)",
+      "Bash(curl -s -m 2 http://127.0.0.1:8642/health)",
+      "Bash(.venv/Scripts/python.exe start_iris.py)",
+      "Bash(echo \"launched pid $!\")",
+      "Bash(.venv/Scripts/python.exe *)",
+      "Bash(npm -v)",
+      "Bash(break)",
+      "Bash(curl -s -m 3 -w \"\\\\nHTTP_CODE:%{http_code}\\\\n\" http://127.0.0.1:8642/health)",
+      "Bash(taskkill //F //PID 9648)",
+      "Bash(taskkill //F //IM python.exe)",
+      "Bash(curl -s -m 3 -o /dev/null -w \"health=%{http_code}\\\\n\" http://127.0.0.1:8642/health)",
+      "Bash(curl -s http://localhost:11434/api/tags)",
+      "Bash(nvidia-smi --query-gpu=name,memory.total,memory.used --format=csv)",
+      "Bash(taskkill //F //IM brave.exe)"
     ]
   }
 }

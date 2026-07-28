@@ -33,6 +33,11 @@ import iris_app_index
 import iris_graph_memory
 import iris_model_config
 import iris_vision
+import iris_task_queue
+import iris_reports
+import Iris_image_generator
+import iris_screen_activity
+from features import browser_automation
 
 mcp = FastMCP(
     "iris-tools",
@@ -61,16 +66,17 @@ async def open_app(app_title: str) -> str:
     Args:
         app_title: The app name to launch (fuzzy-matched against installed apps).
     """
-    target, matched, score = iris_app_index.resolve_app(app_title)
-    if target:
-        try:
-            os.startfile(target) if os.path.isabs(target) or os.path.exists(target) \
-                else subprocess.Popen(target, shell=True)
-            return f"🚀 Launched '{matched}' (match {score}%) → {target}"
-        except Exception as e:
-            return f"❌ Found '{matched}' but launch failed: {e}"
-    # fall back to the original shell-based opener
-    return await Iris_window_CTRL.open(app_title)
+    with iris_screen_activity.active():
+        target, matched, score = iris_app_index.resolve_app(app_title)
+        if target:
+            try:
+                os.startfile(target) if os.path.isabs(target) or os.path.exists(target) \
+                    else subprocess.Popen(target, shell=True)
+                return f"🚀 Launched '{matched}' (match {score}%) → {target}"
+            except Exception as e:
+                return f"❌ Found '{matched}' but launch failed: {e}"
+        # fall back to the original shell-based opener
+        return await Iris_window_CTRL.open(app_title)
 
 
 @mcp.tool()
@@ -91,7 +97,8 @@ async def close_window(window_title: str) -> str:
     Args:
         window_title: Substring to match against open window titles.
     """
-    return await Iris_window_CTRL.close(window_title)
+    with iris_screen_activity.active():
+        return await Iris_window_CTRL.close(window_title)
 
 
 @mcp.tool()
@@ -104,7 +111,8 @@ async def folder_file_command(command: str) -> str:
     Args:
         command: The natural-language folder/file command.
     """
-    return await Iris_window_CTRL.folder_file(command)
+    with iris_screen_activity.active():
+        return await Iris_window_CTRL.folder_file(command)
 
 
 @mcp.tool()
@@ -114,7 +122,8 @@ async def play_file(name: str) -> str:
     Args:
         name: The file name (or close approximation) to search for and open.
     """
-    return await Iris_file_opner.Play_file(name)
+    with iris_screen_activity.active():
+        return await Iris_file_opner.Play_file(name)
 
 
 @mcp.tool()
@@ -137,7 +146,8 @@ def play_youtube(song_name: str) -> str:
     Args:
         song_name: What to search for and play on YouTube.
     """
-    return Iris_youtube_music.play_youtube_song_sync(song_name)
+    with iris_screen_activity.active():
+        return Iris_youtube_music.play_youtube_song_sync(song_name)
 
 
 @mcp.tool()
@@ -147,7 +157,8 @@ def control_youtube(command: str) -> str:
     Args:
         command: One of: pause, play, resume, next, mute, unmute, fullscreen, exit fullscreen.
     """
-    return Iris_youtube_music.youtube_control(command)
+    with iris_screen_activity.active():
+        return Iris_youtube_music.youtube_control(command)
 
 
 @mcp.tool()
@@ -216,7 +227,8 @@ async def run_command(command: str, timeout: int = 120) -> str:
     """
     started = time.time()
     try:
-        rc, text = await asyncio.to_thread(iris_model_config.run_in_ai_terminal, command, timeout)
+        with iris_screen_activity.active():
+            rc, text = await asyncio.to_thread(iris_model_config.run_in_ai_terminal, command, timeout)
         if text is None:
             _log_command(command, "", -1, "timeout")
             return f"⏱️ Command timed out after {timeout}s: {command}"
@@ -447,6 +459,316 @@ def switch_to_cloud_model(model_name: str, provider: str = "openrouter", restart
     if restart_gateway:
         return iris_model_config.switch_cloud_model(model_name, provider)
     return iris_model_config.set_cloud_model(model_name, provider)
+
+
+@mcp.tool()
+def queue_task(description: str, when: str = "now") -> str:
+    """Hand off a task to run later, decoupled from this conversation turn —
+    either in the background right away, or at a specific time.
+
+    Use this whenever Vikash sir says something like "I'm coming back in a
+    bit, meanwhile do/research X", "automate this for me", or gives a fixed
+    time ("remind me / do this at 5:30", "in 30 minutes"). The task runs
+    through you exactly like a normal message (with all your tools
+    available — research, save_report, run_command, etc.), and once it
+    finishes he gets pinged with the result automatically. You don't need to
+    stay "in the loop" for it yourself — just queue it and move on.
+
+    Args:
+        description: What to do, written the way you'd want to receive it
+            as an instruction (be specific — this exact text is what you'll
+            be asked to act on later, with no other context attached).
+        when: "now" (default — runs in the background almost immediately),
+            "in 30 minutes", "in 2 hours", "17:30" / "5:30 pm" (today, or
+            tomorrow if that time already passed), or an ISO timestamp.
+    """
+    task = iris_task_queue.queue_task(description, when)
+    return f"✅ Queued (id={task['id']}, runs at {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(task['run_at']))}): {description}"
+
+
+@mcp.tool()
+def list_scheduled_tasks() -> str:
+    """List queued/background tasks and their status (pending/running/done/failed/cancelled)."""
+    tasks = iris_task_queue.list_tasks()
+    if not tasks:
+        return "No scheduled/background tasks."
+    lines = []
+    for t in tasks[-30:]:
+        ts = time.strftime("%m-%d %H:%M", time.localtime(t["run_at"]))
+        lines.append(f"[{t['id']}] ({t['status']}) @ {ts} — {t['description']}")
+    return "\n".join(lines)
+
+
+@mcp.tool()
+def cancel_scheduled_task(task_id: str) -> str:
+    """Cancel a pending scheduled/background task by its id (see list_scheduled_tasks).
+
+    Args:
+        task_id: The short id shown in list_scheduled_tasks, e.g. "a1b2c3d4e5".
+    """
+    return "✅ Cancelled." if iris_task_queue.cancel_task(task_id) else "⚠ Not found or already running/done."
+
+
+@mcp.tool()
+def save_report(title: str, content: str) -> str:
+    """Save a detailed write-up (research summary, notes, findings) as a
+    markdown file Vikash sir can open later, and tell him where it landed.
+
+    Use this after doing research or preparing anything "detailed" he asked
+    for — write the full content yourself first (using scrape_web/run_command
+    etc. as needed to gather it), then call this to persist it. Always
+    mention the returned file path back to him in your reply.
+
+    Args:
+        title: Short report title (used to name the file too).
+        content: The full markdown body of the report.
+    """
+    path = iris_reports.save_report(title, content)
+    return f"✅ Saved report to: {path}"
+
+
+@mcp.tool()
+def list_reports() -> str:
+    """List recently saved reports (see save_report), most recent first."""
+    reports = iris_reports.list_reports()
+    if not reports:
+        return "No reports saved yet."
+    return "\n".join(f"{title} — {path}" for title, path, _ in reports)
+
+
+@mcp.tool()
+def read_screen() -> str:
+    """See what's currently on Vikash sir's screen — takes a screenshot and
+    extracts any visible text from it (OCR).
+
+    Use this when he asks what's on his screen, to check the state of some
+    app/window before acting, or as situational awareness before automating
+    something. Requires Tesseract-OCR installed on the machine for the text
+    extraction; the screenshot is saved either way.
+    """
+    try:
+        from PIL import ImageGrab
+    except Exception as e:
+        return f"❌ Screenshot unavailable (PIL missing): {e}"
+    folder = os.path.join(PROJECT_ROOT, "iris_data", "screen_snapshots")
+    os.makedirs(folder, exist_ok=True)
+    path = os.path.join(folder, time.strftime("%Y%m%d_%H%M%S") + ".png")
+    try:
+        img = ImageGrab.grab()
+        img.save(path)
+    except Exception as e:
+        return f"❌ Screenshot failed: {e}"
+    try:
+        import pytesseract
+        text = pytesseract.image_to_string(img).strip()
+        if text:
+            return f"📸 Screenshot saved: {path}\n\nText visible on screen:\n{text[:4000]}"
+        return f"📸 Screenshot saved: {path}\n\n(No readable text detected on screen.)"
+    except Exception:
+        return (
+            f"📸 Screenshot saved: {path}\n\n"
+            "⚠ OCR not available (install Tesseract-OCR + `pip install pytesseract` "
+            "for text extraction) — screenshot itself was captured fine."
+        )
+
+
+@mcp.tool()
+async def send_whatsapp_message(message: str, phone_number: str = "") -> str:
+    """Send a WhatsApp message via WhatsApp Web, opened in Brave.
+
+    Use this for "message me on WhatsApp", "send this to myself on WhatsApp",
+    etc. Opens web.whatsapp.com in Brave with the chat + message prefilled,
+    waits for it to load, then sends it. If no phone_number is given, uses
+    WHATSAPP_SELF_NUMBER from .env (Vikash sir's own number) — set that up
+    first if it isn't configured, since "myself" needs a number to resolve to.
+
+    This drives the keyboard, so avoid touching the mouse/keyboard while it's
+    running (roughly 12-15 seconds).
+
+    Args:
+        message: The message text to send.
+        phone_number: Destination number with country code (e.g. "+919876543210").
+            Defaults to WHATSAPP_SELF_NUMBER from .env if omitted.
+    """
+    import urllib.parse
+    phone = (phone_number or os.getenv("WHATSAPP_SELF_NUMBER", "")).strip()
+    if not phone:
+        return (
+            "❌ No phone number configured. Add WHATSAPP_SELF_NUMBER=+91XXXXXXXXXX "
+            "(with country code) to the .env file, or pass phone_number explicitly."
+        )
+    url = f"https://web.whatsapp.com/send?phone={phone}&text={urllib.parse.quote(message)}"
+
+    def _do_send():
+        target, _, _ = iris_app_index.resolve_app("brave")
+        if target:
+            subprocess.Popen([target, url] if os.path.isabs(target) else f'"{target}" "{url}"',
+                              shell=not os.path.isabs(target))
+        else:
+            import webbrowser
+            webbrowser.open(url)
+        time.sleep(13)  # let WhatsApp Web load the chat + prefill the text box
+        import pyautogui
+        pyautogui.press("enter")
+
+    try:
+        with iris_screen_activity.active():
+            await asyncio.to_thread(_do_send)
+        return f"✅ WhatsApp message sent to {phone}: {message}"
+    except Exception as e:
+        return f"❌ Failed to send WhatsApp message: {e}"
+
+
+WEBSITES_DIR = os.path.join(PROJECT_ROOT, "iris_data", "websites")
+
+
+@mcp.tool()
+async def research_website_design(topic: str, count: int = 10) -> str:
+    """Gather real design inspiration for a website before building it.
+
+    Opens Pinterest in Brave for browsing (logging in via Google first if
+    needed — best-effort; if Google throws up a security challenge it stops
+    and tells you rather than trying to push through it), AND scrapes
+    Dribbble's search results for structured, linkable design references you
+    can actually cite (title + real URL), since Pinterest's own page is pure
+    images and can't be reliably parsed for links.
+
+    Use this before building any website: present the shortlist to Vikash
+    sir and ask him to pick one (or approve your favorite). If he doesn't
+    give a clear answer, pick the strongest one yourself and proceed — don't
+    block the whole build waiting on an approval that isn't coming.
+
+    Args:
+        topic: what the website is for/about (e.g. "coffee shop", "SaaS dashboard").
+        count: how many design references to pull (default 10).
+    """
+    brave_path, _, _ = iris_app_index.resolve_app("brave")
+    with iris_screen_activity.active():
+        pinterest_status = await asyncio.to_thread(
+            browser_automation.pinterest_login_flow, brave_path or "", topic
+        )
+
+    dribbble_lines = []
+    try:
+        from scrapling.fetchers import Fetcher
+        q = topic.replace(" ", "+")
+
+        def _fetch():
+            return Fetcher.get(f"https://dribbble.com/search/shots?q={q}+website", stealthy_headers=True)
+
+        page = await asyncio.to_thread(_fetch)
+        seen = set()
+        for a in page.css("a"):
+            href = a.attrib.get("href", "")
+            if "/shots/" not in href:
+                continue
+            label = a.get_all_text(strip=True)
+            if not label or href in seen:
+                continue
+            seen.add(href)
+            full_url = href if href.startswith("http") else f"https://dribbble.com{href}"
+            dribbble_lines.append(f"{label} — {full_url}")
+            if len(dribbble_lines) >= count:
+                break
+    except Exception as e:
+        dribbble_lines = [f"(Dribbble scrape failed: {e})"]
+
+    result = [f"Pinterest: {pinterest_status}", "", f"Top design references for '{topic}':"]
+    result += dribbble_lines or ["(no results found)"]
+    return "\n".join(result)
+
+
+@mcp.tool()
+def generate_design_image(prompt: str, project_path: str, relative_path: str) -> str:
+    """Generate an image (via Stability AI) for use in a website being built,
+    and save it directly into that project's folder.
+
+    Args:
+        prompt: Description of the image to generate.
+        project_path: Absolute path of the website project (from scaffold_website).
+        relative_path: Where to save it inside the project, e.g. "src/assets/hero.png".
+    """
+    full = os.path.abspath(os.path.join(project_path, relative_path))
+    if not full.startswith(os.path.abspath(WEBSITES_DIR)):
+        return "❌ Refused: path escapes the websites sandbox."
+    return Iris_image_generator.generate_image_sync(prompt, full)
+
+
+@mcp.tool()
+async def scaffold_website(project_name: str, stack: str = "vite-react-tailwind") -> str:
+    """Scaffold a new website project (Vite + React + Tailwind by default) —
+    prefer this over a plain static HTML file for anything "AAA level"; it
+    gives you real components, hot-reload, and a proper build.
+
+    Args:
+        project_name: Folder/project name (no spaces — use hyphens).
+        stack: Currently only "vite-react-tailwind" is wired up.
+    """
+    os.makedirs(WEBSITES_DIR, exist_ok=True)
+    project_path = os.path.join(WEBSITES_DIR, project_name)
+    if os.path.exists(project_path):
+        return f"⚠ Project already exists: {project_path}"
+
+    steps = [
+        f'cd "{WEBSITES_DIR}"',
+        f'npm create vite@latest {project_name} -- --template react',
+        f'cd "{project_path}"',
+        'npm install',
+        'npm install -D tailwindcss postcss autoprefixer',
+        'npx tailwindcss init -p',
+    ]
+    log = []
+    with iris_screen_activity.active():
+        for cmd in steps:
+            rc, out = await asyncio.to_thread(iris_model_config.run_in_ai_terminal, cmd, 180)
+            log.append(f"$ {cmd}\n{(out or '(no output / timed out)')[:600]}")
+    ok = os.path.exists(project_path)
+    header = f"{'✅' if ok else '❌'} Scaffolded at {project_path}" if ok else "❌ Scaffold failed — see log below"
+    return header + "\n\n" + "\n\n".join(log)
+
+
+@mcp.tool()
+def write_project_file(project_path: str, relative_path: str, content: str) -> str:
+    """Write (or overwrite) a file inside a scaffolded website project.
+
+    Use this for every React component, page, style sheet, and config file
+    the site needs — write real, complete code, not placeholders.
+
+    Args:
+        project_path: Absolute project path (from scaffold_website).
+        relative_path: File path inside the project, e.g. "src/App.jsx".
+        content: Full file content.
+    """
+    full = os.path.abspath(os.path.join(project_path, relative_path))
+    if not full.startswith(os.path.abspath(WEBSITES_DIR)):
+        return "❌ Refused: path escapes the websites sandbox."
+    os.makedirs(os.path.dirname(full), exist_ok=True)
+    with open(full, "w", encoding="utf-8") as f:
+        f.write(content)
+    return f"✅ Wrote {full}"
+
+
+@mcp.tool()
+async def run_dev_server(project_path: str) -> str:
+    """Start `npm run dev` for a scaffolded website project in its own
+    persistent window (not the shared AI Command Terminal, since a dev
+    server runs forever and would block the command queue).
+
+    Args:
+        project_path: Absolute project path (from scaffold_website).
+    """
+    if not os.path.isdir(project_path):
+        return f"❌ No such project folder: {project_path}"
+    start_cmd = (
+        f'Start-Process powershell -ArgumentList \'-NoExit\',\'-Command\',\'cd "{project_path}"; npm run dev\''
+    )
+    with iris_screen_activity.active():
+        rc, out = await asyncio.to_thread(iris_model_config.run_in_ai_terminal, start_cmd, 30)
+    return (
+        f"🚀 Dev server starting for {project_path} in its own window "
+        "(Vite defaults to http://localhost:5173 — check that window for the exact URL, "
+        "port may differ if 5173 was busy)."
+    )
 
 
 if __name__ == "__main__":

@@ -6,8 +6,38 @@ import asyncio
 
 load_dotenv()
 
-# Stability AI API key
-STABILITY_API_KEY = os.getenv("STABILITY_API_KEY") or "sk-CyYtrtyl00WvQyN5WWNh0u6wCyXl7oP7p68umOkVdCumDS2C"
+# Stability AI API key — set STABILITY_API_KEY in .env (no key is bundled here).
+STABILITY_API_KEY = os.getenv("STABILITY_API_KEY")
+
+
+def generate_image_sync(prompt: str, save_path: str = "generated_image.png") -> str:
+    """Non-interactive variant for pipelines (e.g. the website builder) —
+    same Stability AI call, but never pops up a fullscreen preview window."""
+    if not STABILITY_API_KEY:
+        return "❌ STABILITY_API_KEY not set in .env."
+    url = "https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/text-to-image"
+    headers = {"Authorization": f"Bearer {STABILITY_API_KEY}", "Content-Type": "application/json"}
+    data = {
+        "text_prompts": [{"text": prompt}],
+        "cfg_scale": 10,
+        "height": 1024,
+        "width": 1024,
+        "samples": 1,
+        "steps": 40,
+    }
+    resp = requests.post(url, headers=headers, json=data, timeout=90)
+    if resp.status_code != 200:
+        return f"❌ Stability AI error {resp.status_code}: {resp.text[:300]}"
+    result = resp.json()
+    artifacts = result.get("artifacts") or []
+    if not artifacts:
+        return "❌ No image returned by Stability AI."
+    import base64
+    img_data = base64.b64decode(artifacts[0]["base64"])
+    os.makedirs(os.path.dirname(os.path.abspath(save_path)), exist_ok=True)
+    with open(save_path, "wb") as f:
+        f.write(img_data)
+    return f"✅ Image saved to {save_path}"
 
 @function_tool
 async def generate_image_stability(prompt: str, save_path: str = "generated_image.png") -> str:

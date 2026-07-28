@@ -19,7 +19,7 @@ import numpy as np
 import requests
 
 from PySide6.QtCore import Qt, QTimer, QPointF, QRectF, QThread, Signal
-from PySide6.QtGui import QColor, QPainter, QPen, QBrush, QFont, QTextCursor, QImage, QPixmap, QPainterPath
+from PySide6.QtGui import QColor, QPainter, QPen, QBrush, QFont, QTextCursor, QImage, QPixmap, QPainterPath, QLinearGradient
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QLineEdit, QPushButton,
     QLabel, QVBoxLayout, QHBoxLayout, QSizePolicy, QTextEdit,
@@ -29,6 +29,8 @@ from PySide6.QtWidgets import (
 import iris_model_config
 import iris_voice
 import iris_vision
+import iris_task_queue
+import iris_screen_activity
 
 try:
     import sounddevice as sd
@@ -52,6 +54,22 @@ def touch_ai_flag():
         os.makedirs(os.path.dirname(AI_FLAG), exist_ok=True)
         with open(AI_FLAG, "w") as f:
             f.write(str(time.time()))
+    except Exception:
+        pass
+
+
+def notify_task_complete(window):
+    """A background/scheduled task finished with nobody necessarily watching
+    — beep + flash the taskbar entry so it actually gets noticed, on top of
+    the normal chat bubble + spoken reply."""
+    try:
+        import winsound
+        winsound.MessageBeep(winsound.MB_ICONASTERISK)
+    except Exception:
+        pass
+    try:
+        if window is not None:
+            QApplication.alert(window, 4000)
     except Exception:
         pass
 
@@ -137,7 +155,10 @@ class HermesWorker(QThread):
                     "model": "hermes-agent",
                     "messages": [{"role": "user", "content": self.text}],
                 },
-                timeout=90,
+                # Local small models (e.g. qwen3.5:4b via Ollama) can take a
+                # long time per turn, especially with several tool calls
+                # chained together — 90s was cutting those off mid-run.
+                timeout=300,
             )
             data = resp.json()
             msg = data["choices"][0]["message"]["content"]
@@ -216,6 +237,35 @@ class AutoStartWorker(QThread):
         except Exception as e:
             msg = f"auto-start failed: {e}"
         self.done.emit(msg)
+
+
+class TaskSchedulerThread(QThread):
+    """Polls iris_task_queue for background/scheduled tasks that have come
+    due (queued via the queue_task MCP tool — e.g. "research this while I'm
+    away" or "do this at 5:30") and hands each one to the UI thread to run
+    through the normal Hermes chat pipeline."""
+
+    task_due = Signal(str, str)  # task_id, description
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._stop = False
+
+    def stop(self):
+        self._stop = True
+
+    def run(self):
+        while not self._stop:
+            try:
+                for t in iris_task_queue.due_tasks():
+                    if iris_task_queue.mark_running(t["id"]):
+                        self.task_due.emit(t["id"], t["description"])
+            except Exception:
+                pass
+            for _ in range(20):  # ~20s poll, but stop promptly on shutdown
+                if self._stop:
+                    return
+                time.sleep(1)
 
 
 # (core color, rim color) per mode
@@ -437,6 +487,97 @@ class ParticleOrb(QWidget):
         event.accept()
 
 
+class ScreenAuraOverlay(QWidget):
+    """A soft, animated glow around every edge of the screen — shows
+    whenever Iris is actually controlling the mouse/keyboard/browser (running
+    commands, opening apps, browsing, building a website) so it's obvious
+    at a glance that she's "in control" right now, the way a recording-light
+    or an aurora in the night sky reads as alive and unmistakable. Fades
+    out the moment she's done, and never shows at all for anything
+    explicitly run in the background (see iris_screen_activity.py)."""
+
+    def __init__(self):
+        super().__init__()
+        self.setWindowFlags(
+            Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint |
+            Qt.Tool | Qt.WindowTransparentForInput
+        )
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setAttribute(Qt.WA_TransparentForMouseEvents)
+        self.setAttribute(Qt.WA_ShowWithoutActivating)
+
+        virt = QRectF()
+        for s in QApplication.screens():
+            virt = virt.united(QRectF(s.geometry()))
+        self.setGeometry(virt.toRect())
+
+        self._t = 0.0
+        self._opacity = 0.0
+        self._thickness = 70
+
+        self._timer = QTimer(self)
+        self._timer.timeout.connect(self._tick)
+        self._timer.start(33)  # ~30fps
+        self.hide()
+
+    def _tick(self):
+        active = (
+            os.path.exists(iris_screen_activity.ACTIVE_FLAG)
+            and (time.time() - os.path.getmtime(iris_screen_activity.ACTIVE_FLAG) < 2.0)
+        )
+        self._t += 0.02
+        target = 1.0 if active else 0.0
+        prev = self._opacity
+        self._opacity += (target - self._opacity) * 0.12
+        if self._opacity > 0.01:
+            if not self.isVisible():
+                self.show()
+            self.update()
+        elif prev > 0.01:
+            self.update()  # one last paint at ~0 to clear the frame
+            self.hide()
+
+    def paintEvent(self, event):
+        if self._opacity <= 0.01:
+            return
+        p = QPainter(self)
+        p.setRenderHint(QPainter.Antialiasing, True)
+        w, h = self.width(), self.height()
+        th = self._thickness
+        hue = (self._t * 18) % 360
+        a = int(150 * self._opacity)
+
+        def c(offset):
+            col = QColor.fromHsv(int((hue + offset) % 360), 210, 255)
+            col.setAlpha(a)
+            return col
+
+        clear = QColor(0, 0, 0, 0)
+
+        top = QLinearGradient(0, 0, 0, th)
+        top.setColorAt(0.0, c(0))
+        top.setColorAt(1.0, clear)
+        p.fillRect(QRectF(0, 0, w, th), top)
+
+        bottom = QLinearGradient(0, h, 0, h - th)
+        bottom.setColorAt(0.0, c(180))
+        bottom.setColorAt(1.0, clear)
+        p.fillRect(QRectF(0, h - th, w, th), bottom)
+
+        left = QLinearGradient(0, 0, th, 0)
+        left.setColorAt(0.0, c(90))
+        left.setColorAt(1.0, clear)
+        p.fillRect(QRectF(0, 0, th, h), left)
+
+        right = QLinearGradient(w, 0, w - th, 0)
+        right.setColorAt(0.0, c(270))
+        right.setColorAt(1.0, clear)
+        p.fillRect(QRectF(w - th, 0, th, h), right)
+
+    def stop(self):
+        self._timer.stop()
+
+
 class ChatBar(QWidget):
     """Conversation transcript + compact typing bar. Talks to Hermes
     directly over HTTP so the AI is usable without the voice pipeline.
@@ -451,7 +592,8 @@ class ChatBar(QWidget):
         self._worker = None
         self._listen_worker = None
         self._speak_worker = None
-        self._pending = None  # (display_text, payload_text) queued while a reply is in flight
+        self._pending = None  # (display_text, payload_text, task_id) queued while a reply is in flight
+        self._active_task_id = None  # set while running a queued background/scheduled task
 
         outer = QVBoxLayout(self)
         outer.setContentsMargins(0, 0, 0, 0)
@@ -505,6 +647,13 @@ class ChatBar(QWidget):
         self._wake_thread.heard.connect(self._on_wake_heard)
         self._wake_thread.start()
 
+        # background/scheduled tasks queued via the queue_task MCP tool
+        # ("research this while I'm out", "do this at 5:30") — polled and
+        # fired independently of anything being said out loud.
+        self._task_scheduler = TaskSchedulerThread(self)
+        self._task_scheduler.task_due.connect(self._on_task_due)
+        self._task_scheduler.start()
+
     def start_new_chat(self):
         self.chat = self.history.new_chat()
         self.transcript.clear()
@@ -533,8 +682,17 @@ class ChatBar(QWidget):
     def _send_ambient(self, heard_text: str):
         """Continuously-overheard speech — no wake word required. Iris
         decides for herself whether it's directed at her and whether she
-        can help; if not, she says nothing (see SOUL.md's NO_RESPONSE rule)."""
+        can help; if not, she says nothing (see SOUL.md's NO_RESPONSE rule).
+
+        Before that decision even reaches the (often small/local) LLM, cheap
+        stuff gets filtered out here: one-off short mutters or filler words
+        picked up from ambient room noise never get dispatched at all, unless
+        her name is actually said. This is what keeps her from replying to
+        every little thing said in the room — the model-level NO_RESPONSE
+        check is a second line of defense, not the only one."""
         if not heard_text:
+            return
+        if not self._looks_directed(heard_text):
             return
         payload = (
             "[This was picked up from continuous background listening — it "
@@ -546,11 +704,51 @@ class ChatBar(QWidget):
         )
         self._dispatch(heard_text, payload)
 
-    def _dispatch(self, display_text: str, payload_text: str):
+    def _on_task_due(self, task_id: str, description: str):
+        """A background/scheduled task (see queue_task MCP tool) has come
+        due. Run it through the normal Hermes pipeline like any message, but
+        remember its task_id so completion can be reported back into the
+        queue file and flagged more insistently (this happens with nobody
+        necessarily watching, so a quiet chat bubble isn't enough)."""
+        payload = (
+            "[This is a background/scheduled task you queued earlier via "
+            "queue_task — it is not something Vikash sir just said, act on "
+            "it now using whatever tools you need, then summarize what you "
+            "did. Do NOT call queue_task again for this same task — it is "
+            "already running right now, queueing it again would just loop "
+            "forever. Only use queue_task here if this task's own result "
+            "requires a genuinely separate new future action.] " + description
+        )
+        # Explicitly backgrounded — suppress the on-screen "Iris is active"
+        # glow for the duration of this turn (see iris_screen_activity.py).
+        try:
+            with open(iris_screen_activity.BACKGROUND_FLAG, "w") as f:
+                f.write(str(time.time()))
+        except Exception:
+            pass
+        self._dispatch(f"[Background task] {description}", payload, task_id=task_id)
+
+    _AMBIENT_MIN_WORDS = 4  # short mutters below this get dropped unless her name is in them
+
+    def _looks_directed(self, text: str) -> bool:
+        """Quick local pass to weed out ambient noise before it ever reaches
+        the AI. Anything that says her name is always forwarded, no matter
+        how short. Everything else needs to be a real sentence, not a
+        one-or-two-word fragment (a cough transcribed as "the", a distant
+        "okay", a TV/other-person snippet) — those are the bulk of the false
+        triggers when there's no wake word."""
+        t = text.strip().lower()
+        if not t:
+            return False
+        if "iris" in t:
+            return True
+        return len(t.split()) >= self._AMBIENT_MIN_WORDS
+
+    def _dispatch(self, display_text: str, payload_text: str, task_id: str = None):
         if self._worker is not None:
             # Iris is still replying to the last thing — never drop what was
             # just said/typed, queue it and it fires the moment she's free.
-            self._pending = (display_text, payload_text)
+            self._pending = (display_text, payload_text, task_id)
             self.input.clear()
             self.input.setPlaceholderText("Iris is still replying — sending this right after...")
             return
@@ -566,6 +764,7 @@ class ChatBar(QWidget):
         self._thinking_line = "Iris is thinking..."
         self.transcript.append(f'<i style="color:#888">{self._thinking_line}</i>')
 
+        self._active_task_id = task_id
         self._worker = HermesWorker(payload_text, self)
         self._worker.reply_ready.connect(self._on_reply)
         self._worker.failed.connect(self._on_failed)
@@ -583,10 +782,20 @@ class ChatBar(QWidget):
         self._remove_thinking_line()
         self.transcript.append(html)
 
+    def _clear_background_flag(self):
+        try:
+            if os.path.exists(iris_screen_activity.BACKGROUND_FLAG):
+                os.remove(iris_screen_activity.BACKGROUND_FLAG)
+        except Exception:
+            pass
+
     def _on_reply(self, msg: str):
         if msg.strip().upper() == "NO_RESPONSE":
             # not directed at her / nothing she can help with — stay quiet
             self._remove_thinking_line()
+            if self._active_task_id:
+                iris_task_queue.mark_done(self._active_task_id, "(NO_RESPONSE)", ok=True)
+                self._clear_background_flag()
             return
         self._replace_thinking(f'<b style="color:#D9B8FF">Iris:</b> {msg}')
         self.history.append(self.chat, "assistant", msg)
@@ -594,20 +803,29 @@ class ChatBar(QWidget):
         touch_ai_flag()  # let the orb react like Iris is "speaking"
         self._speak_worker = SpeakWorker(msg, self)
         self._speak_worker.start()
+        if self._active_task_id:
+            iris_task_queue.mark_done(self._active_task_id, msg, ok=True)
+            self._clear_background_flag()
+            notify_task_complete(self.window())
 
     def _on_failed(self, err: str):
         self._replace_thinking(f'<span style="color:#FF8080">⚠ Could not reach Iris: {err}</span>')
+        if self._active_task_id:
+            iris_task_queue.mark_done(self._active_task_id, err, ok=False)
+            self._clear_background_flag()
+            notify_task_complete(self.window())
 
     def _cleanup(self):
         self.input.setEnabled(True)
         self.send_btn.setEnabled(True)
         self.input.setFocus()
         self._worker = None
+        self._active_task_id = None
         self._wake_thread.resume()  # only resume ambient listening once this full turn is done
         if self._pending is not None:
-            display_text, payload_text = self._pending
+            display_text, payload_text, task_id = self._pending
             self._pending = None
-            self._dispatch(display_text, payload_text)
+            self._dispatch(display_text, payload_text, task_id=task_id)
 
     def _on_wake_heard(self, text: str):
         """Fired continuously by WakeListenerThread with anything picked up.
@@ -983,6 +1201,11 @@ class NovaHUD(QMainWindow):
         self.chatbar.chat_updated.connect(self._refresh_sidebar)
         self.orb.activate_requested.connect(self.chatbar.trigger_listen)  # clap twice -> listen
 
+        # Screen-edge glow — lights up around the whole screen whenever Iris
+        # is actively driving the mouse/keyboard/browser, so it's obvious
+        # she's "in control" right now instead of it happening invisibly.
+        self.aura = ScreenAuraOverlay()
+
         # Background vision engine — face/body tracking stay backend-only;
         # only hand tracking ever renders in the UI, per design.
         self.vision_engine = iris_vision.VisionEngine(target_fps=8)
@@ -1059,6 +1282,9 @@ class NovaHUD(QMainWindow):
 
     def closeEvent(self, event):
         self.chatbar._wake_thread.stop()
+        self.chatbar._task_scheduler.stop()
+        self.aura.stop()
+        self.aura.close()
         self.vision_engine.stop()
         self.orb.closeEvent(event)
 
