@@ -130,7 +130,8 @@
       "Bash(uipro init *)",
       "Bash(python3 .claude/skills/ui-ux-pro-max/scripts/search.py \"coffee shop website\" --design-system --json)",
       "Bash(npx skills *)",
-      "Bash(git clone *)"
+      "Bash(git clone *)",
+      "Bash(../../../.venv/Scripts/python.exe -c ' *)"
     ]
   }
 }

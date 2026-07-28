@@ -1,0 +1,5 @@
+﻿1
+At line:1 char:22
++ cd ~/hermes/projects && ls -la
++                      ~~
+The token '&&' is not a valid statement separator in this version.
