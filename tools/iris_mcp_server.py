@@ -463,6 +463,32 @@ def switch_to_cloud_model(model_name: str, provider: str = "openrouter", restart
 
 
 @mcp.tool()
+def colibri_status() -> str:
+    """Check whether the colibri engine (GLM-5.2, 744B MoE, runs locally
+    with no API key) has its model fully downloaded and ready to switch to.
+
+    The model is a ~429GB download to C:\\colibri_models\\glm52_i4 — this
+    just reports whether it's there, not whether it's actually running.
+    """
+    status = iris_model_config.colibri_model_status()
+    if status["present"]:
+        return f"✅ Colibri model present at {status['path']} — ready to switch_to_colibri_mode()."
+    return f"⏳ Colibri model not yet complete at {status['path']} — still downloading or not started."
+
+
+@mcp.tool()
+def switch_to_colibri_mode() -> str:
+    """Switch Hermes to run on colibri (GLM-5.2, 744B-parameter MoE) fully
+    locally — no API key, no cloud, no Ollama. Warning: this hardware measures
+    in the ~0.05-0.1 tokens/second class for this model per colibri's own
+    benchmarks — a short reply can take several minutes. Only switch to this
+    if Vikash sir explicitly asks for it, and warn him about the expected
+    slowness before switching if he hasn't already been told.
+    """
+    return iris_model_config.switch_to_colibri_mode()
+
+
+@mcp.tool()
 def queue_task(description: str, when: str = "now") -> str:
     """Hand off a task to run later, decoupled from this conversation turn —
     either in the background right away, or at a specific time.

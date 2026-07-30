@@ -153,8 +153,11 @@ def listen(timeout: float = 4.0, phrase_time_limit: float = 12.0) -> str:
         return ""
     try:
         r = sr.Recognizer()
-        r.pause_threshold = 0.5     # stop waiting 0.5s after speech ends (default 0.8) — starts processing sooner
-        r.non_speaking_duration = 0.3
+        # 0.5s was cutting people off mid-sentence on any normal thinking
+        # pause — 1.0s gives a real pause room to breathe before ending the
+        # phrase, without waiting so long it feels unresponsive.
+        r.pause_threshold = 1.0
+        r.non_speaking_duration = 0.5
         with sr.Microphone() as source:
             r.adjust_for_ambient_noise(source, duration=0.2)  # shorter calibration — less dead air every cycle
             audio = r.listen(source, timeout=timeout, phrase_time_limit=phrase_time_limit)

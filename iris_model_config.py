@@ -263,6 +263,92 @@ def switch_cloud_model(model_name: str, provider: str = "openrouter") -> str:
     return f"{msg1} {msg2}"
 
 
+# ---------------------------------------------------------------- Colibri (GLM-5.2 744B MoE)
+
+COLIBRI_ENGINE_DIR = os.path.join(PROJECT_ROOT, "colibri_engine")
+COLIBRI_MODEL_PATH = r"C:\colibri_models\glm52_i4"
+COLIBRI_PORT = 8765
+COLIBRI_BASE_URL = f"http://localhost:{COLIBRI_PORT}/v1"
+_COLIBRI_TERM_PID_FILE = os.path.join(DATA_DIR, "colibri_terminal.pid")
+
+
+def colibri_model_status() -> dict:
+    """Whether the (huge, ~429GB) colibri model download is present and
+    looks complete enough to actually serve — config.json + tokenizer.json
+    existing is a reasonable proxy since those are written near the end of
+    a snapshot download."""
+    present = (
+        os.path.isdir(COLIBRI_MODEL_PATH)
+        and os.path.exists(os.path.join(COLIBRI_MODEL_PATH, "config.json"))
+        and os.path.exists(os.path.join(COLIBRI_MODEL_PATH, "tokenizer.json"))
+    )
+    return {"present": present, "path": COLIBRI_MODEL_PATH}
+
+
+def is_colibri_serving_up() -> bool:
+    try:
+        with urllib.request.urlopen(f"http://localhost:{COLIBRI_PORT}/v1/models", timeout=3) as r:
+            return r.status == 200
+    except Exception:
+        return False
+
+
+def ensure_colibri_serving(force_restart: bool = False) -> str:
+    """Make sure `coli web` (API + live dashboard on one port) is running
+    in its own titled terminal — visit http://localhost:8765/ for the
+    dashboard once it's up."""
+    if not colibri_model_status()["present"]:
+        return (
+            f"⚠ Colibri model not found/incomplete at {COLIBRI_MODEL_PATH} — "
+            "download it first (see hf download instructions), then try again."
+        )
+    if not force_restart and is_colibri_serving_up():
+        return "Colibri mode already running — reusing it."
+
+    try:
+        subprocess.run(["taskkill", "/F", "/IM", "colibri.exe"], capture_output=True)
+    except Exception:
+        pass
+
+    python_exe = os.path.join(PROJECT_ROOT, ".venv", "Scripts", "python.exe")
+    script = os.path.join(TOOLS_DIR, "colibri_watcher.ps1")
+    proc = subprocess.Popen(
+        [
+            "powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", script,
+            "-PythonExe", python_exe, "-ColibriDir", COLIBRI_ENGINE_DIR,
+            "-ModelPath", COLIBRI_MODEL_PATH, "-Port", str(COLIBRI_PORT),
+        ],
+        cwd=PROJECT_ROOT,
+        creationflags=subprocess.CREATE_NEW_CONSOLE,
+    )
+    with open(_COLIBRI_TERM_PID_FILE, "w") as f:
+        f.write(str(proc.pid))
+    return (
+        f"🐦 Colibri starting in its own terminal (pid {proc.pid}) — "
+        f"dashboard at http://localhost:{COLIBRI_PORT}/ once it's up. "
+        "GLM-5.2 744B MoE, streaming from disk. First reply can take a long "
+        "time on this hardware (measured ~0.05-0.1 tok/s class)."
+    )
+
+
+def switch_to_colibri_mode() -> str:
+    """Full mode switch to colibri — same pattern as switch_local_model, but
+    the actual inference server is `coli serve`, not Ollama, so Hermes just
+    gets pointed at coli's OpenAI-compatible endpoint like any local model."""
+    status = colibri_model_status()
+    if not status["present"]:
+        return f"⚠ Colibri model not found/incomplete at {status['path']} — can't switch yet."
+    msg1 = ensure_colibri_serving(force_restart=True)
+    _write_model_block(
+        f'model:\n'
+        f'  default: "glm-5.2-colibri"\n'
+        f'  provider: "ollama"\n'
+        f'  base_url: "{COLIBRI_BASE_URL}"\n'
+    )
+    msg2 = ensure_local_ai_mode("glm-5.2-colibri", force_restart=True)
+    return f"{msg1} {msg2}"
+
+
 def restart_gateway_in_new_terminal(title_suffix: str = "") -> str:
     """Back-compat alias — kept because tools/iris_mcp_server.py and older
     callers referenced this name; now routed through ensure_local_ai_mode."""
@@ -278,6 +364,18 @@ def auto_start_if_needed() -> str:
     msgs = [ensure_ai_command_terminal()]
     current = get_current_model()
     model_name = current.get("default")
+
+    if current.get("base_url") == COLIBRI_BASE_URL:
+        # last-configured mode was colibri — its inference server is a
+        # separate process from the hermes gateway, so both need checking.
+        if not colibri_model_status()["present"]:
+            msgs.append(
+                f"⚠ Last mode was colibri but the model isn't at "
+                f"{COLIBRI_MODEL_PATH} — falling back, switch modes manually once it's downloaded."
+            )
+        else:
+            msgs.append(ensure_colibri_serving(force_restart=False))
+
     if is_hermes_up():
         msgs.append("Brain already online — reusing it.")
     else:

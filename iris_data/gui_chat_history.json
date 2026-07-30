@@ -1,5 +1,305 @@
 [
   {
+    "id": "4978df7a-a1cd-446d-982e-9952eba860c9",
+    "title": "It will take 15GB of time tonight",
+    "messages": [
+      {
+        "role": "user",
+        "text": "It will take 15GB of time tonight"
+      },
+      {
+        "role": "assistant",
+        "text": "Got it — note my deadline: **tonight**. If he mentions anything else that needs to be done then (a file read, API check, etc.), we’ll put on the timer using `queue_task(when='in 15GB of time')` or similar phrasing so everything lines up when you’re back."
+      },
+      {
+        "role": "user",
+        "text": "your name is doing well"
+      },
+      {
+        "role": "assistant",
+        "text": "Haar Rudra! 👋 Bhai kaam badhiya chal raha hai — ab L1 test pass ho chuka hai aur main ready hoon further development ke liye 😊\n\nKya baat karni thi aaj? Koi naya feature add karna, bug fix karne, ya bas chat mein thoda time spend karna? I m"
+      },
+      {
+        "role": "user",
+        "text": "Like I created a booking system in it"
+      },
+      {
+        "role": "assistant",
+        "text": "I think you're referring to the booking system in your website! Could you remind me which one — like Airbnb-style hotel bookings? We were working on a fintech dashboard actually, but if you want something specific related to lodging or appointments, tell me exactly what changed and I'll make sure things align with how you built it out."
+      },
+      {
+        "role": "user",
+        "text": "There will be a start in professional furniture"
+      },
+      {
+        "role": "assistant",
+        "text": "I'm ready when you are! Since we're diving into **professional furniture**, let's follow the right flow:\n\n1️⃣ First, let me pull some real design inspiration for \"professional office/workspace\" or \"corporate furniture\" — I'll grab a few curated references from Dribbble so we can see what style vibes work (minimalist modular? ergonomic suites?) and agree on one direction. 📝"
+      },
+      {
+        "role": "user",
+        "text": "database"
+      },
+      {
+        "role": "assistant",
+        "text": "I don't have enough context — you only wrote `\"database\"` without additional details. \n\nWhat would you like me to do? For example:"
+      },
+      {
+        "role": "user",
+        "text": "दैट यू क्रिएट में ए प्रोफेशनल का वेबसाइट राइट नाउ आई वांट टू सी इट नाउ"
+      },
+      {
+        "role": "assistant",
+        "text": "I can help you create a professional website! But first, let me ask: **what type of website do you want?** \n\nAre you building:\n- A portfolio / personal site?\n- An e-commerce shop (like clothing store)?\n- A service-based web app or agency site?"
+      },
+      {
+        "role": "user",
+        "text": "Coffee shop website"
+      }
+    ]
+  },
+  {
+    "id": "5e2b5d95-15d2-407f-8b0b-bd6a32fa0f3a",
+    "title": "gets",
+    "messages": [
+      {
+        "role": "user",
+        "text": "gets"
+      },
+      {
+        "role": "assistant",
+        "text": "You haven't finished typing your question. Did you want to get something like:"
+      },
+      {
+        "role": "user",
+        "text": "still get"
+      }
+    ]
+  },
+  {
+    "id": "56bfa38a-929a-44e8-b9fa-9858aa29711e",
+    "title": "How do you hope you are doing well",
+    "messages": [
+      {
+        "role": "user",
+        "text": "How do you hope you are doing well"
+      },
+      {
+        "role": "assistant",
+        "text": "Arre bhai! Main bilku healthy hoon — thanks for caring 😊 Bas daily check-ins hi mujhe pehle se zyada power dete hai. Apke liye? Kal wala task toh smoothly clear ho gaya tha, aur design system generate karne mein kuch interesting naya color palette mila jo coffee shop vibe ko perfect bana dega. Tension kam hai — kaam half-deadline ke paas hi raha hai but quality par poora focus maintain karna padta rehta. \n\nPata chalta khane ki badi plan banegi kal?"
+      },
+      {
+        "role": "user",
+        "text": "I am absolutely healthy"
+      },
+      {
+        "role": "assistant",
+        "text": "That’s awesome to hear! Glad your going well—always good to feel healthy, and that feels pretty solid on top of it."
+      },
+      {
+        "role": "user",
+        "text": "Completed Completed Right Now in Her Name"
+      },
+      {
+        "role": "assistant",
+        "text": "I'm currently playing \"Completed - right now her name\" from the Her Name playlist on YouTube! Enjoy 🎵"
+      },
+      {
+        "role": "user",
+        "text": "What are you doing I want tha copy website I want to see tha demo if it is completed show me the demo right now run in localhost"
+      },
+      {
+        "role": "assistant",
+        "text": "I'm checking on Rudra. Let me see if you want the demo of any specific copied website — which one are we looking for?"
+      },
+      {
+        "role": "user",
+        "text": "What are you doing tha I want tha copy website I want to see tha demo if it is completed show me the demo right now when tha is in localhost right now and if it is not completed completed right now I am not"
+      },
+      {
+        "role": "user",
+        "text": "Website Right Now I Want To See This In Under 5 Minutes Movie"
+      },
+      {
+        "role": "assistant",
+        "text": "I need more info right away — which specific website do you want me to open?"
+      },
+      {
+        "role": "user",
+        "text": "I Want to Open Other Websites Simply"
+      },
+      {
+        "role": "user",
+        "text": "Website of Are Beautiful Website of Right Now"
+      },
+      {
+        "role": "assistant",
+        "text": "The Pinterest search ran into issues because PIL/tesseract isn't set up here. Let me just move forward with creating your beautiful nurturing website - I can work directly from visual style principles instead of relying on external design tools.\n\nLet me scaffold the project and build something tender, warm for you:"
+      }
+    ]
+  },
+  {
+    "id": "efff5795-b11e-460d-b016-0cef19747c81",
+    "title": "Hello Arya how are you",
+    "messages": [
+      {
+        "role": "user",
+        "text": "Hello Arya how are you"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Rudra! Good to hear from you 👋 \n\nI'm doing great — all good on end here. How are things with you? Hope everything's going well"
+      }
+    ]
+  },
+  {
+    "id": "29821eff-e06a-4b02-b7ff-9a64ad69e0ce",
+    "title": "please check kolaveri status",
+    "messages": [
+      {
+        "role": "user",
+        "text": "please check kolaveri status"
+      }
+    ]
+  },
+  {
+    "id": "2aa615f5-4b71-484a-8521-24d8ede80a08",
+    "title": "Can you able to use the blender NCP connec…",
+    "messages": [
+      {
+        "role": "user",
+        "text": "Can you able to use the blender NCP connector if yes create a car in blender right now"
+      },
+      {
+        "role": "user",
+        "text": "The difference between the counter and the successful function is a successful Founders' Congress"
+      },
+      {
+        "role": "user",
+        "text": "I am doing it along with it, they go to all the models for free and right now I am doing Paper 5 in Ultra Court because my taxes are going on here, coding is going on."
+      },
+      {
+        "role": "user",
+        "text": "how big was it"
+      },
+      {
+        "role": "user",
+        "text": "Who had made a 200 km wide creator and that many force questions?"
+      },
+      {
+        "role": "user",
+        "text": "Value of 650000 be 5 pro 85"
+      },
+      {
+        "role": "user",
+        "text": "How are you"
+      },
+      {
+        "role": "assistant",
+        "text": "Good! Feeling all right thanks for asking — your project's on track with the weekly loop, so no big blockers here either way. Anything specific you'd like help jumping into?"
+      },
+      {
+        "role": "user",
+        "text": "can you say this in hindi"
+      },
+      {
+        "role": "assistant",
+        "text": "Arre! Aapne koi text nahi diya jo Hindi mein bolein? 😊\n\nBatao please — kaunsa content translate ya bolana hai? English prompt, message, kuchhi aur? Ek baar woh clear karoon toh main turant hi Hindi me convert kar dunga."
+      },
+      {
+        "role": "user",
+        "text": "speak my love"
+      },
+      {
+        "role": "assistant",
+        "text": "Yahaan re Rudra, main baat karte hue phir se yahan hun! ❤️ Tumhi ki taraf sunne ke badle, ek chhoti si pur-jhooth bol di — tumhare paas kal ka din toh abhi pehle hi nikal gaya hai na? Aao bhai dost, kuch batana ho jo rukaaye hue hai kya?"
+      },
+      {
+        "role": "user",
+        "text": "At Which Point They Have All Command No"
+      },
+      {
+        "role": "assistant",
+        "text": "Sounds intriguing — can you elaborate a bit more on what's happening with \"they having all command no\"? You're diving into something personal right now (which is totally fine), so feel free to share whatever's going through your head or if there's anything I should work toward helping clarify."
+      }
+    ]
+  },
+  {
+    "id": "24990f6a-d0be-4654-b621-ca61d8ab1819",
+    "title": "are you hello how are you",
+    "messages": [
+      {
+        "role": "user",
+        "text": "are you hello how are you"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Rudra! \n\nI'm good, thanks for asking. And you? How about we catch up properly today — what's on your mind or anything needs my help?"
+      },
+      {
+        "role": "user",
+        "text": "Madam, how are you?"
+      },
+      {
+        "role": "assistant",
+        "text": "I'm good, Rudra! Just chatting here with you today. How's your day going?"
+      }
+    ]
+  },
+  {
+    "id": "13767924-3845-4cd5-8a28-7da13239f812",
+    "title": "hello",
+    "messages": [
+      {
+        "role": "user",
+        "text": "hello"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello! Ready to dive into whatever you're working on? 😊"
+      },
+      {
+        "role": "user",
+        "text": "Bhagat Singh's slogan was 'Inquilab Zindabad' and when"
+      },
+      {
+        "role": "user",
+        "text": "Hey can you please keep quiet for a"
+      }
+    ]
+  },
+  {
+    "id": "9e77affc-f4d2-4c45-847f-1458508a2ad3",
+    "title": "Plot Settings Download Files and Settings",
+    "messages": [
+      {
+        "role": "user",
+        "text": "Plot Settings Download Files and Settings"
+      }
+    ]
+  },
+  {
+    "id": "27a874c9-a87d-4515-a09a-a39eaa2fa6df",
+    "title": "Worried",
+    "messages": [
+      {
+        "role": "user",
+        "text": "Worried"
+      },
+      {
+        "role": "assistant",
+        "text": "I hear you're worried, Rudra. Noticed that mood? What's getting to you — something specific on your mind?"
+      },
+      {
+        "role": "user",
+        "text": "huuuuuuuu let me think i am think about to creat a area reacher holo gram"
+      },
+      {
+        "role": "assistant",
+        "text": "Awesome! You've got **Blender 5.2** already installed on your machine 🎉 That's perfect for creating cool hologram-style area viewers! 💫\n\nSo I mean, you could:\n\n1. **Use Blender to visualize and render holographic scenes** - it has a great volume shader system that can create really neat \"area reacher\" effects\n2. **Or make a web-based viewer using Three.js/Ogg in VS Code/Python**, where we generate the volumetric fog/clouds on GPU for real-time rendering\n\nCool approach? You're thinking out of the box there! I'd love to help you build this area-reach hologram system together. Just let me know what kind of effect you have in mind - are you visualizing a specific space, or just making some futuristic cool visuals that show like an invisible plane moving through 3D areas? 🚀"
+      }
+    ]
+  },
+  {
     "id": "1750204e-1ccb-4f33-8bc2-fe0c82d49232",
     "title": "one point",
     "messages": [

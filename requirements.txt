@@ -22,3 +22,4 @@ psutil
 sounddevice
 numpy
 pytesseract
+ruamel.yaml

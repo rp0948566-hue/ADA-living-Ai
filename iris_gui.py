@@ -21,9 +21,9 @@ import requests
 from PySide6.QtCore import Qt, QTimer, QPointF, QRectF, QThread, Signal
 from PySide6.QtGui import QColor, QPainter, QPen, QBrush, QFont, QTextCursor, QImage, QPixmap, QPainterPath, QLinearGradient
 from PySide6.QtWidgets import (
-    QApplication, QMainWindow, QWidget, QLineEdit, QPushButton,
+    QApplication, QMainWindow, QWidget, QPushButton,
     QLabel, QVBoxLayout, QHBoxLayout, QSizePolicy, QTextEdit,
-    QListWidget, QListWidgetItem, QFrame, QComboBox, QCheckBox,
+    QFrame, QComboBox, QCheckBox,
 )
 
 import iris_model_config
@@ -31,6 +31,7 @@ import iris_voice
 import iris_vision
 import iris_task_queue
 import iris_screen_activity
+import iris_mcp_connectors
 
 try:
     import sounddevice as sd
@@ -216,7 +217,8 @@ class WakeListenerThread(QThread):
                 continue
             # short timeout: when nobody's talking, give up fast and loop
             # right back around instead of sitting there waiting.
-            text = iris_voice.listen_and_translate(timeout=1.5, phrase_time_limit=8)
+            # phrase_time_limit was 8s, cutting off longer sentences mid-word
+            text = iris_voice.listen_and_translate(timeout=1.5, phrase_time_limit=20)
             if self._stop:
                 return
             if text and not self._paused:
@@ -237,6 +239,40 @@ class AutoStartWorker(QThread):
         except Exception as e:
             msg = f"auto-start failed: {e}"
         self.done.emit(msg)
+
+
+class ColibriReadyWatcher(QThread):
+    """Polls for the colibri (GLM-5.2) model download finishing and, the
+    moment it does, switches Hermes to it automatically — no restart, no
+    manual dropdown click needed. Only fires once (the transition from
+    not-present to present), and only while nothing else has already been
+    switched to colibri."""
+
+    became_ready = Signal(str)  # carries the switch_to_colibri_mode() result
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._stop = False
+
+    def stop(self):
+        self._stop = True
+
+    def run(self):
+        was_present = iris_model_config.colibri_model_status()["present"]
+        while not self._stop:
+            for _ in range(60):  # ~60s poll, but stop promptly on shutdown
+                if self._stop:
+                    return
+                time.sleep(1)
+            now_present = iris_model_config.colibri_model_status()["present"]
+            if now_present and not was_present:
+                try:
+                    msg = iris_model_config.switch_to_colibri_mode()
+                except Exception as e:
+                    msg = f"⚠ Auto-switch to colibri failed: {e}"
+                self.became_ready.emit(msg)
+                return  # job done — one-shot
+            was_present = now_present
 
 
 class TaskSchedulerThread(QThread):
@@ -579,21 +615,24 @@ class ScreenAuraOverlay(QWidget):
 
 
 class ChatBar(QWidget):
-    """Conversation transcript + compact typing bar. Talks to Hermes
-    directly over HTTP so the AI is usable without the voice pipeline.
-    Persists every exchange to ChatHistoryStore for the sidebar."""
+    """Conversation transcript + a live status line — voice-only now, no
+    typing bar. Talks to Hermes directly over HTTP. Persists every exchange
+    to ChatHistoryStore for the sidebar."""
 
     chat_updated = Signal()  # tell the sidebar to refresh its list
 
-    def __init__(self, history: ChatHistoryStore, parent=None):
+    def __init__(self, history: ChatHistoryStore, orb: "ParticleOrb" = None, parent=None):
         super().__init__(parent)
         self.history = history
+        self.orb = orb  # read its live mic level for the "hearing you" indicator
         self.chat = None  # active chat dict from the history store
         self._worker = None
         self._listen_worker = None
         self._speak_worker = None
         self._pending = None  # (display_text, payload_text, task_id) queued while a reply is in flight
         self._active_task_id = None  # set while running a queued background/scheduled task
+        self._busy = False  # true whenever a reply is in flight — status line shows that, not mic level
+        self._status_override = None  # (text, expires_at) — a transient message that beats the live mic status
 
         outer = QVBoxLayout(self)
         outer.setContentsMargins(0, 0, 0, 0)
@@ -608,41 +647,19 @@ class ChatBar(QWidget):
         self.transcript.setMaximumHeight(160)
         outer.addWidget(self.transcript)
 
-        box = QWidget()
-        box.setObjectName("chatbox")
-        box.setStyleSheet(
-            "#chatbox { background:#1a1a1e; border:1px solid #2c2c32; border-radius:14px; }"
+        # Live status line — replaces the old typing bar entirely. Always
+        # shows exactly what's happening right now: listening, hearing you
+        # speak, thinking, or why something got ignored.
+        self.status_label = QLabel("👂 Listening... just talk, or clap twice")
+        self.status_label.setAlignment(Qt.AlignCenter)
+        self.status_label.setFixedHeight(48)
+        self.status_label.setStyleSheet(
+            "QLabel { background:#1a1a1e; border:1px solid #2c2c32; border-radius:14px;"
+            " color:#9a9aa2; font-size:13px; }"
         )
-        box.setFixedHeight(64)  # shrunk down from the original 110px
-        row = QHBoxLayout(box)
-        row.setContentsMargins(18, 0, 10, 0)
-        row.setSpacing(8)
+        outer.addWidget(self.status_label)
 
-        self.input = QLineEdit()
-        self.input.setPlaceholderText("Ask Iris anything...")
-        self.input.setStyleSheet(
-            "QLineEdit { background:transparent; border:none; color:#E8E8EC;"
-            " font-size:14px; }"
-        )
-        self.input.returnPressed.connect(self._send)
-        row.addWidget(self.input, 1, Qt.AlignVCenter)
-
-        self.send_btn = QPushButton("↑")
-        self.send_btn.setFixedSize(30, 30)
-        self.send_btn.setCursor(Qt.PointingHandCursor)
-        self.send_btn.setStyleSheet(
-            "QPushButton { background:#3a3a42; color:white; border-radius:15px;"
-            " font-size:14px; font-weight:bold; }"
-            "QPushButton:hover { background:#4a4a54; }"
-        )
-        self.send_btn.clicked.connect(self._send)
-        row.addWidget(self.send_btn, 0, Qt.AlignVCenter)
-
-        outer.addWidget(box)
-
-        # always-on listening — no button to click, just say "Iris ..." or
-        # clap twice. Typing still works too.
-        self.input.setPlaceholderText("Listening... just talk, or clap twice, or type here...")
+        # always-on listening — no button, no wake word, just talk or clap twice.
         self._wake_thread = WakeListenerThread(self)
         self._wake_thread.heard.connect(self._on_wake_heard)
         self._wake_thread.start()
@@ -653,6 +670,33 @@ class ChatBar(QWidget):
         self._task_scheduler = TaskSchedulerThread(self)
         self._task_scheduler.task_due.connect(self._on_task_due)
         self._task_scheduler.start()
+
+        self._status_timer = QTimer(self)
+        self._status_timer.timeout.connect(self._update_status_label)
+        self._status_timer.start(150)
+
+    _MIC_SPEAKING_THRESHOLD = 0.015
+
+    def _flash_status(self, text: str, seconds: float = 2.5):
+        """Show a message that overrides the live mic/thinking status for a
+        short while — used so a filtered/ignored utterance is visible for a
+        moment instead of looking like nothing happened at all."""
+        self._status_override = (text, time.time() + seconds)
+        self.status_label.setText(text)
+
+    def _update_status_label(self):
+        if self._status_override is not None:
+            text, expires_at = self._status_override
+            if time.time() < expires_at:
+                return  # still showing the override
+            self._status_override = None
+        if self._busy:
+            return  # _dispatch/_on_reply/_on_failed own the label while busy
+        mic_level = getattr(self.orb, "_mic", 0.0) if self.orb is not None else 0.0
+        if mic_level > self._MIC_SPEAKING_THRESHOLD:
+            self.status_label.setText("🎤 Hearing you...")
+        else:
+            self.status_label.setText("👂 Listening... just talk, or clap twice")
 
     def start_new_chat(self):
         self.chat = self.history.new_chat()
@@ -673,12 +717,6 @@ class ChatBar(QWidget):
         color = "#8FD3FF" if role == "user" else "#D9B8FF"
         self.transcript.append(f'<b style="color:{color}">{who}:</b> {text}')
 
-    def _send(self):
-        text = self.input.text().strip()
-        if not text:
-            return
-        self._dispatch(text, text)
-
     def _send_ambient(self, heard_text: str):
         """Continuously-overheard speech — no wake word required. Iris
         decides for herself whether it's directed at her and whether she
@@ -693,6 +731,10 @@ class ChatBar(QWidget):
         if not heard_text:
             return
         if not self._looks_directed(heard_text):
+            # Not silent-silent: flash why, so "heard but nothing happened"
+            # doesn't look like a hang — this is the difference between
+            # "ignored as noise" and "dispatched but Iris never replied".
+            self._flash_status(f'🤫 Heard "{heard_text}" — too short, ignored')
             return
         payload = (
             "[This was picked up from continuous background listening — it "
@@ -747,17 +789,15 @@ class ChatBar(QWidget):
     def _dispatch(self, display_text: str, payload_text: str, task_id: str = None):
         if self._worker is not None:
             # Iris is still replying to the last thing — never drop what was
-            # just said/typed, queue it and it fires the moment she's free.
+            # just said, queue it and it fires the moment she's free.
             self._pending = (display_text, payload_text, task_id)
-            self.input.clear()
-            self.input.setPlaceholderText("Iris is still replying — sending this right after...")
+            self._flash_status("Iris is still replying — sending this right after...", seconds=5)
             return
         if self.chat is None:
             self.start_new_chat()
 
-        self.input.clear()
-        self.input.setEnabled(False)
-        self.send_btn.setEnabled(False)
+        self._busy = True
+        self.status_label.setText("🤔 Iris is thinking...")
         self._append_line("user", display_text)
         self.history.append(self.chat, "user", display_text)
         self.chat_updated.emit()
@@ -793,6 +833,7 @@ class ChatBar(QWidget):
         if msg.strip().upper() == "NO_RESPONSE":
             # not directed at her / nothing she can help with — stay quiet
             self._remove_thinking_line()
+            self._flash_status("🤫 Not directed at Iris — stayed quiet", seconds=2)
             if self._active_task_id:
                 iris_task_queue.mark_done(self._active_task_id, "(NO_RESPONSE)", ok=True)
                 self._clear_background_flag()
@@ -803,6 +844,7 @@ class ChatBar(QWidget):
         touch_ai_flag()  # let the orb react like Iris is "speaking"
         self._speak_worker = SpeakWorker(msg, self)
         self._speak_worker.start()
+        self._flash_status("💬 Iris replied", seconds=1.5)
         if self._active_task_id:
             iris_task_queue.mark_done(self._active_task_id, msg, ok=True)
             self._clear_background_flag()
@@ -810,15 +852,14 @@ class ChatBar(QWidget):
 
     def _on_failed(self, err: str):
         self._replace_thinking(f'<span style="color:#FF8080">⚠ Could not reach Iris: {err}</span>')
+        self._flash_status(f"⚠ Could not reach Iris: {err}", seconds=4)
         if self._active_task_id:
             iris_task_queue.mark_done(self._active_task_id, err, ok=False)
             self._clear_background_flag()
             notify_task_complete(self.window())
 
     def _cleanup(self):
-        self.input.setEnabled(True)
-        self.send_btn.setEnabled(True)
-        self.input.setFocus()
+        self._busy = False
         self._worker = None
         self._active_task_id = None
         self._wake_thread.resume()  # only resume ambient listening once this full turn is done
@@ -839,7 +880,7 @@ class ChatBar(QWidget):
         if self._listen_worker is not None:
             return
         self._wake_thread.pause()  # don't fight the one-shot capture for the mic
-        self.input.setPlaceholderText("Listening...")
+        self._flash_status("🎤 Listening...", seconds=15)
         self._listen_worker = ListenWorker(self)
         self._listen_worker.heard.connect(self._on_capture_heard)
         self._listen_worker.finished.connect(self._listen_cleanup)
@@ -847,48 +888,13 @@ class ChatBar(QWidget):
 
     def _on_capture_heard(self, text: str):
         if text:
-            self.input.setText(text)
-            self._send()  # _cleanup (fired once the reply finishes) resumes ambient listening
+            self._dispatch(text, text)  # _cleanup (fired once the reply finishes) resumes ambient listening
         else:
-            self.input.setPlaceholderText("Didn't catch that — try again or clap twice")
+            self._flash_status("Didn't catch that — try again or clap twice", seconds=3)
             self._wake_thread.resume()  # nothing dispatched — safe to resume right away
 
     def _listen_cleanup(self):
-        self.input.setPlaceholderText("Listening... just talk, or clap twice, or type here...")
         self._listen_worker = None
-
-
-class ChatRow(QWidget):
-    """One row in the previous-chats list: title (click to open) + a small
-    ✕ button (click to delete that chat)."""
-
-    clicked = Signal()
-    delete_clicked = Signal()
-
-    def __init__(self, title: str, parent=None):
-        super().__init__(parent)
-        lay = QHBoxLayout(self)
-        lay.setContentsMargins(6, 4, 4, 4)
-        lay.setSpacing(6)
-
-        self.label = QLabel(title)
-        self.label.setStyleSheet("color:#C9C9CF; font-size:12px; background:transparent;")
-        lay.addWidget(self.label, 1)
-
-        del_btn = QPushButton("✕")
-        del_btn.setFixedSize(20, 20)
-        del_btn.setCursor(Qt.PointingHandCursor)
-        del_btn.setToolTip("Delete this chat")
-        del_btn.setStyleSheet(
-            "QPushButton { background:transparent; color:#8a8a90; border:none; font-size:12px; }"
-            "QPushButton:hover { color:#FF8080; }"
-        )
-        del_btn.clicked.connect(self.delete_clicked.emit)
-        lay.addWidget(del_btn, 0)
-
-    def mousePressEvent(self, event):
-        self.clicked.emit()
-        super().mousePressEvent(event)
 
 
 class Sidebar(QFrame):
@@ -913,9 +919,25 @@ class Sidebar(QFrame):
         title.setStyleSheet("color:#E8E8EC; font-size:16px; font-weight:700; letter-spacing:1px;")
         lay.addWidget(title)
 
+        self.mcp_toggle_btn = QPushButton("🔌  MCP")
+        self.mcp_toggle_btn.setCursor(Qt.PointingHandCursor)
+        self.mcp_toggle_btn.setStyleSheet(
+            "QPushButton { background:#1f1f24; color:#C9C9CF; border:1px solid #2c2c32;"
+            " border-radius:8px; padding:6px; text-align:left; font-size:12px; }"
+            "QPushButton:hover { background:#27272d; }"
+        )
+        self.mcp_toggle_btn.clicked.connect(self._toggle_mcp_panel)
+        lay.addWidget(self.mcp_toggle_btn)
+
+        # --- Chats section (default view) ---
+        self.chats_section = QWidget()
+        chats_lay = QVBoxLayout(self.chats_section)
+        chats_lay.setContentsMargins(0, 0, 0, 0)
+        chats_lay.setSpacing(12)
+
         model_label = QLabel("BRAIN MODEL")
         model_label.setStyleSheet("color:#6b6b72; font-size:10px; font-weight:600; letter-spacing:1px;")
-        lay.addWidget(model_label)
+        chats_lay.addWidget(model_label)
 
         self.model_combo = QComboBox()
         self.model_combo.setStyleSheet(
@@ -926,12 +948,12 @@ class Sidebar(QFrame):
         )
         self._populate_models()
         self.model_combo.activated.connect(self._on_model_picked)
-        lay.addWidget(self.model_combo)
+        chats_lay.addWidget(self.model_combo)
 
         self.model_status = QLabel("")
         self.model_status.setWordWrap(True)
         self.model_status.setStyleSheet("color:#7fd48a; font-size:10px;")
-        lay.addWidget(self.model_status)
+        chats_lay.addWidget(self.model_status)
 
         new_btn = QPushButton("+  New chat")
         new_btn.setCursor(Qt.PointingHandCursor)
@@ -941,20 +963,76 @@ class Sidebar(QFrame):
             "QPushButton:hover { background:#27272d; }"
         )
         new_btn.clicked.connect(self.new_chat_clicked.emit)
-        lay.addWidget(new_btn)
+        chats_lay.addWidget(new_btn)
+        chats_lay.addStretch(1)
 
-        hist_label = QLabel("PREVIOUS CHATS")
-        hist_label.setStyleSheet("color:#6b6b72; font-size:10px; font-weight:600; letter-spacing:1px;")
-        lay.addWidget(hist_label)
+        lay.addWidget(self.chats_section, 1)
 
-        self.list = QListWidget()
-        self.list.setStyleSheet(
-            "QListWidget { background:transparent; border:none; color:#C9C9CF; font-size:12px; }"
-            "QListWidget::item { padding:8px 6px; border-radius:8px; }"
-            "QListWidget::item:selected { background:#24242b; color:#fff; }"
-            "QListWidget::item:hover { background:#1c1c21; }"
+        # --- MCP connectors section (hidden until the MCP button is clicked) ---
+        self.mcp_section = QWidget()
+        self.mcp_section.setVisible(False)
+        mcp_lay = QVBoxLayout(self.mcp_section)
+        mcp_lay.setContentsMargins(0, 0, 0, 0)
+        mcp_lay.setSpacing(10)
+
+        mcp_title = QLabel("MCP CONNECTORS")
+        mcp_title.setStyleSheet("color:#6b6b72; font-size:10px; font-weight:600; letter-spacing:1px;")
+        mcp_lay.addWidget(mcp_title)
+
+        self._mcp_checkboxes = {}
+        for name, label, enabled, ready, note in iris_mcp_connectors.list_connectors():
+            row = QWidget()
+            row_lay = QVBoxLayout(row)
+            row_lay.setContentsMargins(0, 0, 0, 0)
+            row_lay.setSpacing(2)
+
+            top_row = QHBoxLayout()
+            cb = QCheckBox(label)
+            cb.setChecked(enabled)
+            cb.setStyleSheet("QCheckBox { color:#E8E8EC; font-size:13px; }")
+            cb.stateChanged.connect(lambda state, n=name: self._on_connector_toggled(n, state))
+            self._mcp_checkboxes[name] = cb
+            top_row.addWidget(cb, 1)
+            row_lay.addLayout(top_row)
+
+            note_label = QLabel(note)
+            note_label.setWordWrap(True)
+            note_label.setStyleSheet("color:#6b6b72; font-size:10px; padding-left:22px;")
+            row_lay.addWidget(note_label)
+
+            mcp_lay.addWidget(row)
+
+        self.mcp_status = QLabel("")
+        self.mcp_status.setWordWrap(True)
+        self.mcp_status.setStyleSheet("color:#7fd48a; font-size:10px;")
+        mcp_lay.addWidget(self.mcp_status)
+        mcp_lay.addStretch(1)
+
+        lay.addWidget(self.mcp_section, 1)
+
+        # Auto-switch to colibri the moment its (huge) model download
+        # finishes — no waiting for a restart or manual dropdown click.
+        self._colibri_watcher = ColibriReadyWatcher(self)
+        self._colibri_watcher.became_ready.connect(self._on_colibri_ready)
+        self._colibri_watcher.start()
+
+    def _on_colibri_ready(self, msg: str):
+        self.model_status.setText(f"🐦 Colibri model finished downloading — {msg}")
+        self._populate_models()
+
+    def _toggle_mcp_panel(self):
+        showing_mcp = not self.mcp_section.isVisible()
+        self.mcp_section.setVisible(showing_mcp)
+        self.chats_section.setVisible(not showing_mcp)
+        self.mcp_toggle_btn.setText("←  Chats" if showing_mcp else "🔌  MCP")
+
+    def _on_connector_toggled(self, name: str, state: int):
+        enabled = bool(state)  # 0 = unchecked, non-zero = checked (non-tristate box)
+        iris_mcp_connectors.set_enabled(name, enabled)
+        self.mcp_status.setText(
+            f"✅ {'Enabled' if enabled else 'Disabled'} — restart the gateway "
+            "(switch model or relaunch) to apply."
         )
-        lay.addWidget(self.list, 1)
 
     def _populate_models(self):
         """Auto-detect installed Ollama models + mark whichever Hermes is
@@ -971,8 +1049,15 @@ class Sidebar(QFrame):
         cloud_label = f"☁ {current_default} (cloud)" if not current_is_local and current_default else "☁ cloud (current)"
         self.model_combo.addItem(cloud_label, ("cloud", current_default or ""))
 
+        colibri_ready = iris_model_config.colibri_model_status()["present"]
+        colibri_label = "🐦 GLM-5.2 colibri (ready)" if colibri_ready else "🐦 GLM-5.2 colibri (still downloading...)"
+        self.model_combo.addItem(colibri_label, ("colibri", "glm-5.2-colibri"))
+
         # pre-select whatever is actually active right now
-        target = ("local", current_default) if current_is_local else ("cloud", current_default)
+        if current.get("base_url") == iris_model_config.COLIBRI_BASE_URL:
+            target = ("colibri", "glm-5.2-colibri")
+        else:
+            target = ("local", current_default) if current_is_local else ("cloud", current_default)
         for i in range(self.model_combo.count()):
             if self.model_combo.itemData(i) == target:
                 self.model_combo.setCurrentIndex(i)
@@ -981,6 +1066,24 @@ class Sidebar(QFrame):
 
     def _on_model_picked(self, index: int):
         kind, model_name = self.model_combo.itemData(index)
+        if kind == "colibri":
+            if not iris_model_config.colibri_model_status()["present"]:
+                self.model_status.setText(
+                    f"⚠ Model not finished downloading yet — {iris_model_config.COLIBRI_MODEL_PATH}"
+                )
+                return
+            self.model_combo.setEnabled(False)
+            self.model_status.setText(
+                "Switching to colibri (GLM-5.2 744B)... very slow on this hardware, first reply may take minutes."
+            )
+            try:
+                msg = iris_model_config.switch_to_colibri_mode()
+                self.model_status.setText(f"✅ {msg}")
+            except Exception as e:
+                self.model_status.setText(f"⚠ Colibri switch failed: {e}")
+            finally:
+                self.model_combo.setEnabled(True)
+            return
         if kind != "local" or not model_name:
             return  # only local switches are driven from this dropdown
         self.model_combo.setEnabled(False)
@@ -994,18 +1097,7 @@ class Sidebar(QFrame):
             self.model_combo.setEnabled(True)
 
     def refresh(self, chats):
-        self.list.clear()
-        for c in chats:
-            chat_id = c["id"]
-            item = QListWidgetItem()
-            item.setData(Qt.UserRole, chat_id)
-            self.list.addItem(item)
-
-            row = ChatRow(c["title"] or "New chat")
-            row.clicked.connect(lambda cid=chat_id: self.chat_selected.emit(cid))
-            row.delete_clicked.connect(lambda cid=chat_id: self.chat_delete_requested.emit(cid))
-            item.setSizeHint(row.sizeHint())
-            self.list.setItemWidget(item, row)
+        pass  # previous-chats list removed from the sidebar
 
 
 class CameraWidget(QWidget):
@@ -1197,7 +1289,7 @@ class NovaHUD(QMainWindow):
         root_lay.addWidget(self.canvas, 1)
 
         self.orb = ParticleOrb(self.canvas)
-        self.chatbar = ChatBar(self.history, self.canvas)
+        self.chatbar = ChatBar(self.history, self.orb, self.canvas)
         self.chatbar.chat_updated.connect(self._refresh_sidebar)
         self.orb.activate_requested.connect(self.chatbar.trigger_listen)  # clap twice -> listen
 
@@ -1283,6 +1375,7 @@ class NovaHUD(QMainWindow):
     def closeEvent(self, event):
         self.chatbar._wake_thread.stop()
         self.chatbar._task_scheduler.stop()
+        self.sidebar._colibri_watcher.stop()
         self.aura.stop()
         self.aura.close()
         self.vision_engine.stop()
