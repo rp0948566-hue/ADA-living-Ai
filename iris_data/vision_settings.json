@@ -1,0 +1,8 @@
+{
+  "camera_enabled": true,
+  "face_recognition": true,
+  "body_tracking": true,
+  "hand_tracking": true,
+  "gesture_recognition": true,
+  "clap_detection": true
+}
