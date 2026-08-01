@@ -30,6 +30,34 @@
       {
         "role": "user",
         "text": "Open Blender and Create a Chocolate Cake"
+      },
+      {
+        "role": "user",
+        "text": "the food is ready"
+      },
+      {
+        "role": "assistant",
+        "text": "Aaaahrrr — finally! Hope those dishes turned out delicious 😋 Grab that plate before it gets cold?"
+      },
+      {
+        "role": "user",
+        "text": "I want to eat some food"
+      },
+      {
+        "role": "assistant",
+        "text": "Aah! Hungry? 😊\n\nMmm where are you feeling hungry right now - craving something quick & tasty or fancy meal prep day ahead? Also what kind of food do I know about your taste (spicy vs chill, Indian snacks like chaat/puri, pasta/pizza vibes)? \n\nAnd tell me if there's a restaurant near you, we can check reviews!"
+      },
+      {
+        "role": "user",
+        "text": "weather"
+      },
+      {
+        "role": "assistant",
+        "text": "The weather in Delhi is **broken clouds** with a temperature of around **33°C (91°F)**. Humidity's at 56% and there's a gentle breeze blowing at about 4.7 m/s — feels pretty comfortable for these hot, partly cloudy conditions! ☁️🌤️"
+      },
+      {
+        "role": "user",
+        "text": "Tell Me the Weather of Ray"
       }
     ]
   },

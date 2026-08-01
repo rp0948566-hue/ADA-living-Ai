@@ -8,13 +8,16 @@ Falls back automatically to pyttsx3 (Windows SAPI, fully offline) whenever
 ElevenLabs is unavailable — no key, no credit, no internet, rate-limited.
 Either way, Iris always has *some* voice.
 
-Listening: SpeechRecognition's microphone capture + the free Google Web
-Speech recognizer (no API key required, just needs internet for the
-recognition call itself — the mic capture and everything else stays local).
-Whatever language Rudra actually spoke in gets auto-translated to English
-before it's handed to the AI (see listen_and_translate / translate_to_english).
+Listening: SpeechRecognition's microphone capture (voice-activity detection,
+same as before) feeding OpenAI Whisper (whisper/ — cloned locally, see
+README.md removed / LICENSE kept per its MIT terms) running fully offline on
+this machine. No Google Speech API, no internet dependency for recognition
+itself. Whisper's task="translate" mode transcribes AND translates to
+English in one pass, so whatever language Rudra spoke in — Hindi, English,
+Hinglish — comes out as English text with no separate translation call.
 """
 import os
+import tempfile
 import threading
 
 try:
@@ -26,6 +29,11 @@ try:
     import speech_recognition as sr
 except Exception:
     sr = None
+
+try:
+    import whisper as _openai_whisper
+except Exception:
+    _openai_whisper = None
 
 try:
     import numpy as np
@@ -125,32 +133,30 @@ def speak(text: str):
             pass
 
 
-def translate_to_english(text: str) -> str:
-    """Translate arbitrary-language text to English via Google's free
-    (no-key) translate endpoint. Returns the original text unchanged if
-    translation fails or it's already English."""
-    if not text:
-        return text
-    try:
-        resp = requests.get(
-            "https://translate.googleapis.com/translate_a/single",
-            params={"client": "gtx", "sl": "auto", "tl": "en", "dt": "t", "q": text},
-            timeout=8,
-        )
-        resp.raise_for_status()
-        data = resp.json()
-        translated = "".join(seg[0] for seg in data[0] if seg[0])
-        return translated.strip() or text
-    except Exception:
-        return text
 
 
-def listen(timeout: float = 4.0, phrase_time_limit: float = 12.0) -> str:
-    """Capture from the default mic and transcribe, in whatever language was
-    spoken. Returns "" on failure (no mic, silence, unrecognized speech, no
-    internet for recognition)."""
+WHISPER_MODEL_SIZE = os.getenv("WHISPER_MODEL_SIZE", "base")
+
+_whisper_model = None
+_whisper_load_lock = threading.Lock()
+
+
+def _get_whisper_model():
+    """Lazy-loaded, loaded once and reused — loading takes a few seconds,
+    transcribing after that is fast. First call after launch pays this cost."""
+    global _whisper_model
+    if _whisper_model is None and _openai_whisper is not None:
+        with _whisper_load_lock:
+            if _whisper_model is None:
+                _whisper_model = _openai_whisper.load_model(WHISPER_MODEL_SIZE)
+    return _whisper_model
+
+
+def _capture_audio(timeout: float, phrase_time_limit: float):
+    """Mic capture with voice-activity detection — returns a
+    speech_recognition AudioData object, or None on failure/silence."""
     if sr is None:
-        return ""
+        return None
     try:
         r = sr.Recognizer()
         # 0.5s was cutting people off mid-sentence on any normal thinking
@@ -160,25 +166,42 @@ def listen(timeout: float = 4.0, phrase_time_limit: float = 12.0) -> str:
         r.non_speaking_duration = 0.5
         with sr.Microphone() as source:
             r.adjust_for_ambient_noise(source, duration=0.2)  # shorter calibration — less dead air every cycle
-            audio = r.listen(source, timeout=timeout, phrase_time_limit=phrase_time_limit)
+            return r.listen(source, timeout=timeout, phrase_time_limit=phrase_time_limit)
     except Exception:
-        return ""  # no mic / nothing captured
+        return None  # no mic / nothing captured
 
-    try:
-        return r.recognize_google(audio, language="hi-IN")
-    except sr.UnknownValueError:
-        pass  # genuinely not recognized as Hindi speech — worth trying English
-    except sr.RequestError:
-        return ""  # network/quota hiccup — retrying in English would just mangle the Hindi
 
+def _whisper_transcribe(audio, task: str) -> str:
+    """task: "transcribe" (original language) or "translate" (-> English)."""
+    model = _get_whisper_model()
+    if model is None or audio is None:
+        return ""
+    wav_path = None
     try:
-        return r.recognize_google(audio)
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as f:
+            f.write(audio.get_wav_data())
+            wav_path = f.name
+        result = model.transcribe(wav_path, task=task, fp16=False)
+        return (result.get("text") or "").strip()
     except Exception:
         return ""
+    finally:
+        if wav_path:
+            try:
+                os.remove(wav_path)
+            except Exception:
+                pass
+
+
+def listen(timeout: float = 4.0, phrase_time_limit: float = 12.0) -> str:
+    """Capture from the default mic and transcribe, in whatever language was
+    spoken. Returns "" on failure (no mic, silence, unrecognized speech)."""
+    return _whisper_transcribe(_capture_audio(timeout, phrase_time_limit), task="transcribe")
 
 
 def listen_and_translate(timeout: float = 4.0, phrase_time_limit: float = 12.0) -> str:
-    """listen() + auto-translate to English — whatever language Rudra spoke
-    in, this is what gets sent to the AI backend."""
-    heard = listen(timeout=timeout, phrase_time_limit=phrase_time_limit)
-    return translate_to_english(heard)
+    """Capture + transcribe + translate to English, all in one Whisper pass
+    — whatever language Rudra spoke in, this is what gets sent to the AI
+    backend. No separate network call needed (unlike the old Google
+    Translate step) since Whisper's translate mode does both at once."""
+    return _whisper_transcribe(_capture_audio(timeout, phrase_time_limit), task="translate")
