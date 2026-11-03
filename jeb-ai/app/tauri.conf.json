@@ -1,0 +1,52 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Jeb",
+  "version": "0.1.0",
+  "identifier": "dev.jeb.airspace",
+  "build": {
+    "frontendDist": "../ui/dist",
+    "beforeBuildCommand": "npm --prefix ui run build"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Jeb",
+        "width": 1440,
+        "height": 900,
+        "minWidth": 900,
+        "minHeight": 600,
+        "visible": false
+      },
+      {
+        "label": "notch",
+        "url": "notch.html",
+        "width": 320,
+        "height": 90,
+        "decorations": false,
+        "transparent": true,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "resizable": false,
+        "visible": false,
+        "shadow": false,
+        "focus": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": [
+      "deb"
+    ],
+    "icon": [
+      "icons/icon.png"
+    ],
+    "category": "Utility",
+    "shortDescription": "Jeb live airspace",
+    "longDescription": "Jeb: voice-driven live world map and air traffic, Rust backend with TypeScript UI."
+  }
+}
