@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Jeb notch</title>
+<style>
+  html, body { margin: 0; height: 100%; background: transparent; overflow: hidden; font: 14px/1.4 system-ui, "Segoe UI", sans-serif; color: #eef3f8; }
+  .notch { position: absolute; top: 0; left: 50%; width: 60px; height: 6px; opacity: 0; transform: translateX(-50%); background: #000;
+    border: 1px solid rgba(255,255,255,.1); border-top: 0; border-radius: 0 0 12px 12px; overflow: hidden;
+    transition: width .55s cubic-bezier(.2,1.1,.3,1), height .55s cubic-bezier(.2,1.1,.3,1), border-radius .55s, opacity .2s; }
+  .notch.show { opacity: 1; width: 190px; height: 30px; border-radius: 0 0 14px 14px; }
+  .notch.show.talk { width: 300px; height: 70px; border-radius: 0 0 18px 18px; }
+  .in { position: absolute; inset: 0; padding: 5px 14px 0; opacity: 0; transition: opacity .25s .18s; }
+  .show .in { opacity: 1; }
+  .row { display: flex; align-items: center; gap: 8px; height: 20px; }
+  .orb { width: 11px; height: 11px; border-radius: 50%; flex: none; background: radial-gradient(circle at 35% 30%, #d9f4ff, #2a86b5 70%); box-shadow: 0 0 8px rgba(92,200,255,.6); }
+  [data-s="listening"] .orb { animation: pulse 1.2s infinite; background: radial-gradient(circle at 35% 30%, #d8ffe9, #1f9a64 70%); }
+  [data-s="thinking"] .orb { animation: pulse .7s infinite; background: radial-gradient(circle at 35% 30%, #fff1d6, #b8731a 70%); }
+  [data-s="error"] .orb { background: radial-gradient(circle at 35% 30%, #ffd9df, #b3283f 70%); }
+  #status { font-weight: 600; font-size: 11px; letter-spacing: .02em; }
+  .bars { flex: 1; display: flex; align-items: center; justify-content: flex-end; gap: 2px; height: 14px; }
+  .bars i { width: 2px; height: 3px; border-radius: 3px; background: #5cc8ff; opacity: .85; }
+  [data-s="speaking"] .bars i, [data-s="listening"] .bars i { animation: bar .9s ease-in-out infinite; }
+  .bars i:nth-child(3n) { animation-delay: -.3s !important; } .bars i:nth-child(3n+1) { animation-delay: -.6s !important; } .bars i:nth-child(2n) { animation-duration: 1.2s !important; }
+  #say { margin-top: 2px; color: #cfdbe6; font-size: 11px; line-height: 1.25; max-height: 28px; overflow: hidden; }
+  #say b { color: #8696a7; font-weight: 600; margin-right: 6px; font-size: 9px; text-transform: uppercase; letter-spacing: .08em; }
+  @keyframes pulse { 50% { transform: scale(1.25); } } @keyframes bar { 0%,100% { height: 3px; } 50% { height: 13px; } }
+</style></head>
+<body>
+  <div class="notch" id="notch" data-s="idle"><div class="in">
+    <div class="row"><span class="orb"></span><span id="status">Idle</span><div class="bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+    <div id="say"></div></div></div>
+  <script type="module" src="/src/notch.ts"></script>
+</body></html>
