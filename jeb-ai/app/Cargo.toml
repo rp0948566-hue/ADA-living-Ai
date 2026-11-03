@@ -1,0 +1,16 @@
+[package]
+name = "jeb-app"
+version = "0.1.0"
+edition = "2021"
+description = "Jeb: live airspace desktop app (Tauri shell, Rust backend, TypeScript UI)"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+jeb-core = { path = "../core" }
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+serde_json = "1"
+tokio = { version = "1", features = ["time"] }
+gtk = "0.18"
