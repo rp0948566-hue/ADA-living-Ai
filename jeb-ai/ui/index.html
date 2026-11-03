@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jeb</title>
+<style>
+  :root { --bg: #05080d; --panel: rgba(12,16,22,.78); --panel2: rgba(255,255,255,.04); --line: rgba(255,255,255,.09); --text: #eef3f8; --muted: #8696a7;
+          --accent: #5cc8ff; --ok: #5be2a0; --amber: #ff9a3c; --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace; --shadow: rgba(0,0,0,.8); }
+  [data-theme="light"] { --bg: #dfe8ef; --panel: rgba(255,255,255,.78); --panel2: rgba(20,40,60,.05); --line: rgba(20,40,60,.12); --text: #14212d; --muted: #5d7284;
+          --accent: #0a86c4; --ok: #14935a; --shadow: rgba(255,255,255,.9); }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { height: 100%; background: var(--bg); color: var(--text); overflow: hidden; font: 14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  #globe { position: fixed; inset: 0; opacity: 0; transition: opacity 1.6s ease; } #globe.ready { opacity: 1; }
+  .cesium-widget-credits { display: none !important; }
+  .glass { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; backdrop-filter: blur(18px) saturate(1.3); }
+  .side { position: fixed; left: 16px; top: 16px; bottom: 16px; width: 290px; z-index: 5; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+  .side .glass { pointer-events: auto; }
+  .brand { display: flex; align-items: center; gap: 10px; padding: 12px 14px; font-weight: 700; letter-spacing: .04em; }
+  .brand small { margin-left: auto; font-weight: 500; color: var(--muted); letter-spacing: 0; }
+  .theme { width: 56px; height: 28px; border-radius: 99px; border: 1px solid var(--line); background: var(--panel2); display: flex; align-items: center; padding: 2px; cursor: pointer; justify-content: space-between; color: var(--muted); }
+  .theme span { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; }
+  [data-theme="dark"] .theme span:last-child, [data-theme="light"] .theme span:first-child { background: var(--accent); color: #fff; }
+  .search { display: flex; padding: 0 12px 12px; }
+  .search input { flex: 1; min-width: 0; background: var(--panel2); border: 1px solid var(--line); border-radius: 11px; color: var(--text); padding: 9px 12px; font: 13px var(--mono); outline: none; }
+  .search input:focus { border-color: var(--accent); }
+  .list { flex: 1; min-height: 0; overflow: auto; padding: 8px; display: flex; flex-direction: column; gap: 7px; }
+  .list h4 { color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; padding: 4px 6px 2px; }
+  .it { background: var(--panel2); border: 1px solid transparent; border-radius: 13px; padding: 9px 11px; cursor: pointer; }
+  .it:hover { background: rgba(127,127,127,.14); } .it.sel { border-color: var(--accent); }
+  .it .t { display: flex; justify-content: space-between; align-items: baseline; font: 600 13px var(--mono); }
+  .it .t em { font-style: normal; font-size: 10px; color: var(--ok); letter-spacing: .08em; }
+  .it .s { display: flex; justify-content: space-between; color: var(--muted); font-size: 11.5px; margin-top: 3px; }
+  .empty { color: var(--muted); padding: 14px 8px; font-size: 12.5px; }
+  .detail { position: fixed; right: 16px; top: 16px; bottom: 16px; width: 340px; z-index: 5; transform: translateX(calc(100% + 24px)); transition: transform .5s cubic-bezier(.2,.9,.25,1); overflow: auto; padding: 0 0 12px; }
+  .detail.open { transform: none; }
+  .d-st { padding: 14px 16px 0; font: 600 10px var(--mono); letter-spacing: .1em; color: var(--ok); text-align: center; }
+  .d-close { position: absolute; right: 12px; top: 10px; background: none; border: 0; color: var(--muted); font-size: 18px; cursor: pointer; }
+  .d-id { font: 600 24px var(--mono); text-align: center; margin: 6px 0 4px; }
+  .d-photo { margin: 4px 14px 0; border-radius: 12px; overflow: hidden; background: var(--panel2); position: relative; }
+  .d-photo img { width: 100%; display: block; } .d-photo span { position: absolute; right: 8px; bottom: 6px; font-size: 10px; color: #fff; text-shadow: 0 0 4px #000; }
+  .d-sub { text-align: center; margin: 10px 0 2px; } .d-pos { text-align: center; color: var(--muted); font: 11px var(--mono); margin-bottom: 10px; }
+  .route { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 14px; }
+  .route .cell b { display: block; font: 700 20px var(--mono); } .route .cell small { color: var(--muted); font-size: 11.5px; display: block; margin: 0; }
+  .prog { margin: 10px 14px 0; height: 6px; border-radius: 6px; background: var(--panel2); position: relative; }
+  .prog i { position: absolute; left: 0; top: 0; bottom: 0; background: linear-gradient(90deg, var(--amber), var(--accent)); border-radius: 6px; }
+  .prog-l { display: flex; justify-content: space-between; margin: 5px 16px 0; color: var(--muted); font-size: 11px; }
+  .gridc { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 14px; }
+  .cell { background: var(--panel2); border: 1px solid var(--line); border-radius: 12px; padding: 9px 11px; }
+  .cell label { display: block; color: var(--muted); font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; }
+  .cell b { font: 600 17px var(--mono); } .cell small { color: var(--muted); font-size: 11px; margin-left: 3px; }
+  .d-sec { padding: 12px 16px 6px; color: var(--muted); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
+  .alt { margin: 0 14px; height: 6px; border-radius: 6px; background: var(--panel2); position: relative; overflow: hidden; }
+  .alt i { position: absolute; left: 0; top: 0; bottom: 0; background: linear-gradient(90deg, var(--amber), var(--accent)); transition: width .6s; }
+  .counter { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 5; text-align: center; pointer-events: none; text-shadow: 0 2px 18px var(--shadow); }
+  .counter b { display: block; font: 700 30px var(--mono); } .counter span { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  .zoom { position: fixed; right: 16px; bottom: 16px; z-index: 6; display: flex; flex-direction: column; gap: 8px; transition: right .5s; }
+  .detail.open ~ .zoom { right: 372px; }
+  .zoom button { width: 40px; height: 40px; border-radius: 12px; font-size: 18px; color: var(--text); cursor: pointer; }
+  #boot { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; background: var(--bg); transition: opacity 1.2s; color: var(--muted); letter-spacing: .2em; font-size: 12px; text-transform: uppercase; }
+  #boot.gone { opacity: 0; pointer-events: none; }
+  #feed { position: fixed; left: 50%; top: 10px; transform: translateX(-50%); z-index: 4; font-size: 11px; color: var(--muted); letter-spacing: .08em; }
+</style>
+</head>
+<body>
+  <div id="boot">Jeb · loading airspace</div>
+  <div id="globe"></div>
+  <div id="feed"></div>
+  <div class="side">
+    <div class="glass">
+      <div class="brand"><span>JEB · AIRSPACE</span><small></small>
+        <div class="theme" id="theme" role="switch" aria-label="Light or dark" style="margin-left:auto"><span>☀</span><span>☾</span></div></div>
+      <div class="search"><input id="q" placeholder="Search callsign or reg…" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="glass list" id="list"><div class="empty">Loading live traffic…</div></div>
+  </div>
+  <div class="glass detail" id="detail">
+    <button class="d-close" id="dclose" aria-label="Close">×</button>
+    <div class="d-st" id="dst">IN FLIGHT · LIVE</div>
+    <div class="d-id" id="did">—</div>
+    <div class="d-photo" id="dphoto"></div>
+    <div class="d-sub" id="dsub"></div><div class="d-pos" id="dpos"></div>
+    <div id="droute"></div>
+    <div class="d-sec">Flight data</div>
+    <div class="gridc">
+      <div class="cell"><label>Altitude</label><b id="dalt">—</b><small>ft</small></div>
+      <div class="cell"><label>Speed</label><b id="dspd">—</b><small>km/h</small></div>
+      <div class="cell"><label>Heading</label><b id="dhdg">—</b><small>°</small></div>
+      <div class="cell"><label>Climb</label><b id="dvr">—</b><small>m/s</small></div>
+      <div class="cell"><label>Squawk</label><b id="dsq">—</b></div>
+      <div class="cell"><label>Mach</label><b id="dmach">—</b></div>
+    </div>
+    <div class="d-sec">Altitude</div><div class="alt"><i id="dbar" style="width:0"></i></div>
+    <div class="d-sec">Transponder</div>
+    <div class="gridc"><div class="cell"><label>ICAO24</label><b id="dhex" style="font-size:14px">—</b></div><div class="cell"><label>Registration</label><b id="dreg" style="font-size:14px">—</b></div></div>
+  </div>
+  <div class="counter"><b id="count">0</b><span>aircraft in the air right now</span></div>
+  <div class="zoom"><button class="glass" id="zin" aria-label="Zoom in">+</button><button class="glass" id="zout" aria-label="Zoom out">−</button></div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
