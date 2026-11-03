@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jeb</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cesium@1.121.1/Build/Cesium/Widgets/widgets.css">
+<style>
+  :root {
+    --bg: #05080d; --panel: rgba(12, 16, 22, .78); --panel2: rgba(255,255,255,.04); --line: rgba(255,255,255,.09);
+    --text: #eef3f8; --muted: #8696a7; --accent: #5cc8ff; --ok: #5be2a0; --warn: #ffb454; --bad: #ff6b81; --amber: #ff9a3c;
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { height: 100%; background: var(--bg); color: var(--text); overflow: hidden;
+               font: 14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  #globe { position: fixed; inset: 0; opacity: 0; transition: opacity 1.6s ease; }
+  #globe.ready { opacity: 1; }
+  .cesium-viewer-bottom { left: auto !important; right: 10px; bottom: 4px; opacity: .55; font-size: 10px; }
+  .cesium-widget-credits, .cesium-credit-logoContainer { display: none !important; }
+  .cesium-credit-textContainer, .cesium-credit-expand-link { color: #9fb0c0 !important; }
+
+  /* ---------- notch: drops from the top edge only while Jeb is active ---------- */
+  .notch { position: fixed; top: 0; left: 50%; z-index: 20; width: 44px; height: 14px; opacity: 0; pointer-events: none;
+           transform: translate(-50%, -110%); background: #000; border: 1px solid var(--line); border-top: 0;
+           border-radius: 0 0 22px 22px; overflow: hidden; box-shadow: 0 18px 50px rgba(0,0,0,.55);
+           transition: transform .55s cubic-bezier(.2,1.25,.3,1), width .55s cubic-bezier(.2,1.1,.3,1), height .55s cubic-bezier(.2,1.1,.3,1),
+                       border-radius .55s, opacity .25s; }
+  .notch.show { opacity: 1; transform: translate(-50%, 0); width: min(440px, calc(100vw - 24px)); height: 58px; border-radius: 0 0 30px 30px; }
+  .notch.show.talk { height: 118px; border-radius: 0 0 34px 34px; }
+  .notch .in { position: absolute; inset: 0; padding: 12px 20px 0; opacity: 0; transition: opacity .25s .18s; }
+  .notch.show .in { opacity: 1; }
+  .nrow { display: flex; align-items: center; gap: 12px; height: 34px; }
+  .orb { width: 22px; height: 22px; border-radius: 50%; flex: none; background: radial-gradient(circle at 35% 30%, #d9f4ff, #2a86b5 70%);
+         box-shadow: 0 0 14px rgba(92,200,255,.6); }
+  .notch[data-s="listening"] .orb { animation: pulse 1.2s infinite; background: radial-gradient(circle at 35% 30%, #d8ffe9, #1f9a64 70%); box-shadow: 0 0 14px rgba(91,226,160,.6); }
+  .notch[data-s="thinking"] .orb { animation: pulse .7s infinite; background: radial-gradient(circle at 35% 30%, #fff1d6, #b8731a 70%); box-shadow: 0 0 14px rgba(255,180,84,.6); }
+  .notch[data-s="acting"] .orb { animation: pulse .5s infinite; }
+  .notch[data-s="error"] .orb { background: radial-gradient(circle at 35% 30%, #ffd9df, #b3283f 70%); }
+  #status { font-weight: 600; letter-spacing: .02em; flex: none; }
+  .bars { flex: 1; display: flex; align-items: center; justify-content: flex-end; gap: 3px; height: 24px; }
+  .bars i { width: 3px; height: 4px; border-radius: 3px; background: var(--accent); opacity: .85; }
+  .notch[data-s="speaking"] .bars i, .notch[data-s="listening"] .bars i { animation: bar .9s ease-in-out infinite; }
+  .bars i:nth-child(3n) { animation-delay: -.3s !important; } .bars i:nth-child(3n+1) { animation-delay: -.6s !important; }
+  .bars i:nth-child(2n) { animation-duration: 1.2s !important; }
+  #say { margin-top: 4px; color: #cfdbe6; font-size: 13px; line-height: 1.35; max-height: 38px; overflow: hidden; }
+  #say b { color: var(--muted); font-weight: 600; margin-right: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; }
+  @keyframes pulse { 50% { transform: scale(1.25); } }
+  @keyframes bar { 0%,100% { height: 4px; } 50% { height: 22px; } }
+
+  /* ---------- tracking list (left) ---------- */
+  .side { position: fixed; left: 16px; top: 16px; bottom: 16px; width: 290px; z-index: 5; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+  .glass { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; backdrop-filter: blur(18px) saturate(1.3); pointer-events: auto; }
+  .brand { display: flex; align-items: center; gap: 10px; padding: 12px 14px; font-weight: 700; letter-spacing: .04em; }
+  .brand small { margin-left: auto; font-weight: 500; color: var(--muted); letter-spacing: 0; }
+  .search { display: flex; gap: 8px; padding: 0 12px 12px; }
+  .search input { flex: 1; min-width: 0; background: var(--panel2); border: 1px solid var(--line); border-radius: 11px; color: var(--text);
+                  padding: 9px 12px; font: 13px var(--mono); outline: none; }
+  .search input:focus { border-color: var(--accent); }
+  .list { flex: 1; min-height: 0; overflow: auto; padding: 8px; display: flex; flex-direction: column; gap: 7px; }
+  .list h4 { color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; padding: 4px 6px 2px; }
+  .it { background: var(--panel2); border: 1px solid transparent; border-radius: 13px; padding: 9px 11px; cursor: pointer; transition: border-color .15s, background .15s; }
+  .it:hover { background: rgba(255,255,255,.07); }
+  .it.sel { border-color: rgba(92,200,255,.5); background: rgba(92,200,255,.08); }
+  .it .t { display: flex; justify-content: space-between; align-items: baseline; font-family: var(--mono); font-size: 13px; font-weight: 600; }
+  .it .t em { font-style: normal; font-size: 10px; color: var(--ok); letter-spacing: .08em; }
+  .it .s { display: flex; justify-content: space-between; color: var(--muted); font-size: 11.5px; margin-top: 3px; }
+  .empty { color: var(--muted); padding: 14px 8px; font-size: 12.5px; }
+
+  /* ---------- detail card (right) ---------- */
+  .detail { position: fixed; right: 16px; top: 16px; bottom: 16px; width: 330px; z-index: 5; transform: translateX(calc(100% + 24px)); transition: transform .5s cubic-bezier(.2,.9,.25,1);
+            overflow: auto; padding: 0 0 12px; }
+  .detail.open { transform: none; }
+  .d-st { padding: 14px 16px 0; font: 600 10px var(--mono); letter-spacing: .1em; color: var(--ok); text-align: center; }
+  .d-close { position: absolute; right: 12px; top: 10px; background: none; border: 0; color: var(--muted); font-size: 18px; cursor: pointer; }
+  .d-id { font: 600 24px var(--mono); text-align: center; margin: 6px 0 4px; letter-spacing: .03em; }
+  .d-photo { margin: 4px 14px 0; border-radius: 12px; overflow: hidden; background: var(--panel2); min-height: 8px; position: relative; }
+  .d-photo img { width: 100%; display: block; }
+  .d-photo span { position: absolute; right: 8px; bottom: 6px; font-size: 10px; color: #fff; text-shadow: 0 0 4px #000; }
+  .d-sub { text-align: center; margin: 10px 0 2px; font-size: 14px; }
+  .d-pos { text-align: center; color: var(--muted); font: 11px var(--mono); margin-bottom: 10px; }
+  .gridc { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 14px; }
+  .cell { background: var(--panel2); border: 1px solid var(--line); border-radius: 12px; padding: 9px 11px; }
+  .cell label { display: block; color: var(--muted); font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; }
+  .cell b { font: 600 17px var(--mono); }
+  .cell small { color: var(--muted); font-size: 11px; margin-left: 3px; }
+  .d-sec { padding: 12px 16px 6px; color: var(--muted); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
+  .alt { margin: 0 14px; height: 6px; border-radius: 6px; background: var(--panel2); position: relative; overflow: hidden; }
+  .alt i { position: absolute; left: 0; top: 0; bottom: 0; background: linear-gradient(90deg, var(--amber), var(--accent)); border-radius: 6px; transition: width .6s; }
+
+  /* ---------- bottom ---------- */
+  .counter { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 5; text-align: center; pointer-events: none; text-shadow: 0 2px 18px rgba(0,0,0,.8); }
+  .counter b { display: block; font: 700 30px var(--mono); letter-spacing: .02em; }
+  .counter span { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #b9c7d4; }
+  .zoom { position: fixed; right: 16px; bottom: 16px; z-index: 6; display: flex; flex-direction: column; gap: 8px; transition: right .5s; }
+  .detail.open ~ .zoom { right: 362px; }
+  .zoom button { width: 40px; height: 40px; border-radius: 12px; font-size: 18px; color: var(--text); cursor: pointer; }
+  #boot { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; background: #05080d; transition: opacity 1.2s; color: var(--muted); letter-spacing: .2em; font-size: 12px; text-transform: uppercase; }
+  #boot.gone { opacity: 0; pointer-events: none; }
+  @media (max-width: 820px) { .side { display: none; } .detail { width: calc(100vw - 32px); } }
+</style>
+</head>
+<body>
+  <div id="boot">Jeb · loading airspace</div>
+  <div id="globe"></div>
+
+  <div class="notch" id="notch" data-s="idle" role="status" aria-live="polite">
+    <div class="in">
+      <div class="nrow"><span class="orb"></span><span id="status">Idle</span>
+        <div class="bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+      <div id="say"></div>
+    </div>
+  </div>
+
+  <div class="side">
+    <div class="glass">
+      <div class="brand"><span>JEB · AIRSPACE</span><small id="model">no model yet</small></div>
+      <div class="search"><input id="q" placeholder="Search callsign or reg…" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="glass list" id="list"><div class="empty">Loading live traffic…</div></div>
+  </div>
+
+  <div class="glass detail" id="detail">
+    <button class="d-close" id="dclose" aria-label="Close">×</button>
+    <div class="d-st" id="dst">IN FLIGHT · LIVE</div>
+    <div class="d-id" id="did">—</div>
+    <div class="d-photo" id="dphoto"></div>
+    <div class="d-sub" id="dsub"></div>
+    <div class="d-pos" id="dpos"></div>
+    <div class="gridc">
+      <div class="cell"><label>Altitude</label><b id="dalt">—</b><small>ft</small></div>
+      <div class="cell"><label>Speed</label><b id="dspd">—</b><small>km/h</small></div>
+      <div class="cell"><label>Heading</label><b id="dhdg">—</b><small>°</small></div>
+      <div class="cell"><label>Climb</label><b id="dvr">—</b><small>m/s</small></div>
+      <div class="cell"><label>Squawk</label><b id="dsq">—</b></div>
+      <div class="cell"><label>Mach</label><b id="dmach">—</b></div>
+    </div>
+    <div class="d-sec">Altitude profile</div><div class="alt"><i id="dbar" style="width:0"></i></div>
+    <div class="d-sec">Transponder</div>
+    <div class="gridc">
+      <div class="cell"><label>ICAO24</label><b id="dhex" style="font-size:14px">—</b></div>
+      <div class="cell"><label>Registration</label><b id="dreg" style="font-size:14px">—</b></div>
+    </div>
+  </div>
+
+  <div class="counter"><b id="count">0</b><span>aircraft in the air right now</span></div>
+  <div class="zoom"><button class="glass" id="zin" aria-label="Zoom in">+</button><button class="glass" id="zout" aria-label="Zoom out">−</button></div>
+
+<script>window.CESIUM_BASE_URL = "https://cdn.jsdelivr.net/npm/cesium@1.121.1/Build/Cesium/";</script>
+<script src="https://cdn.jsdelivr.net/npm/cesium@1.121.1/Build/Cesium/Cesium.js"></script>
+<script>
+const $ = (id) => document.getElementById(id);
+
+/* ================= notch ================= */
+const LABEL = { idle: "Idle", listening: "Listening", thinking: "Thinking", speaking: "Speaking", acting: "Working", error: "Something failed" };
+const notch = $("notch");
+let hideT = 0;
+function setState(s) {
+  clearTimeout(hideT);
+  notch.dataset.s = s; $("status").textContent = LABEL[s] || s;
+  if (s === "idle") hideT = setTimeout(() => { notch.classList.remove("show", "talk"); }, 1800);   // drops away after Jeb finishes
+  else notch.classList.add("show");
+}
+function say(who, text) {
+  const el = $("say"); el.innerHTML = ""; const b = document.createElement("b"); b.textContent = who;
+  el.append(b, document.createTextNode(text)); notch.classList.add("show", "talk");
+}
+function setModel(n) { $("model").textContent = n || "no model yet"; }
+function handle(e) {
+  if (e.kind === "snapshot") { setState("idle"); setModel(e.model); }
+  else if (e.kind === "state") setState(e.state);
+  else if (e.kind === "model") setModel(e.name);
+  else if (e.kind === "user") say("You", e.text);
+  else if (e.kind === "jeb") { const t = $("say").lastChild; const cur = notch.dataset.s === "speaking" && $("say").firstChild?.textContent === "Jeb";
+    if (cur) t.textContent += " " + e.text; else say("Jeb", e.text); }
+  else if (e.kind === "focus") focusQuery(e.query || "", e.lat, e.lon);
+}
+function connect() {
+  const es = new EventSource("/events");
+  es.onmessage = (m) => handle(JSON.parse(m.data));
+  es.onerror = () => { es.close(); setTimeout(connect, 1500); };
+}
+connect();
+
+/* ================= globe ================= */
+const C = Cesium;
+C.Ion.defaultAccessToken = "";
+const viewer = new C.Viewer("globe", {
+  baseLayer: false, baseLayerPicker: false, geocoder: false, homeButton: false, sceneModePicker: false, navigationHelpButton: false,
+  animation: false, timeline: false, fullscreenButton: false, infoBox: false, selectionIndicator: false, requestRenderMode: false,
+  skyBox: false, contextOptions: { webgl: { alpha: false } },
+});
+const scene = viewer.scene, globe = scene.globe, camera = scene.camera;
+viewer.imageryLayers.addImageryProvider(new C.UrlTemplateImageryProvider({
+  url: "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+  maximumLevel: 18, credit: "Imagery © Esri, Maxar, Earthstar Geographics",
+}));
+viewer.imageryLayers.addImageryProvider(new C.UrlTemplateImageryProvider({   // place names, roads and borders over the imagery
+  url: "https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
+  maximumLevel: 13, credit: "Labels © Esri",
+}));
+scene.backgroundColor = C.Color.fromCssColorString("#05080d");
+scene.skyAtmosphere.show = true; scene.skyAtmosphere.hueShift = -0.02; scene.skyAtmosphere.brightnessShift = 0.1;
+globe.enableLighting = true; globe.showGroundAtmosphere = true; globe.atmosphereLightIntensity = 14;
+globe.baseColor = C.Color.fromCssColorString("#0a1a2c"); globe.maximumScreenSpaceError = 1.4;
+scene.highDynamicRange = false; scene.fog.enabled = true; scene.moon && (scene.moon.show = false); scene.sun && (scene.sun.show = true);
+viewer.clock.shouldAnimate = true; viewer.clock.currentTime = C.JulianDate.now();
+scene.screenSpaceCameraController.minimumZoomDistance = 600;
+camera.setView({ destination: C.Cartesian3.fromDegrees(20, 25, 2.6e7) });
+
+/* ---- aircraft store: hex -> state; one billboard each, dead-reckoned between data pulls ---- */
+const AC = new Map();
+const bills = scene.primitives.add(new C.BillboardCollection({ scene }));
+const labels = scene.primitives.add(new C.LabelCollection({ scene }));
+function planeIcon() {
+  const c = document.createElement("canvas"); c.width = c.height = 64; const g = c.getContext("2d");
+  g.translate(32, 32); g.beginPath();
+  g.moveTo(0, -28); g.lineTo(4, -12); g.lineTo(27, 4); g.lineTo(27, 9); g.lineTo(4, 3); g.lineTo(3, 18); g.lineTo(11, 25); g.lineTo(11, 29);
+  g.lineTo(0, 26); g.lineTo(-11, 29); g.lineTo(-11, 25); g.lineTo(-3, 18); g.lineTo(-4, 3); g.lineTo(-27, 9); g.lineTo(-27, 4); g.lineTo(-4, -12); g.closePath();
+  g.fillStyle = "#fff"; g.fill(); g.lineWidth = 3; g.strokeStyle = "rgba(0,0,0,.55)"; g.stroke(); return c;
+}
+const ICON = planeIcon();
+const altColor = (m) => m < 3000 ? C.Color.fromCssColorString("#ffb454") : m < 8000 ? C.Color.fromCssColorString("#c8f26b") : C.Color.fromCssColorString("#cdeeff");
+let selected = null;
+
+function upsert(hex, o) {
+  let a = AC.get(hex);
+  if (!a) { a = { hex, trail: [] }; a.bb = bills.add({ image: ICON, scale: 0.34, alignedAxis: C.Cartesian3.UNIT_Z, id: hex,
+            scaleByDistance: new C.NearFarScalar(2e5, 1.15, 2.4e7, 0.26), position: C.Cartesian3.ZERO }); AC.set(hex, a); }
+  Object.assign(a, o); a.ts = performance.now();
+  a.bb.rotation = -C.Math.toRadians(a.hdg || 0);
+  a.bb.color = hex === selected ? C.Color.fromCssColorString("#ff8a1f") : altColor(a.alt || 0);
+  a.bb.position = C.Cartesian3.fromDegrees(a.lon, a.lat, Math.max(a.alt || 0, 0));
+  return a;
+}
+async function pullGlobal() {
+  try {
+    const d = await (await fetch("/flights")).json(); if (!d.f.length) return;
+    const seen = new Set();
+    for (const f of d.f) {
+      const hex = f[0]; seen.add(hex); const cur = AC.get(hex);
+      if (cur && performance.now() - (cur.nearAt || 0) < 40000) continue;       // fresher detailed data wins
+      upsert(hex, { call: f[1], lat: f[2], lon: f[3], alt: f[4], vel: f[5], hdg: f[6], vr: f[7] });
+    }
+    for (const [hex, a] of AC) if (!seen.has(hex) && performance.now() - (a.nearAt || 0) > 90000 && hex !== selected) { bills.remove(a.bb); AC.delete(hex); }
+    $("count").dataset.n = AC.size; renderList();
+  } catch (e) { /* keep flying on stale data */ }
+}
+async function pullNear() {
+  if (camera.positionCartographic.height > 3.5e6) return;
+  const c = center(); if (!c) return;
+  try {
+    const d = await (await fetch(`/near?lat=${c.lat}&lon=${c.lon}`)).json();
+    for (const p of d.ac) {
+      if (p.lat == null || p.lon == null || p.alt_baro === "ground") continue;
+      const a = upsert(p.hex.toLowerCase(), { call: (p.flight || "").trim(), lat: p.lat, lon: p.lon, alt: (p.alt_baro || 0) * 0.3048,
+        vel: (p.gs || 0) * 0.5144, hdg: p.track ?? p.true_heading ?? 0, vr: (p.baro_rate || 0) * 0.00508, type: p.t, reg: p.r, sq: p.squawk, mach: p.mach, nearAt: performance.now() });
+    }
+    renderList();
+  } catch (e) {}
+}
+function center() {
+  const r = scene.canvas.getBoundingClientRect(); const p = camera.pickEllipsoid(new C.Cartesian2(r.width / 2, r.height / 2), globe.ellipsoid);
+  if (!p) return null; const g = C.Cartographic.fromCartesian(p); return { lat: C.Math.toDegrees(g.latitude), lon: C.Math.toDegrees(g.longitude) };
+}
+
+/* ---- dead reckoning: every aircraft keeps flying along its heading between pulls ---- */
+let lastAll = 0, lastFrame = performance.now();
+function advance(a, dt) {
+  if (!a.vel) return;
+  const h = C.Math.toRadians(a.hdg || 0);
+  a.lat += (a.vel * Math.cos(h) * dt) / 111320; a.lon += (a.vel * Math.sin(h) * dt) / (111320 * Math.max(Math.cos(C.Math.toRadians(a.lat)), 0.05));
+  a.alt += (a.vr || 0) * dt;
+  a.bb.position = C.Cartesian3.fromDegrees(a.lon, a.lat, Math.max(a.alt, 0));
+}
+scene.preRender.addEventListener(() => {
+  const now = performance.now(), dt = (now - lastFrame) / 1000; lastFrame = now;
+  const h = camera.positionCartographic.height, c = h < 4e6 ? center() : null;
+  if (now - lastAll > 250) { for (const a of AC.values()) advance(a, (now - lastAll) / 1000 || 0.25); lastAll = now; }
+  else if (c) for (const a of AC.values()) if (Math.abs(a.lat - c.lat) < 6 && Math.abs(a.lon - c.lon) < 9) advance(a, dt);   // smooth motion where you are looking
+  if (selected && AC.get(selected)) trackSelected(AC.get(selected));
+  if (!userBusy && !selected && h > 8e6) camera.rotate(C.Cartesian3.UNIT_Z, -0.0009);    // slow idle spin
+  $("count").textContent = Math.round(counterShown += (AC.size - counterShown) * 0.08).toLocaleString("en-US");
+});
+let counterShown = 0, userBusy = false;
+scene.canvas.addEventListener("pointerdown", () => { userBusy = true; });
+scene.canvas.addEventListener("pointerup", () => { setTimeout(() => (userBusy = false), 6000); });
+
+/* ---- labels (flight numbers) on the planes nearest the view centre ---- */
+setInterval(() => {
+  labels.removeAll(); const h = camera.positionCartographic.height; const c = h < 1.6e6 ? center() : null;
+  if (!c) return;
+  const near = [...AC.values()].filter((a) => a.call && Math.abs(a.lat - c.lat) < 6 && Math.abs(a.lon - c.lon) < 9)
+    .sort((x, y) => (x.lat - c.lat) ** 2 + (x.lon - c.lon) ** 2 - ((y.lat - c.lat) ** 2 + (y.lon - c.lon) ** 2)).slice(0, 90);
+  for (const a of near) labels.add({ position: C.Cartesian3.fromDegrees(a.lon, a.lat, a.alt), text: a.call, font: "600 12px ui-monospace, Menlo, monospace",
+    fillColor: C.Color.WHITE, outlineColor: C.Color.BLACK.withAlpha(.8), outlineWidth: 3, style: C.LabelStyle.FILL_AND_OUTLINE,
+    pixelOffset: new C.Cartesian2(14, -10), horizontalOrigin: C.HorizontalOrigin.LEFT, distanceDisplayCondition: new C.DistanceDisplayCondition(0, 1.6e6) });
+}, 700);
+
+/* ---- selection: fly in, trail behind, dashed projection ahead ---- */
+const lines = scene.primitives.add(new C.PolylineCollection());
+const trail = lines.add({ width: 2.2, material: C.Material.fromType("Color", { color: C.Color.fromCssColorString("#ff8a1f") }), positions: [] });
+const ahead = lines.add({ width: 2, material: C.Material.fromType("PolylineDash", { color: C.Color.WHITE.withAlpha(.85), dashLength: 14 }), positions: [] });
+let lastTrail = 0;
+function trackSelected(a) {
+  const now = performance.now();
+  if (now - lastTrail > 1000) {
+    lastTrail = now; a.trail.push([a.lon, a.lat, a.alt]); if (a.trail.length > 600) a.trail.shift();
+    if (a.trail.length > 1) trail.positions = C.Cartesian3.fromDegreesArrayHeights(a.trail.flat());
+    const h = C.Math.toRadians(a.hdg || 0), pts = [];
+    for (let i = 0; i <= 12; i++) { const s = (a.vel || 0) * 120 * i;
+      pts.push(a.lon + (s * Math.sin(h)) / (111320 * Math.cos(C.Math.toRadians(a.lat))), a.lat + (s * Math.cos(h)) / 111320, a.alt); }
+    ahead.positions = C.Cartesian3.fromDegreesArrayHeights(pts); fillDetail(a);
+  }
+}
+async function select(hex, fly = true) {
+  const prev = AC.get(selected); if (prev) prev.bb.color = altColor(prev.alt || 0);
+  selected = hex; const a = AC.get(hex); if (!a) return;
+  a.bb.color = C.Color.fromCssColorString("#ff8a1f"); a.trail = []; trail.positions = []; ahead.positions = [];
+  $("detail").classList.add("open"); fillDetail(a); loadPhoto(a); renderList();
+  if (fly) camera.flyTo({ destination: C.Cartesian3.fromDegrees(a.lon, a.lat - 1.9, 300000), orientation: { heading: 0, pitch: C.Math.toRadians(-55), roll: 0 }, duration: 3.2 });
+  pullNearAt(a.lat, a.lon);
+}
+async function pullNearAt(lat, lon) {
+  try { const d = await (await fetch(`/near?lat=${lat}&lon=${lon}`)).json();
+    for (const p of d.ac) { if (p.lat == null || p.alt_baro === "ground") continue;
+      upsert(p.hex.toLowerCase(), { call: (p.flight || "").trim(), lat: p.lat, lon: p.lon, alt: (p.alt_baro || 0) * 0.3048, vel: (p.gs || 0) * 0.5144,
+        hdg: p.track ?? 0, vr: (p.baro_rate || 0) * 0.00508, type: p.t, reg: p.r, sq: p.squawk, mach: p.mach, nearAt: performance.now() }); }
+    const a = AC.get(selected); if (a) { fillDetail(a); loadPhoto(a); } renderList(); } catch (e) {}
+}
+function fillDetail(a) {
+  $("did").textContent = a.call || a.hex.toUpperCase(); $("dsub").textContent = [a.type, a.reg].filter(Boolean).join(" · ") || "Aircraft";
+  $("dpos").textContent = `${a.lat.toFixed(3)}° · ${a.lon.toFixed(3)}°`;
+  $("dalt").textContent = Math.round((a.alt || 0) * 3.28084).toLocaleString("en-US"); $("dspd").textContent = Math.round((a.vel || 0) * 3.6);
+  $("dhdg").textContent = Math.round(a.hdg || 0); $("dvr").textContent = (a.vr || 0).toFixed(1); $("dsq").textContent = a.sq || "—";
+  $("dmach").textContent = a.mach ? a.mach.toFixed(3) : "—"; $("dhex").textContent = a.hex.toUpperCase(); $("dreg").textContent = a.reg || "—";
+  $("dbar").style.width = Math.min(100, ((a.alt || 0) / 13000) * 100) + "%";
+}
+let photoFor = "";
+async function loadPhoto(a) {
+  if (!a.reg || photoFor === a.reg) return; photoFor = a.reg; const box = $("dphoto"); box.innerHTML = "";
+  try { const p = await (await fetch("/photo?reg=" + encodeURIComponent(a.reg))).json(); if (!p.src || photoFor !== a.reg) return;
+    const im = new Image(); im.src = p.src; im.alt = a.reg; const by = document.createElement("span"); by.textContent = "© " + p.by; box.append(im, by); } catch (e) {}
+}
+$("dclose").onclick = () => { $("detail").classList.remove("open"); const p = AC.get(selected); if (p) p.bb.color = altColor(p.alt || 0);
+  selected = null; photoFor = ""; trail.positions = []; ahead.positions = []; renderList(); };
+new C.ScreenSpaceEventHandler(scene.canvas).setInputAction((m) => {
+  const p = scene.pick(m.position); if (p && p.id && AC.has(p.id)) select(p.id);
+}, C.ScreenSpaceEventType.LEFT_CLICK);
+$("zin").onclick = () => camera.zoomIn(camera.positionCartographic.height * 0.4);
+$("zout").onclick = () => camera.zoomOut(camera.positionCartographic.height * 0.6);
+
+/* ---- tracking list ---- */
+const row = (a) => `<div class="it${a.hex === selected ? " sel" : ""}" data-h="${a.hex}"><div class="t"><span>${a.call || a.hex.toUpperCase()}</span><em>LIVE</em></div>
+  <div class="s"><span>${[a.type, a.reg].filter(Boolean).join(" · ") || "—"}</span><span>${Math.round((a.alt || 0) * 3.28084 / 100) * 100} ft · ${Math.round((a.vel || 0) * 3.6)} km/h</span></div></div>`;
+let listT = 0;
+function renderList() {
+  clearTimeout(listT); listT = setTimeout(() => {
+    const q = $("q").value.trim().toLowerCase(); let html = "";
+    if (q) { const m = [...AC.values()].filter((a) => (a.call || "").toLowerCase().includes(q) || (a.reg || "").toLowerCase().includes(q) || a.hex.includes(q)).slice(0, 14);
+      html = m.length ? m.map(row).join("") : `<div class="empty">No match in live traffic.</div>`; }
+    else { const c = center(); const pool = [...AC.values()].filter((a) => a.call);
+      const pick = c ? pool.sort((x, y) => (x.lat - c.lat) ** 2 + (x.lon - c.lon) ** 2 - ((y.lat - c.lat) ** 2 + (y.lon - c.lon) ** 2)).slice(0, 14) : pool.filter((a) => a.type).slice(0, 14);
+      html = `<h4>${c ? "Near view centre" : "Tracking list"}</h4>` + pick.map(row).join(""); }
+    $("list").innerHTML = html;
+  }, 120);
+}
+$("q").addEventListener("input", renderList);
+$("q").addEventListener("keydown", (e) => { if (e.key === "Enter") focusQuery($("q").value); });
+$("list").addEventListener("click", (e) => { const it = e.target.closest(".it"); if (it) select(it.dataset.h); });
+setInterval(() => { if (!$("q").value) renderList(); }, 4000);
+function focusQuery(q, lat, lon) {
+  q = q.trim().toLowerCase();
+  if (q) { const a = [...AC.values()].find((x) => (x.call || "").toLowerCase() === q || (x.reg || "").toLowerCase() === q) || [...AC.values()].find((x) => (x.call || "").toLowerCase().startsWith(q));
+    if (a) return select(a.hex); }
+  if (lat != null && lon != null) camera.flyTo({ destination: C.Cartesian3.fromDegrees(lon, lat, 600000), duration: 3 });
+}
+
+/* ---- boot ---- */
+(async () => {
+  await pullGlobal(); $("boot").classList.add("gone"); $("globe").classList.add("ready");
+  camera.flyTo({ destination: C.Cartesian3.fromDegrees(25, 30, 1.6e7), duration: 4 });
+  setInterval(pullGlobal, 900000); setInterval(pullNear, 5000);
+})();
+</script>
+</body>
+</html>
