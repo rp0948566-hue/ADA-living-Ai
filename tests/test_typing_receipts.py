@@ -9,7 +9,7 @@ import subprocess
 import unittest
 from unittest.mock import patch
 
-import atticus
+import jev
 import tests
 from tests import run_swift
 
@@ -23,7 +23,7 @@ class TypingReceiptTests(unittest.TestCase):
             return run_swift(self, source)
 
     def test_missing_readback_is_not_a_send_receipt(self):
-        source = (ROOT / 'Atticus.swift').read_text()
+        source = (ROOT / 'Jev.swift').read_text()
         method = source[source.index('    static func submitReceipt('):source.index('    static func validate(', source.index('    static func submitReceipt('))]
         self.swift('''import Foundation
 struct Map { var texts: [String] = []; var page = "", windowID = "42" }
@@ -38,7 +38,7 @@ precondition(Hands.submitReceipt("draft", nil, "draft", before, posted))
 ''')
 
     def test_typing_refuses_a_different_focused_composer(self):
-        source = (ROOT / 'Atticus.swift').read_text()
+        source = (ROOT / 'Jev.swift').read_text()
         start = source.index('    static func typeText(')
         method = source[start:source.index('    static func settle(', start)]
         # Include the shared focus check once added, keeping this fixture tied to production code.
@@ -92,19 +92,19 @@ precondition(try! Hands.typeText("draft", Node(), 1, NSRunningApplication(), app
         with tempfile.TemporaryDirectory() as root:
             state = Path(root, 'hands.json')
             state.write_text(json.dumps({'pid': 42, 'windowID': '7', 'focusIdentity': 'AXTextArea:[1]:[0,0,100,100]'}))
-            with patch.object(atticus, 'DIR', root), patch.dict(os.environ, {'ATTICUS_HANDS_STATE': str(state)}, clear=True), \
-                 patch.object(atticus.subprocess, 'run', return_value=subprocess.CompletedProcess([], 0, 'unverified: Do not repeat typing.')) as run, \
-                 patch.object(sys, 'argv', ['atticus.py', '--type', 'draft']), patch.object(sys, 'stdout', new_callable=io.StringIO) as out:
-                atticus.main()
+            with patch.object(jev, 'DIR', root), patch.dict(os.environ, {'JEV_HANDS_STATE': str(state)}, clear=True), \
+                 patch.object(jev.subprocess, 'run', return_value=subprocess.CompletedProcess([], 0, 'unverified: Do not repeat typing.')) as run, \
+                 patch.object(sys, 'argv', ['jev.py', '--type', 'draft']), patch.object(sys, 'stdout', new_callable=io.StringIO) as out:
+                jev.main()
                 self.assertIn('unverified:', out.getvalue())
                 run.assert_called_once()
-                self.assertEqual(run.call_args.kwargs['env']['ATTICUS_HANDS_WINDOW'], '7')
-                self.assertEqual(run.call_args.kwargs['env']['ATTICUS_HANDS_STATE'], str(state))
+                self.assertEqual(run.call_args.kwargs['env']['JEV_HANDS_WINDOW'], '7')
+                self.assertEqual(run.call_args.kwargs['env']['JEV_HANDS_STATE'], str(state))
                 # A replayed shortcut has no map in its ask: it still types at the focused caret, without a pin.
                 state.unlink(); run.reset_mock(); out.truncate(0); out.seek(0)
                 run.return_value = subprocess.CompletedProcess([], 0, 'verified: Typing dispatched.')
-                atticus.main()
-                run.assert_called_once_with([atticus.APP, '--type'], input='draft', capture_output=True, text=True)
+                jev.main()
+                run.assert_called_once_with([jev.APP, '--type'], input='draft', capture_output=True, text=True)
                 self.assertIn('verified:', out.getvalue())
 
     def test_cli_screenshot_survives_producer_exit_for_next_reader(self):
@@ -112,18 +112,18 @@ precondition(try! Hands.typeText("draft", Node(), 1, NSRunningApplication(), app
         script = r'''import os, sys
 from pathlib import Path
 from unittest.mock import patch
-import atticus
+import jev
 
 def capture(args, **kwargs):
     Path(args[3]).write_bytes(b"fixture image")
     return type("Result", (), {"returncode": 0, "stdout": ""})()
-with patch.object(atticus, "pref", return_value=False), patch.object(atticus, "screens", return_value=[("Fixture", 0, 0, 100, 100, True)]), patch.object(atticus.subprocess, "run", side_effect=capture):
-    os.environ.pop("ATTICUS_ASK", None)
-    sys.argv = ["atticus.py", "--look"]
-    atticus.main()
+with patch.object(jev, "pref", return_value=False), patch.object(jev, "screens", return_value=[("Fixture", 0, 0, 100, 100, True)]), patch.object(jev.subprocess, "run", side_effect=capture):
+    os.environ.pop("JEV_ASK", None)
+    sys.argv = ["jev.py", "--look"]
+    jev.main()
 '''
         with tempfile.TemporaryDirectory() as root:
-            env = {**os.environ, 'ATTICUS_DIR': root}
+            env = {**os.environ, 'JEV_DIR': root}
             produced = subprocess.run([sys.executable, '-c', script], cwd=ROOT, env=env, capture_output=True, text=True)
             self.assertEqual(produced.returncode, 0, produced.stderr)
             path = Path(produced.stdout.strip().rsplit(': ', 1)[1])
@@ -132,7 +132,7 @@ with patch.object(atticus, "pref", return_value=False), patch.object(atticus, "s
             self.assertEqual(reader.returncode, 0, reader.stderr)
 
     def test_submit_dispatch_stops_on_uncertain_typing_or_lost_field_focus(self):
-        source = (ROOT / 'Atticus.swift').read_text()
+        source = (ROOT / 'Jev.swift').read_text()
         start = source.index('            case "type":\n                let (n,e) = try resolve(')
         branch = source[start:source.index('            case "type-after":', start)]
         self.swift('''import Foundation
@@ -170,7 +170,7 @@ for test in 0...4 {
 ''')
 
     def test_typing_destination_keeps_observed_window_and_composer(self):
-        source = (ROOT / 'Atticus.swift').read_text()
+        source = (ROOT / 'Jev.swift').read_text()
         start = source.index('    func destinationMatches() -> Bool {')
         function = source[start:source.index('    guard mapped.map(', start)]
         self.swift('''import Foundation

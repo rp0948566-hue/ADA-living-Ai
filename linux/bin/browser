@@ -1,0 +1,9 @@
+#!/usr/bin/env python3
+"""browser: Jev's web agent (linux/browser.py). Drives a page by its controls, not the mouse. Own visible window by default
+(you can watch and take over); `browser yours` to drive your real browser. Needs ~/.local/share/jev/py on PYTHONPATH."""
+import os, sys
+os.environ.setdefault('PYTHONPATH', os.path.expanduser('~/.local/share/jev/py'))
+sys.path.insert(0, os.environ['PYTHONPATH'].split(os.pathsep)[0])
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import browser
+print(browser.run(sys.argv[1:]))

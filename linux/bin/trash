@@ -1,0 +1,79 @@
+#!/usr/bin/env python3
+"""macOS-style `trash <path>...`: move to the desktop Trash (recoverable, never a permanent delete).
+Each item is labelled in the Trash, e.g. "report (deleted by Jev - clean my downloads).pdf"; Restore puts back the original name.
+The reason is the user's own request for this ask, so the AI spends no tokens on it. Optional: --why "<reason>", --by "<name>"."""
+import datetime, json, os, re, shutil, subprocess, sys, urllib.parse
+
+args, why, by = sys.argv[1:], '', 'Jev'
+TRASH = os.path.join(os.environ.get('XDG_DATA_HOME') or os.path.expanduser('~/.local/share'), 'Trash')
+
+
+def undo(words):
+    """--undo [words]: put the newest item Jev trashed (matching the words, if any) back where it was. Never overwrites."""
+    best = None
+    try: names = os.listdir(os.path.join(TRASH, 'info'))
+    except OSError: names = []
+    for n in names:
+        try:
+            with open(os.path.join(TRASH, 'info', n)) as f: t = f.read()
+        except OSError: continue
+        m = re.search(r'^Path=(.*)$', t, re.M)
+        if not m or 'X-Deleted-By=' not in t or not all(w.lower() in (n + t).lower() for w in words): continue
+        key = os.path.getmtime(os.path.join(TRASH, 'info', n))
+        if best is None or key > best[0]: best = (key, n, urllib.parse.unquote(m.group(1)))
+    if not best: return 'Nothing of mine in the Trash to put back.'
+    _, n, dest = best; item = os.path.join(TRASH, 'files', n[:-len('.trashinfo')])
+    if os.path.lexists(dest): return f'Not restored: {dest} already exists.'
+    if not os.path.lexists(item): return 'Not restored: the file is gone from the Trash.'
+    os.makedirs(os.path.dirname(dest), exist_ok=True); shutil.move(item, dest); os.remove(os.path.join(TRASH, 'info', n))
+    return f'Restored {dest}'
+
+
+if args[:1] == ['--undo']: print(undo(args[1:])); sys.exit(0)
+while args[:1] and args[0] in ('--why', '--by') and len(args) > 1:
+    if args[0] == '--why': why = args[1]
+    else: by = args[1]
+    args = args[2:]
+paths = [a for a in args if a != '--']
+if not paths: sys.exit('usage: trash [--why REASON] [--by NAME] PATH...')
+
+
+def request():   # the user's words for this ask: DIR/answers/<ask>.request (jev.py save_request)
+    ask = os.environ.get('JEV_ASK')
+    cfg = os.environ.get('JEV_DIR') or os.path.expanduser('~/.config/jev')
+    try:
+        with open(os.path.join(cfg, 'answers', os.path.basename(os.path.normpath(ask)) + '.request')) as f: return f.read()
+    except (TypeError, OSError): return ''
+
+
+why = ' '.join((why or request()).split())
+short = re.sub(r'[\\:*?"<>|\x00-\x1f]', '', why.replace('/', '\u2215'))[:60].rstrip()   # safe in a file name; ∕ looks like / but isn't a separator
+code = 0
+for p in paths:
+    full = os.path.abspath(os.path.expanduser(p))
+    if subprocess.run(['gio', 'trash', '--', full]).returncode: code = 1; continue
+    # find the item gio just made: newest info whose Path is this file. shortcut: home Trash only; other disks' .Trash-<uid> stay unlabelled
+    try:
+        infos = []
+        for n in os.listdir(os.path.join(TRASH, 'info')):
+            with open(os.path.join(TRASH, 'info', n)) as f: t = f.read()
+            m = re.search(r'^Path=(.*)$', t, re.M)
+            if m and urllib.parse.unquote(m.group(1)) == full: infos.append((os.path.getmtime(os.path.join(TRASH, 'info', n)), n, t))
+        if not infos: continue
+        _, info, text = max(infos)
+        old = info[:-len('.trashinfo')]
+        base = os.path.basename(full)
+        stem, ext = (base, '') if os.path.isdir(os.path.join(TRASH, 'files', old)) else os.path.splitext(base)
+        tag = f' (deleted by {by}' + (f' - {short}' if short else '') + ')'
+        new, i = f'{stem}{tag}{ext}', 2
+        while os.path.lexists(os.path.join(TRASH, 'files', new)) or os.path.lexists(os.path.join(TRASH, 'info', new + '.trashinfo')):
+            new, i = f'{stem}{tag} {i}{ext}', i + 1
+        # info before the file: the desktop's Trash watcher reads it the moment the new name appears (else Restore can't find the path)
+        with open(os.path.join(TRASH, 'info', new + '.trashinfo'), 'w') as f:   # extra keys: ignored by file managers, kept for the record
+            f.write(text.rstrip('\n') + f'\nX-Deleted-By={by}\nX-Deleted-Why={json.dumps(why)[1:-1]}\n')
+        os.rename(os.path.join(TRASH, 'files', old), os.path.join(TRASH, 'files', new))
+        os.remove(os.path.join(TRASH, 'info', info))
+        print(f'Moved to Trash as "{new}"')
+    except OSError:
+        pass   # already in the Trash, just without the label
+sys.exit(code)

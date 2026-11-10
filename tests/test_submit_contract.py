@@ -9,12 +9,12 @@ import unittest
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-import atticus
+import jev
 
 
 class SubmitContractTests(unittest.TestCase):
     def test_shared_form_instructions_require_explicit_submit_intent(self):
-        forms = next(line for line in atticus.SYSTEM.splitlines() if line.startswith('Forms/worksheets:'))
+        forms = next(line for line in jev.SYSTEM.splitlines() if line.startswith('Forms/worksheets:'))
         self.assertIn('Filling never authorizes submission.', forms)
         self.assertIn('Submit/send only if explicitly asked', forms)
         self.assertNotIn('Then click Submit', forms)
@@ -36,17 +36,17 @@ class SubmitContractTests(unittest.TestCase):
 
         page = {'app': 'Browser Fixture', 'adapter': adapter, 'window': 10, 'tab': 2, 'target': {'windowID': '10'}}
         with tempfile.TemporaryDirectory() as scratch, \
-             patch.dict(os.environ, {'ATTICUS_ASK': scratch}, clear=True), \
-             patch.object(atticus, 'DIR', scratch), \
-             patch.object(atticus, 'browser_adapter', return_value=adapter), \
-             patch.object(atticus, 'pref', side_effect=lambda key, default=None: safe if key == 'safe' else default), \
-             patch.object(atticus, 'task_allowed', return_value=False), \
-             patch.object(atticus, 'managed_agent', return_value=False), \
-             patch.object(atticus, 'emit'), \
-             patch.object(atticus, 'page_ready', return_value=True), \
-             patch.object(atticus.subprocess, 'run', side_effect=worker), \
-             patch.object(atticus, 'ask_user', return_value=answer) as ask:
-            result = atticus.web(action, '1' if action == 'fill' else '2',
+             patch.dict(os.environ, {'JEV_ASK': scratch}, clear=True), \
+             patch.object(jev, 'DIR', scratch), \
+             patch.object(jev, 'browser_adapter', return_value=adapter), \
+             patch.object(jev, 'pref', side_effect=lambda key, default=None: safe if key == 'safe' else default), \
+             patch.object(jev, 'task_allowed', return_value=False), \
+             patch.object(jev, 'managed_agent', return_value=False), \
+             patch.object(jev, 'emit'), \
+             patch.object(jev, 'page_ready', return_value=True), \
+             patch.object(jev.subprocess, 'run', side_effect=worker), \
+             patch.object(jev, 'ask_user', return_value=answer) as ask:
+            result = jev.web(action, '1' if action == 'fill' else '2',
                                  'Submit this answer' if action == 'fill' else '', app=page['app'], page=page)
         return result, actions, ask
 

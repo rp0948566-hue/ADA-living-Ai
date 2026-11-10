@@ -6,7 +6,7 @@ import sys
 import unittest
 from unittest.mock import patch
 
-import atticus
+import jev
 
 
 class PageJSTests(unittest.TestCase):
@@ -36,36 +36,36 @@ class PageJSTests(unittest.TestCase):
         return run
 
     def test_already_enabled_needs_no_menu_access(self):
-        with patch.object(atticus.subprocess, 'run', side_effect=self.worker(enabled=True)) as run, \
-             patch.object(atticus, 'proc_of', return_value='Browser Fixture'):
-            self.assertTrue(atticus.allow_page_js('Browser Fixture'))
+        with patch.object(jev.subprocess, 'run', side_effect=self.worker(enabled=True)) as run, \
+             patch.object(jev, 'proc_of', return_value='Browser Fixture'):
+            self.assertTrue(jev.allow_page_js('Browser Fixture'))
         self.assertEqual(run.call_count, 1)
 
     def test_menu_enable_succeeds_unless_click_fails(self):
         for works in (True, False):
-            with self.subTest(works=works), patch.object(atticus.subprocess, 'run', side_effect=self.worker(click_works=works)) as run, \
-                 patch.object(atticus, 'proc_of', return_value='Browser Fixture'):
-                self.assertEqual(atticus.allow_page_js('Browser Fixture'), works)
+            with self.subTest(works=works), patch.object(jev.subprocess, 'run', side_effect=self.worker(click_works=works)) as run, \
+                 patch.object(jev, 'proc_of', return_value='Browser Fixture'):
+                self.assertEqual(jev.allow_page_js('Browser Fixture'), works)
                 self.assertEqual(run.call_count, 2)
 
     def test_checked_setting_succeeds_when_chrome_page_rejects_probe(self):
-        with patch.object(atticus.subprocess, 'run', side_effect=self.worker(checked=True)) as run, \
-             patch.object(atticus, 'proc_of', return_value='Browser Fixture'):
-            self.assertTrue(atticus.allow_page_js('Browser Fixture'))
+        with patch.object(jev.subprocess, 'run', side_effect=self.worker(checked=True)) as run, \
+             patch.object(jev, 'proc_of', return_value='Browser Fixture'):
+            self.assertTrue(jev.allow_page_js('Browser Fixture'))
         self.assertEqual(run.call_count, 2)
         self.assertEqual(self.clicks, 0)
 
     def test_ask_still_requires_consent(self):
-        with patch.dict(atticus.os.environ, {'ATTICUS_ASK': '/fixture'}), \
-             patch.object(atticus, 'pref', return_value=False), patch.object(atticus, 'ask_user', return_value='n'), \
-             patch.object(atticus.subprocess, 'run') as run:
-            self.assertFalse(atticus.allow_page_js('Browser Fixture', ask=True))
+        with patch.dict(jev.os.environ, {'JEV_ASK': '/fixture'}), \
+             patch.object(jev, 'pref', return_value=False), patch.object(jev, 'ask_user', return_value='n'), \
+             patch.object(jev.subprocess, 'run') as run:
+            self.assertFalse(jev.allow_page_js('Browser Fixture', ask=True))
         run.assert_not_called()
 
     def test_setup_cli_succeeds_with_already_enabled_translated_menu(self):
-        with patch.object(sys, 'argv', ['atticus.py', '--allow-js']), \
-             patch.object(atticus.subprocess, 'run', side_effect=self.worker(enabled=True)) as run, \
+        with patch.object(sys, 'argv', ['jev.py', '--allow-js']), \
+             patch.object(jev.subprocess, 'run', side_effect=self.worker(enabled=True)) as run, \
              contextlib.redirect_stdout(io.StringIO()) as out:
-            atticus.main()
+            jev.main()
         self.assertEqual(out.getvalue(), 'on\n')
         self.assertEqual(run.call_count, 2)  # background launch, then the language-free probe

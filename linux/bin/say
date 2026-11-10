@@ -1,0 +1,7 @@
+#!/usr/bin/env python3
+"""macOS `say` for Linux: say [-v voice|?] [--tone normal|calm|deep|fast|soft] [text]. Neural Piper voice (linux/voice.py),
+falls back to spd-say/espeak-ng. Reads text from stdin when none is given."""
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import runpy
+runpy.run_module('voice', run_name='__main__')

@@ -1,0 +1,10 @@
+#!/usr/bin/env python3
+"""screentext: what is on the screen, as text (OCR), for a text-only model. Uses the Screen Recording counterpart (linux/shot.py)."""
+import os, sys, tempfile
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import shot
+fd, p = tempfile.mkstemp(suffix='.png'); os.close(fd)
+try:
+    if not shot.capture(p): sys.exit('No screenshot: allow Jev in the desktop\'s "Take screenshot?" prompt, then try again.')
+    print(shot.text(p).strip() or '(no readable text on screen)')
+finally: os.path.exists(p) and os.remove(p)

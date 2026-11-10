@@ -3,11 +3,11 @@ from pathlib import Path
 import unittest
 from unittest.mock import patch
 
-import atticus
+import jev
 from tests import run_swift
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = (ROOT / 'Atticus.swift').read_text()
+SOURCE = (ROOT / 'Jev.swift').read_text()
 
 
 class IdeaTests(unittest.TestCase):
@@ -34,15 +34,15 @@ print("ok")
         self.assertIn('"comeBack": true', defaults)
         page = (ROOT / 'ui/settings.html').read_text()
         tips = page.index('data-k="support"')
-        self.assertIn('<b>Ideas when I’m away</b><span>Now and then, a short idea if you haven’t used Atticus.</span></div><label class="sw"><input type="checkbox" data-k="comeBack">',
+        self.assertIn('<b>Ideas when I’m away</b><span>Now and then, a short idea if you haven’t used Jev.</span></div><label class="sw"><input type="checkbox" data-k="comeBack">',
                       page[tips:tips + 300])
-        self.assertEqual(atticus.switches()['comeBack'], 'Ideas when I’m away')   # by voice too
+        self.assertEqual(jev.switches()['comeBack'], 'Ideas when I’m away')   # by voice too
 
     def test_telemetry_counts_the_index_never_the_text(self):
         for action, index in (('shown', 3), ('clicked', 0)):
             sent = []
-            with patch('sys.argv', ['atticus.py', '--telemetry', 'idea', action, str(index)]), patch.object(atticus, 'posthog', lambda *a: sent.append(a)):
-                atticus.main()
+            with patch('sys.argv', ['jev.py', '--telemetry', 'idea', action, str(index)]), patch.object(jev, 'posthog', lambda *a: sent.append(a)):
+                jev.main()
             self.assertEqual(sent, [('idea', {'action': action, 'index': index})])
 
 

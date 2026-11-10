@@ -7,7 +7,7 @@ from tests.test_drawing_math_page import MATH_STUB
 
 class CrowdedOverlayTests(unittest.TestCase):
     def test_dense_placement(self):
-        source = (Path(__file__).resolve().parents[1] / 'Atticus.swift').read_text()
+        source = (Path(__file__).resolve().parents[1] / 'Jev.swift').read_text()
         helpers = source[source.index('    // Search obstacle edges'):source.index('    // The box\'s spot')]
         harness = '''import Cocoa
 struct DrawingCalloutView { static let notch: CGFloat = 7 }
@@ -34,7 +34,7 @@ print("crowded geometry passed")
         self.assertIn('crowded geometry passed', run_swift(self, harness))
 
     def test_render_labels_avoid_later_marks(self):
-        source = (Path(__file__).resolve().parents[1] / 'Atticus.swift').read_text()
+        source = (Path(__file__).resolve().parents[1] / 'Jev.swift').read_text()
         model = source[source.index('struct DrawingShape:'):source.index('struct DrawingStep:')]
         view = source[source.index('final class DrawingView:'):source.index('// One step')]
         helpers = source[source.index('    static func pathPoints('):source.index("    // The box's spot")]
@@ -70,7 +70,7 @@ print("render placement passed")
         self.assertIn('render placement passed', run_swift(self, harness))
 
     def test_page_navigation_before_step_navigation(self):
-        source = (Path(__file__).resolve().parents[1] / 'Atticus.swift').read_text()
+        source = (Path(__file__).resolve().parents[1] / 'Jev.swift').read_text()
         methods = source[source.index('    func advance() {'):source.index('    func clicked(_ point:')]
         harness = "import Foundation\n" + r'''
 struct Request { var steps = [0,1]; let teaching = true }
@@ -91,7 +91,7 @@ print("page navigation passed")
         self.assertIn('page navigation passed', run_swift(self, harness))
 
     def test_text_pages_preserve_words_and_fit(self):
-        source = (Path(__file__).resolve().parents[1] / 'Atticus.swift').read_text()
+        source = (Path(__file__).resolve().parents[1] / 'Jev.swift').read_text()
         body = source[source.index('    static func body(_ text:'):source.index('    static func size(_ text:')]
         pages = source[source.index('    static func pages(_ text:'):source.index('    static func bubble(_ card:')]
         harness = "import Cocoa\n" + MATH_STUB + "struct Layout { static let font = NSFont.systemFont(ofSize:14,weight:.medium)\n" + body + pages + r''' }

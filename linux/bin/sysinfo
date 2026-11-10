@@ -1,0 +1,6 @@
+#!/usr/bin/env python3
+"""sysinfo: live CPU, memory, disk, temperature, GPU, battery and the busiest programs, with warnings (linux/sysmon.py)."""
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import sysmon
+print(sysmon.text())

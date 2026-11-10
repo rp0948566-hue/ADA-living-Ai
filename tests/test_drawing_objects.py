@@ -2,7 +2,7 @@
 import unittest
 import json
 
-import atticus
+import jev
 
 
 class ObjectStrokeTests(unittest.TestCase):
@@ -13,7 +13,7 @@ class ObjectStrokeTests(unittest.TestCase):
         payload = {'steps': [{'screen': 1, 'say': 'The outline encloses the inner stroke.',
                               'shapes': [outline, detail]}]}
         mapping = {'1': {'frame': [-200,100,200,200], 'pixels': [100,100]}}
-        result = atticus.drawing(payload, mapping)
+        result = jev.drawing(payload, mapping)
         self.assertTrue(result['teaching'])
         shapes = result['steps'][0]['shapes']
         self.assertEqual(shapes[0]['points'], [[-160,180],[-160,120],[-40,120],[-40,180],
@@ -23,17 +23,17 @@ class ObjectStrokeTests(unittest.TestCase):
         self.assertEqual(payload['steps'][0]['shapes'][0], outline)
 
     def test_generic_help_example_is_valid_and_encloses_detail(self):
-        example = atticus.DRAW_HELP.split('Generic outline + detail example (place in clear screen space): ',1)[1].split('\n',1)[0]
-        result = atticus.drawing(json.loads(example.rstrip('.')))
+        example = jev.DRAW_HELP.split('Generic outline + detail example (place in clear screen space): ',1)[1].split('\n',1)[0]
+        result = jev.drawing(json.loads(example.rstrip('.')))
         outline, detail = result['steps'][0]['shapes']
         self.assertTrue(outline['curve']); self.assertTrue(outline['fill'])
         self.assertEqual(outline['points'][0], outline['points'][-1])
         self.assertEqual(detail['points'], [[130,160],[190,160]])
-        self.assertIn('never an image card', atticus.DRAW_HELP)
+        self.assertIn('never an image card', jev.DRAW_HELP)
 
     def test_curve_and_fill_limits(self):
         good = {'kind': 'path', 'curve': True, 'points': [[10,10]] * 64}
-        self.assertEqual(atticus.drawing({'steps': [{'say':'Outline.', 'shapes':[good]}]})
+        self.assertEqual(jev.drawing({'steps': [{'say':'Outline.', 'shapes':[good]}]})
                          ['steps'][0]['shapes'][0], good)
         bad = [dict(good, points=[[10,10]] * n) for n in (2,3,5,65,67)]
         bad += [dict(good, curve=v) for v in (1,'yes',None)]
@@ -43,10 +43,10 @@ class ObjectStrokeTests(unittest.TestCase):
                 dict(good, points=[[True,10]] * 4)]
         for shape in bad:
             with self.subTest(shape=shape), self.assertRaises(ValueError):
-                atticus.drawing({'steps':[{'say':'Outline.', 'shapes':[shape]}]})
+                jev.drawing({'steps':[{'say':'Outline.', 'shapes':[shape]}]})
         for n in (1,257):
             with self.assertRaises(ValueError):
-                atticus.drawing({'steps':[{'say':'Outline.', 'shapes':[
+                jev.drawing({'steps':[{'say':'Outline.', 'shapes':[
                     {'kind':'path','fill':True,'points':[[10,10]] * n}]}]})
 
 

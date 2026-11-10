@@ -1,0 +1,1 @@
+{"uuid": "jev-windows@jev.local", "name": "Jev windows", "description": "Lets Jev list, focus and place windows on Wayland.", "shell-version": ["48", "49", "50", "51"]}

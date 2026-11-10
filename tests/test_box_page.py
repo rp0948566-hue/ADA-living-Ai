@@ -62,13 +62,13 @@ for (let i=0;i<10;i++) {
   out.turns.push([inView(turn.querySelector('.elapsed')), inView(turn.querySelector('.step.live')), !turn.querySelector('.elapsed span'), turn.querySelectorAll('.elapsed').length]);
   ui.line('✓ Finished the request.'); if(i===1)ui.line('i Learned: change the setting'); ui.finished(); settle();
 }
-ui.line('i Support: Atticus is free, leave a tip'); settle();
+ui.line('i Support: Jev is free, leave a tip'); settle();
 const support=document.querySelector('.tip.kofi'), link=support.querySelector('button:not(.off)');
 link.scrollIntoView(); const lr=link.getBoundingClientRect(), bg=getComputedStyle(link).backgroundColor;
 out.support=[link.tagName, ui.pointer([lr.x+lr.width/2,lr.y+lr.height/2]), getComputedStyle(link).cursor]; settle();
 out.support.push(bg!==getComputedStyle(link).backgroundColor);
 link.click(); out.support.push(!support.isConnected); ui.pointer([]);
-ui.dictate(true); ui.learned('Atticus'); const dn = document.getElementById('dn');
+ui.dictate(true); ui.learned('Jev'); const dn = document.getElementById('dn');
 out.learned = [dn.textContent, getComputedStyle(dn).display, dn.className];
 return out;
 '''
@@ -138,7 +138,7 @@ class BoxPageTests(unittest.TestCase):
         self.assertEqual([p for p in got['posts'] if isinstance(p, dict) and 'error' in p], [])
         return got
 
-    @unittest.skipUnless(os.environ.get('ATTICUS_VM'), 'real mouse events: VM only')
+    @unittest.skipUnless(os.environ.get('JEV_VM'), 'real mouse events: VM only')
     def test_real_mouse_scrolls_code_selects_text_and_click_copies(self):
         with tempfile.TemporaryDirectory() as tmp:
             page, src, binary = Path(tmp) / 'ui.html', Path(tmp) / 'page.swift', Path(tmp) / 'page'
@@ -223,7 +223,7 @@ return {quiet, timeout, gone: document.querySelectorAll('.hf').length, words: th
         self.assertEqual(out['dismissedDuringAsk'], [[True, True, 1, True, True]] * 3)
         self.assertEqual(out['support'], ['BUTTON', True, 'pointer', True, True])
         self.assertTrue(any(isinstance(p, dict) and p.get('kofi') for p in got['posts']))
-        self.assertEqual(out['learned'], ['Learned “Atticus” Undo', 'flex', 'dn tick'])
+        self.assertEqual(out['learned'], ['Learned “Jev” Undo', 'flex', 'dn tick'])
 
     def test_minimize_keeps_live_work_and_restores_scroll(self):
         got = self.render(r'''

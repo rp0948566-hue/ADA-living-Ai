@@ -1,0 +1,28 @@
+name: Build jev-x
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            script: bash build-jev-x.sh
+            artifact: dist/jev-x
+          - os: windows-latest
+            script: pwsh build-jev-x.ps1
+            artifact: dist/jev-x.exe
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: ${{ matrix.script }}
+      - name: Smoke test --doctor
+        # exit 1 here just means "no model server in CI", expected; only a crash before that output is a real failure
+        run: (${{ matrix.artifact }} --doctor || true) | grep -q '"os"'
+        shell: bash
+      - uses: actions/upload-artifact@v4
+        with:
+          name: jev-x-${{ matrix.os }}
+          path: ${{ matrix.artifact }}

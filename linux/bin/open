@@ -1,0 +1,30 @@
+#!/usr/bin/env python3
+"""macOS `open` for Linux: open [-a App] [-b id] [-g] [-j] [-R] [--bg] [--args ...] [target...]"""
+import os, shutil, subprocess, sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+import wm
+a, app, targets, reveal = sys.argv[1:], '', [], False
+rest, i = [], 0
+while i < len(a):
+    t = a[i]
+    if t == '--args': rest = a[i + 1:]; break
+    if t in ('-a', '-b'): app = a[i + 1] if i + 1 < len(a) else ''; i += 1
+    elif t == '-R': reveal = True
+    elif t in ('-g', '-j', '-n', '-F', '-W', '-h', '--bg') or t.startswith('--'): pass
+    else: targets.append(t)
+    i += 1
+def bg(argv): subprocess.Popen(argv, start_new_session=True, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+if reveal:
+    for t in targets: bg(['nautilus', '--select', os.path.abspath(t)] if shutil.which('nautilus') else ['xdg-open', os.path.dirname(os.path.abspath(t))])
+    sys.exit(0)
+if app:
+    entry = wm.desktop_apps().get(app) or next((d for n, d in wm.desktop_apps().items() if n.lower() == app.lower() or d['id'] == app), None)
+    if entry:
+        bg(['gtk-launch', entry['id'], *targets] if shutil.which('gtk-launch') else [entry['exe'], *targets, *rest]); sys.exit(0)
+    exe = shutil.which(app) or shutil.which(app.lower().replace(' ', '-'))
+    if not exe: print(f'Unable to find application named {app!r}', file=sys.stderr); sys.exit(1)
+    bg([exe, *targets, *rest]); sys.exit(0)
+for t in targets:
+    if not (os.path.exists(os.path.expanduser(t)) or '://' in t or t.startswith('mailto:')):
+        print(f'The file {t} does not exist.', file=sys.stderr); sys.exit(1)
+    bg(['xdg-open', os.path.expanduser(t)])

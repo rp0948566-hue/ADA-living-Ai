@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class BoxStillTests(unittest.TestCase):
     def test_step_resize_drag_and_pointer_changes_do_not_relocate_box(self):
-        source = (ROOT / 'Atticus.swift').read_text()
+        source = (ROOT / 'Jev.swift').read_text()
         placement = source[source.index('    var boxHome:'):source.index('    func glide(')]
         follow = source[source.index('    func followPointerScreen()'):source.index('    func startFollowingPointerScreen()')]
         resize = source[source.index('    func frame(_ requested:'):source.index('    // Which edges the point')]

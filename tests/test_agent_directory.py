@@ -7,18 +7,18 @@ import unittest
 from pathlib import Path
 from unittest.mock import Mock, patch
 
-import atticus
+import jev
 
 
 class AgentDirectoryTests(unittest.TestCase):
     def test_directory_loss_at_scan_event_and_save_terminalizes_once(self):
         for boundary in ('scan', 'event', 'save', 'context', 'cancel', 'root', 'read', 'read-save'):
             with self.subTest(boundary=boundary), tempfile.TemporaryDirectory() as root, \
-                 patch.object(atticus, 'DIR', root), patch.object(atticus, 'pref', side_effect=lambda k, d: d), \
-                 patch.object(atticus, 'close_agent_window'), patch.object(atticus, 'stop_claude'):
+                 patch.object(jev, 'DIR', root), patch.object(jev, 'pref', side_effect=lambda k, d: d), \
+                 patch.object(jev, 'close_agent_window'), patch.object(jev, 'stop_claude'):
                 events = []
                 launch = Mock()
-                manager = atticus.Agents(emit=lambda e: events.append(json.loads(json.dumps(e))), launch=launch)
+                manager = jev.Agents(emit=lambda e: events.append(json.loads(json.dumps(e))), launch=launch)
                 row = manager.new()
                 row.update(status='running', brief='Fixture task', _metadataAt=float('inf'))
                 manager.rows[row['id']] = row
@@ -28,7 +28,7 @@ class AgentDirectoryTests(unittest.TestCase):
                 manager.outstanding[row['id']] = 1
                 manager.offers.add(row['id'])
                 events.clear()
-                original = atticus.private_json
+                original = jev.private_json
 
                 def lose_after_state(path, data):
                     original(path, data)
@@ -41,9 +41,9 @@ class AgentDirectoryTests(unittest.TestCase):
                 elif boundary == 'cancel': manager.command({'action': 'stop', 'id': row['id']})
                 elif boundary == 'read': manager.read(row, worker)
                 elif boundary == 'read-save':
-                    with patch.object(atticus, 'private_json', side_effect=lose_after_state): manager.read(row, worker)
+                    with patch.object(jev, 'private_json', side_effect=lose_after_state): manager.read(row, worker)
                 elif boundary == 'context':
-                    with patch.object(atticus, 'private_json', side_effect=lose_after_state): manager.save(row)
+                    with patch.object(jev, 'private_json', side_effect=lose_after_state): manager.save(row)
                 else: manager.save(row)
 
                 terminal = json.loads(json.dumps(row))
@@ -62,7 +62,7 @@ class AgentDirectoryTests(unittest.TestCase):
                 self.assertEqual(row, terminal)
                 self.assertEqual(len(events), 1)
                 self.assertEqual(events[0]['event'], 'state')
-                record = Path(atticus.agent_gate_dir(row['directory'])) / 'terminal.json'
+                record = Path(jev.agent_gate_dir(row['directory'])) / 'terminal.json'
                 if boundary == 'root': self.assertFalse(record.exists())
                 else: self.assertEqual(json.loads(record.read_text()), terminal)
                 self.assertFalse(Path(row['directory']).exists())

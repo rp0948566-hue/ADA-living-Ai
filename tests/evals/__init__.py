@@ -1,1 +1,1 @@
-# Task eval harness for Atticus (fake Mac + optional live Claude).
+# Task eval harness for Jev (fake Mac + optional live Claude).

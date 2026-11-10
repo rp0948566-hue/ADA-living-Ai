@@ -5,7 +5,7 @@ import subprocess
 import unittest
 from unittest.mock import patch
 
-import atticus
+import jev
 
 UNCHECKED = 'Moved Fixture, but could not check where its window is. Look at the screen before saying it worked.'
 
@@ -43,10 +43,10 @@ class Windows:
         return ''
 
     def place(self, title, where='left'):
-        with patch.object(atticus.subprocess, 'run', side_effect=self.run), patch.object(atticus, 'osa', side_effect=self.osa), \
-             patch.object(atticus, 'free_focus') as focus, patch.object(atticus, 'preview_app'), patch.object(atticus.time, 'sleep'), \
-             patch.object(atticus, 'screens', return_value=[('Laptop', 0, 0, 1000, 800, True)]):
-            return atticus.place('Fixture', where, 'laptop', title), focus
+        with patch.object(jev.subprocess, 'run', side_effect=self.run), patch.object(jev, 'osa', side_effect=self.osa), \
+             patch.object(jev, 'free_focus') as focus, patch.object(jev, 'preview_app'), patch.object(jev.time, 'sleep'), \
+             patch.object(jev, 'screens', return_value=[('Laptop', 0, 0, 1000, 800, True)]):
+            return jev.place('Fixture', where, 'laptop', title), focus
 
 
 class PlacementTargetTests(unittest.TestCase):
@@ -58,7 +58,7 @@ class PlacementTargetTests(unittest.TestCase):
                 windows = Windows('Study-Guide copy.pdf', 'Study-Guide.pdf')
                 before = windows.frames
                 out, _ = windows.place(asked)
-                self.assertFalse(atticus.place_failed(out), out)
+                self.assertFalse(jev.place_failed(out), out)
                 self.assertEqual(windows.moved(before), [moved])
                 self.assertIn((moved, [0, 25, 500, 775]), windows.frames)
 
@@ -66,7 +66,7 @@ class PlacementTargetTests(unittest.TestCase):
         windows = Windows('Calendar', 'Inbox - Fixture Mail')
         before = windows.frames
         out, _ = windows.place('Inbox')
-        self.assertFalse(atticus.place_failed(out), out)
+        self.assertFalse(jev.place_failed(out), out)
         self.assertEqual(windows.moved(before), ['Inbox - Fixture Mail'])
 
     def test_ambiguous_title_touches_nothing(self):
@@ -77,7 +77,7 @@ class PlacementTargetTests(unittest.TestCase):
                 windows = Windows(*names)
                 before = windows.frames
                 out, focus = windows.place(asked)
-                self.assertTrue(atticus.place_failed(out), out)
+                self.assertTrue(jev.place_failed(out), out)
                 self.assertEqual(windows.frames, before)
                 self.assertEqual(windows.writes, [])
                 focus.assert_not_called()
@@ -90,7 +90,7 @@ class PlacementTargetTests(unittest.TestCase):
             return run(args, **kw)
         windows.run = opening
         out, _ = windows.place('')
-        self.assertFalse(atticus.place_failed(out), out)
+        self.assertFalse(jev.place_failed(out), out)
         self.assertEqual(windows.frames, [('Study-Guide copy.pdf', [300, 300, 800, 600]), ('Study-Guide.pdf', [0, 25, 500, 775])])
 
     def test_every_write_names_the_one_resolved_window(self):
@@ -105,49 +105,49 @@ class PlacementReceiptTests(unittest.TestCase):
     def test_only_a_checked_receipt_is_done(self):
         for out in ('', UNCHECKED, 'something unexpected', 'Fixture window -> full of Laptop\nunexpected'):
             with self.subTest(out=out):
-                self.assertTrue(atticus.place_failed(out))
-        self.assertFalse(atticus.place_failed('Fixture window -> left of Laptop\nOther is already full screen on Monitor; brought it into view'))
+                self.assertTrue(jev.place_failed(out))
+        self.assertFalse(jev.place_failed('Fixture window -> left of Laptop\nOther is already full screen on Monitor; brought it into view'))
 
     def test_unchecked_prestage_is_not_followed_by_full_screen(self):
-        with patch.object(atticus, 'request_screen', return_value='laptop'), patch.object(atticus, 'place', return_value=UNCHECKED) as place:
-            atticus.place_many(['Fixture', 'fullscreen', 'laptop', '+', 'Other', 'fullscreen', 'monitor'])
+        with patch.object(jev, 'request_screen', return_value='laptop'), patch.object(jev, 'place', return_value=UNCHECKED) as place:
+            jev.place_many(['Fixture', 'fullscreen', 'laptop', '+', 'Other', 'fullscreen', 'monitor'])
         self.assertEqual([c.args[1] for c in place.call_args_list], ['full', 'full'])
 
     def test_replay_stops_at_an_unchecked_move_and_never_says_its_saved_reply(self):
-        skill = {'cmds': [atticus.PLACE + ' Fixture full laptop', atticus.PLACE + ' Other left laptop'], 'reply': 'All set.'}
-        with patch.object(atticus, 'skills', return_value={'fixture time': skill}), patch.object(atticus, 'save_skills'), \
-             patch.object(atticus, 'wants_focus', return_value=True), patch.object(atticus, 'place_many', return_value=UNCHECKED) as place:
-            out = atticus.fast('fixture time')
+        skill = {'cmds': [jev.PLACE + ' Fixture full laptop', jev.PLACE + ' Other left laptop'], 'reply': 'All set.'}
+        with patch.object(jev, 'skills', return_value={'fixture time': skill}), patch.object(jev, 'save_skills'), \
+             patch.object(jev, 'wants_focus', return_value=True), patch.object(jev, 'place_many', return_value=UNCHECKED) as place:
+            out = jev.fast('fixture time')
         place.assert_called_once()
         self.assertNotIn('All set', out or '')
         self.assertIn('could not check', out or '')
-        self.assertTrue(atticus.failed_action_reply(out, bool(atticus.fast.cmds)))   # logged as not done
-        self.assertIsNone(atticus.fast.shortcut)
+        self.assertTrue(jev.failed_action_reply(out, bool(jev.fast.cmds)))   # logged as not done
+        self.assertIsNone(jev.fast.shortcut)
 
     def test_instant_move_reports_unchecked_as_not_done(self):
-        with patch.object(atticus, 'move_target', return_value=('Fixture', 'left', 'laptop')), patch.object(atticus, 'proc_of', return_value='Fixture'), \
-             patch.object(atticus, 'skills', return_value={}), patch.object(atticus, 'fast_hands', return_value=None), \
-             patch.object(atticus, 'place', return_value=UNCHECKED) as place:
-            out = atticus.fast('put fixture left')
+        with patch.object(jev, 'move_target', return_value=('Fixture', 'left', 'laptop')), patch.object(jev, 'proc_of', return_value='Fixture'), \
+             patch.object(jev, 'skills', return_value={}), patch.object(jev, 'fast_hands', return_value=None), \
+             patch.object(jev, 'place', return_value=UNCHECKED) as place:
+            out = jev.fast('put fixture left')
         place.assert_called_once()
         self.assertIn('could not check', out)
-        self.assertTrue(atticus.failed_action_reply(out, bool(atticus.fast.cmds)))
+        self.assertTrue(jev.failed_action_reply(out, bool(jev.fast.cmds)))
 
     def test_show_never_claims_an_unchecked_display(self):
-        with patch.object(atticus, 'app_named', return_value='Fixture'), patch.object(atticus, 'app_id', return_value=''), \
-             patch.object(atticus, 'front', return_value=('Other', '')), patch.object(atticus, 'wants_focus', return_value=True), \
-             patch.object(atticus, 'screens', return_value=[('Laptop', 0, 0, 1000, 800, True), ('Monitor', 1000, 0, 1000, 800, False)]), \
-             patch.object(atticus, 'osa', return_value='1'), patch.object(atticus.subprocess, 'run', return_value=subprocess.CompletedProcess([], 0)), \
-             patch.object(atticus, 'pref', side_effect=lambda k, d=None: 'other' if k == 'openOn' else d), \
-             patch.object(atticus, 'place', return_value=UNCHECKED) as place:
-            self.assertNotIn('Monitor', atticus.show('Fixture'))
+        with patch.object(jev, 'app_named', return_value='Fixture'), patch.object(jev, 'app_id', return_value=''), \
+             patch.object(jev, 'front', return_value=('Other', '')), patch.object(jev, 'wants_focus', return_value=True), \
+             patch.object(jev, 'screens', return_value=[('Laptop', 0, 0, 1000, 800, True), ('Monitor', 1000, 0, 1000, 800, False)]), \
+             patch.object(jev, 'osa', return_value='1'), patch.object(jev.subprocess, 'run', return_value=subprocess.CompletedProcess([], 0)), \
+             patch.object(jev, 'pref', side_effect=lambda k, d=None: 'other' if k == 'openOn' else d), \
+             patch.object(jev, 'place', return_value=UNCHECKED) as place:
+            self.assertNotIn('Monitor', jev.show('Fixture'))
         place.assert_called_once()
 
     def test_cli_exits_nonzero_unless_checked(self):
         for out, code in ((UNCHECKED, 1), ('unexpected', 1), ('Fixture window -> full of Laptop', None)):
-            with self.subTest(out=out), patch('sys.argv', ['atticus.py', '--place', 'Fixture']), \
-                 patch.object(atticus, 'place_many', return_value=out), patch('builtins.print'):
-                try: got = atticus.main()
+            with self.subTest(out=out), patch('sys.argv', ['jev.py', '--place', 'Fixture']), \
+                 patch.object(jev, 'place_many', return_value=out), patch('builtins.print'):
+                try: got = jev.main()
                 except SystemExit as stop: got = stop.code
                 self.assertEqual(got, code)
 

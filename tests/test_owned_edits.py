@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class OwnedEditTests(unittest.TestCase):
     def test_only_verified_inserted_span_can_be_repeated_or_corrected(self):
-        source = Path(os.environ.get('OWNED_EDITS_SOURCE', ROOT / 'Atticus.swift')).read_text()
+        source = Path(os.environ.get('OWNED_EDITS_SOURCE', ROOT / 'Jev.swift')).read_text()
         methods = source[source.index('    static func ownedEdits(') if '    static func ownedEdits(' in source else source.index('    static func insertionTarget('):source.index('    static func fieldFocused(')]
         with tempfile.TemporaryDirectory() as root:
             swift = r'''import Cocoa
@@ -51,7 +51,7 @@ struct Hands {
  struct Failure: Error { init(_ s: String) {} }
  struct Insertion { let field: Field, anchor: Field, old: String, location: Int, label: String }
  struct OwnedEdit: Codable { let field: String, anchor: String, location: Int, length: Int, after: String }
- static let env = ["ATTICUS_HANDS_STATE": "ROOT/hands.json"]
+ static let env = ["JEV_HANDS_STATE": "ROOT/hands.json"]
  static func digest(_ s: [String]) -> String { s.joined(separator:"|") }
  static func root(_ a: NSRunningApplication) throws -> (Field,Field) { (window,window) }
  static func documentIdentity(_ a: NSRunningApplication,_ w: Field) -> String { "42:7" }
@@ -86,7 +86,7 @@ let edited = field.text, count = writes
 do { _ = try Hands.insertAfter(anchor," Replacement.",app); fatalError("stale receipt accepted") } catch {}
 precondition(field.text == edited && writes == count)
 // A receipt survives a helper restart; a new ask has no ownership of an old answer.
-try? FileManager.default.removeItem(atPath:Hands.env["ATTICUS_HANDS_STATE"]! + ".edits")
+try? FileManager.default.removeItem(atPath:Hands.env["JEV_HANDS_STATE"]! + ".edits")
 field.text = original; mutateOnCaret = true
 let before = writes
 do { _ = try Hands.insertAfter(anchor," Answer.",app); fatalError("concurrent edit accepted") } catch {}
@@ -103,7 +103,7 @@ precondition(keys == ["cmd+v"], "duplicate paste")
 field.text = "Edited question\nUser content"; let missing = field.text
 do { _ = try Hands.insertAfter(anchor," Answer.",app); fatalError("missing anchor accepted") } catch {}
 precondition(field.text == missing && keys == ["cmd+v"])
-try FileManager.default.removeItem(atPath:Hands.env["ATTICUS_HANDS_STATE"]! + ".edits")
+try FileManager.default.removeItem(atPath:Hands.env["JEV_HANDS_STATE"]! + ".edits")
 separate = true; field.text = ""; refuse = false
 _ = try Hands.insertAfter(anchor," Separate answer.",app)
 _ = try Hands.insertAfter(anchor," Corrected answer.",app)

@@ -1,4 +1,4 @@
-"""Whisper engine (Atticus.swift `// MARK: Whisper` section) compiled alone against a scratch ATTICUS_DIR."""
+"""Whisper engine (Jev.swift `// MARK: Whisper` section) compiled alone against a scratch JEV_DIR."""
 import functools
 import hashlib
 import http.server
@@ -15,11 +15,11 @@ from unittest.mock import patch
 from tests import run_swift
 
 ROOT = Path(__file__).resolve().parents[1]
-TURBO = Path(os.environ.get("ATTICUS_WHISPER_TURBO", "~/Library/Application Support/whisper-models/ggml-large-v3-turbo-q5_0.bin")).expanduser()
+TURBO = Path(os.environ.get("JEV_WHISPER_TURBO", "~/Library/Application Support/whisper-models/ggml-large-v3-turbo-q5_0.bin")).expanduser()
 
 
 def engine():
-    source = (ROOT / "Atticus.swift").read_text()
+    source = (ROOT / "Jev.swift").read_text()
     prefs = source[source.index("enum Prefs"):source.index("func applySharing(")]
     whisper = source[source.index("// MARK: Whisper"):source.index("// MARK: end Whisper")]
     return "import Cocoa\nimport AVFoundation\nimport CryptoKit\nlet controlKey = 1, optionKey = 2\n" + prefs + whisper
@@ -28,8 +28,8 @@ def engine():
 @unittest.skipUnless(sys.platform == "darwin", "macOS Swift regression")
 class WhisperNativeTests(unittest.TestCase):
     def scratch(self):
-        root = tempfile.mkdtemp(prefix="atticus-whisper-"); self.addCleanup(shutil.rmtree, root, True)
-        p = patch.dict(os.environ, {"ATTICUS_DIR": root}); p.start(); self.addCleanup(p.stop)
+        root = tempfile.mkdtemp(prefix="jev-whisper-"); self.addCleanup(shutil.rmtree, root, True)
+        p = patch.dict(os.environ, {"JEV_DIR": root}); p.start(); self.addCleanup(p.stop)
         return Path(root)
 
     def test_wav_audio_and_catalog(self):

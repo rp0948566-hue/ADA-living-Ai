@@ -42,7 +42,7 @@ if(!old.removed||button.disabled||button.textContent!=='Try again'||sent.id!=='q
 
     def test_dictation_pill_shows_the_wave_not_the_words(self):
         source = (Path(__file__).resolve().parents[1] / 'ui' / 'ui.html').read_text()
-        native = (Path(__file__).resolve().parents[1] / 'Atticus.swift').read_text()
+        native = (Path(__file__).resolve().parents[1] / 'Jev.swift').read_text()
         self.assertIn('<span id="dictwave" role="img" aria-label="Listening"></span>', source)
         helper = source[source.index('  const dictateMode ='):source.index('\n  };', source.index('  const dictateMode =')) + 5]
         dictate = source[source.index('    dictate(on) {'):source.index('    locked(on) {')]
@@ -67,7 +67,7 @@ const nodes=new Map(),$=id=>{if(!nodes.has(id))nodes.set(id,{textContent:''});re
 paintDone({claude:false,mic:true,speech:false,ax:false});
 if($('done-title').textContent!=='Setup isn’t finished yet'||!$('done-sub').textContent.includes('AI provider, Speech Recognition, Accessibility')||$('finish').textContent!=='Finish Setup Later')process.exit(1);
 paintDone({claude:true,mic:true,speech:true,ax:false});
-if($('done-title').textContent!=='Voice is ready'||$('finish').textContent!=='Start Using Atticus')process.exit(2);
+if($('done-title').textContent!=='Voice is ready'||$('finish').textContent!=='Start Using Jev')process.exit(2);
 '''
         result = subprocess.run(['node', '--input-type=module'], input=script, capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, result.stderr)
@@ -112,8 +112,8 @@ expect(md('snake_case_name and _em_'),'<p>snake_case_name and <em>em</em></p>','
     def test_worker_start_failure_has_persistent_recovery_actions(self):
         root = Path(__file__).resolve().parents[1]
         page = (root / 'ui' / 'ui.html').read_text()
-        native = (root / 'Atticus.swift').read_text()
-        self.assertIn('Atticus’s helper couldn’t start', page)
+        native = (root / 'Jev.swift').read_text()
+        self.assertIn('Jev’s helper couldn’t start', page)
         self.assertIn("post({workerRetry:true})", page)
         self.assertIn("post({setup:true})", page)
         self.assertIn('pinned = true; js("workerFailed"); show()', native)
@@ -125,16 +125,16 @@ expect(md('snake_case_name and _em_'),'<p>snake_case_name and <em>em</em></p>','
     def test_paused_shortcut_offers_rate_limited_resume(self):
         root = Path(__file__).resolve().parents[1]
         page = (root / 'ui' / 'ui.html').read_text()
-        native = (root / 'Atticus.swift').read_text()
+        native = (root / 'Jev.swift').read_text()
         self.assertIn("post({resume:true})", page)
         self.assertIn("Date().timeIntervalSince(pausedNotice) > 4", native)
         resume = native[native.index('if b["resume"] != nil {'):native.index('if b["kofi"]')]
-        self.assertIn('Atticus.settings.apply("paused", false)', resume)
+        self.assertIn('Jev.settings.apply("paused", false)', resume)
 
     def test_minimize_animates_via_fold_bridge_and_refolds_after_questions(self):
         root = Path(__file__).resolve().parents[1]
         box = (root / 'ui/ui.html').read_text()
-        swift = (root / 'Atticus.swift').read_text()
+        swift = (root / 'Jev.swift').read_text()
         self.assertIn('body.fold-morph', box)
         self.assertIn('foldBeforeQuestion', box)
         self.assertIn('unfoldForAnswer(focusAnswer)', box)

@@ -1,0 +1,134 @@
+#!/usr/bin/env python3
+"""Linux counterpart of the Swift app's command-line verbs that jev.py calls as `$JEV_APP <verb>`:
+--window-target --target-app --system-ui --raise --look --text --type --draw-target --calendar --hands.
+Same arguments, same stdout shapes, same exit codes as Jev.swift (docs/LINUX-PORT.md)."""
+import json, os, re, shutil, subprocess, sys, tempfile
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import wm
+
+
+def target(w, title=''):
+    return {'pid': w['pid'], 'windowID': str(w['id']), 'windowFrame': w['frame'], 'window': w['title'] or w['app'], 'app': w['app'], 'minimized': False}
+
+
+def pick(app, title='', frame=None):
+    rows = [w for w in wm.windows() if w['app'].casefold() == app.casefold() or w['cls'].casefold() == app.casefold()]
+    rows = [w for w in rows if (not title or title.casefold() in w['title'].casefold()) and w['frame'][2] > 1 and w['frame'][3] > 1 or not w['frame'][2] and (not title or title.casefold() in w['title'].casefold())]
+    if frame: rows = [w for w in rows if all(abs(a - b) < 2 for a, b in zip(w['frame'], frame))]
+    if frame and len(rows) != 1: return None   # indistinguishable windows are not a safe preview target
+    return max(rows, key=lambda w: w['frame'][2] * w['frame'][3], default=None)
+
+
+def ocr(path):
+    if not shutil.which('tesseract'): return ''
+    return subprocess.run(['tesseract', path, '-', '--psm', '6'], capture_output=True, text=True).stdout
+
+
+def atspi_text(pid):
+    return _atspi_text_child(pid)
+
+
+def _atspi_text_child(pid):
+    try: return subprocess.run([sys.executable, os.path.abspath(__file__), '--atspi-text', str(pid)], capture_output=True, text=True, timeout=8).stdout
+    except Exception: return ''
+
+
+def _atspi_text(pid):
+    """Visible text of one app's accessibility tree (names and text), the AX read on macOS."""
+    try:
+        import gi; gi.require_version('Atspi', '2.0'); from gi.repository import Atspi
+    except Exception: return ''
+    desk, out = Atspi.get_desktop(0), []
+    def walk(n, depth=0):
+        if depth > 25 or len(out) > 4000: return
+        try:
+            name = n.get_name() or ''
+            if name: out.append(name)
+            t = n.get_text_iface() if hasattr(n, 'get_text_iface') else None
+            if t is not None and t.get_character_count(): out.append(Atspi.Text.get_text(n, 0, min(t.get_character_count(), 4000)))
+            for i in range(n.get_child_count()): walk(n.get_child_at_index(i), depth + 1)
+        except Exception: pass
+    for i in range(desk.get_child_count()):
+        a = desk.get_child_at_index(i)
+        if a.get_process_id() == pid: walk(a)
+    return '\n'.join(dict.fromkeys(l for l in out if l.strip()))
+
+
+def look(i, path, wid=None):
+    scr = wm.screens(); i = max(1, min(i, len(scr)))
+    fd, whole = tempfile.mkstemp(suffix='.png'); os.close(fd)
+    try:
+        import shot
+        if not shot.capture(whole): return 1
+        from PIL import Image
+        img = Image.open(whole).convert('RGB'); _, x, y, w, h, _ = scr[i - 1]
+        sx, sy = img.width / max(s[1] + s[3] for s in scr), img.height / max(s[2] + s[4] for s in scr)
+        c = img.crop((int(x * sx), int(y * sy), int((x + w) * sx), int((y + h) * sy)))
+        c.resize((1280, max(1, round(1280 * c.height / c.width)))).save(path, 'JPEG', quality=70)
+        return 0
+    finally: os.path.exists(whole) and os.remove(whole)
+
+
+def type_text(text):
+    """Type at the focused caret. Clipboard paste is the reliable path on Wayland; xdotool types on X11."""
+    if not text: print('not_done: nothing to type'); return 1
+    if os.environ.get('XDG_SESSION_TYPE') != 'wayland' and shutil.which('xdotool'):
+        r = subprocess.run(['xdotool', 'type', '--clearmodifiers', '--delay', '6', '--', text], capture_output=True)
+    elif shutil.which('ydotool'): r = subprocess.run(['ydotool', 'type', text], capture_output=True)
+    else:
+        old = subprocess.run(['pbpaste'], capture_output=True, text=True).stdout if shutil.which('wl-paste') or shutil.which('xclip') else ''
+        subprocess.run(['pbcopy'], input=text, text=True)
+        r = subprocess.run(['xdotool', 'key', '--clearmodifiers', 'ctrl+v'] if shutil.which('xdotool') else ['true'], capture_output=True)
+        subprocess.run(['pbcopy'], input=old, text=True)
+    ok = r.returncode == 0
+    print(('done' if ok else 'not_done') + ': ' + ('Typing dispatched to the chosen composer. Do not repeat typing without inspecting it.' if ok else 'The chosen field lost focus or input could not be sent.'))
+    return 0 if ok else 1
+
+
+def main(a):
+    if not a: return 2
+    v = a[0]
+    if v == '--atspi-text': print(_atspi_text(int(a[1]))); return 0
+    if v in ('--window-target', '--target-app') and len(a) >= 2:
+        name = a[1]
+        if v == '--target-app':
+            apps = {w['app'] for w in wm.windows() if w['app'].casefold() == name.casefold() or w['cls'].casefold() == name.casefold()}
+            known = next((n for n in wm.desktop_apps() if n.casefold() == name.casefold()), '')
+            if len(apps) == 1: print(next(iter(apps)))
+            elif known: print(known)
+            return 0
+        frame = None
+        if len(a) == 5:
+            try: frame = json.loads(a[4])
+            except ValueError: return 1
+            if frame and (len(frame) != 4 or not all(isinstance(n, (int, float)) for n in frame)): return 1
+        w = pick(name, a[2] if len(a) > 2 else '', frame)
+        if w: print(json.dumps(target(w)))
+        return 0
+    if v == '--system-ui': print('{}'); return 0
+    if v == '--raise': return 0   # no focus guard on Linux
+    if v == '--look' and len(a) in (3, 4): return look(int(a[1]) if a[1].isdigit() else 1, a[2], None)
+    if v == '--text' and len(a) >= 2:
+        w = pick(a[1], a[2] if len(a) > 2 else '')
+        text = atspi_text(w['pid']) if w else ''
+        if not text and w and w['frame'][2]:
+            fd, p = tempfile.mkstemp(suffix='.png'); os.close(fd)
+            try:
+                subprocess.run(['import', '-window', hex(w['id']), p], capture_output=True) if shutil.which('import') else None
+                text = ocr(p)
+            finally: os.remove(p)
+        print(text.strip()); return 0 if text.strip() else 1
+    if v == '--type' and len(a) == 1: return type_text(sys.stdin.read())
+    if v == '--draw-target': return 0
+    if v == '--calendar':
+        import jev_calendar
+        try: print(json.dumps(jev_calendar.run(json.loads(sys.stdin.read()))))
+        except (ValueError, OSError) as e: print(json.dumps({'error': f'Calendar could not finish: {e}'}))
+        return 0
+    if v == '--hands':
+        import hands; return hands.cli(a[1:])
+    print(f'unknown verb {v}', file=sys.stderr); return 2
+
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv[1:]))

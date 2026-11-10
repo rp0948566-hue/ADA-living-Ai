@@ -1,0 +1,211 @@
+<title>Jev Project Brief</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* layout: single reading column, wide blocks scroll inside themselves; pies sit side by side and stack on phones */
+:root{--bg:#f6f7f9;--panel:#ffffff;--fg:#14181f;--mute:#5b6573;--line:#dde2ea;--accent:#1f5eff;--have:#1b8a5a;--part:#c98a00;--miss:#c8402f;--c1:#1f5eff;--c2:#7a5cff;--c3:#1b8a5a;--c4:#c98a00;--code:#eef1f6;
+--sans:'IBM Plex Sans',system-ui,sans-serif;--mono:'IBM Plex Mono',ui-monospace,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1218;--panel:#161c25;--fg:#e8ecf2;--mute:#9aa5b4;--line:#283140;--accent:#6b97ff;--have:#3fcf8e;--part:#f0b73a;--miss:#ff7a68;--c1:#6b97ff;--c2:#a28bff;--c3:#3fcf8e;--c4:#f0b73a;--code:#1c2430;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1218;--panel:#161c25;--fg:#e8ecf2;--mute:#9aa5b4;--line:#283140;--accent:#6b97ff;--have:#3fcf8e;--part:#f0b73a;--miss:#ff7a68;--c1:#6b97ff;--c2:#a28bff;--c3:#3fcf8e;--c4:#f0b73a;--code:#1c2430;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font:15px/1.6 var(--sans);padding-block:28px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+main{max-width:920px;margin:0 auto;display:flex;flex-direction:column;gap:34px}
+h1{font-size:clamp(28px,5vw,40px);line-height:1.1;margin:0;font-weight:600;text-wrap:balance}
+h2{font-size:21px;margin:0 0 12px;font-weight:600;text-wrap:balance}
+h3{font-size:15px;margin:18px 0 6px;font-weight:600}
+p{margin:0 0 10px;max-width:70ch}
+.lede{color:var(--mute);font-size:17px;max-width:62ch}
+.tag{font:500 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+section{min-width:0}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:500 12px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--mute)}
+code,pre{font-family:var(--mono);font-size:13px}
+code{background:var(--code);padding:1px 5px;border-radius:4px}
+pre.block{background:var(--code);padding:14px;border-radius:8px;overflow-x:auto;margin:0;white-space:pre-wrap}
+.pill{display:inline-block;font:500 12px var(--mono);padding:2px 8px;border-radius:99px;border:1px solid currentColor}
+.have{color:var(--have)}.part{color:var(--part)}.miss{color:var(--miss)}
+.pies{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.pie{display:flex;flex-direction:column;gap:12px;min-width:0}
+.pie svg{width:100%;max-width:230px;height:auto;margin:0 auto;display:block}
+.legend{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:13px}
+.legend li{display:flex;gap:8px;align-items:baseline}
+.legend i{width:10px;height:10px;border-radius:2px;flex:none;transform:translateY(1px)}
+.legend b{margin-left:auto;font-variant-numeric:tabular-nums;font-weight:500}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.cols>div{min-width:0}
+button{font:500 13px var(--sans);background:var(--accent);color:#fff;border:0;border-radius:6px;padding:7px 12px;cursor:pointer}
+button:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+.mermaid{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;overflow-x:auto}
+ol,ul{margin:0 0 10px;padding-left:20px}
+li{margin-bottom:3px}
+</style>
+
+<main>
+<header>
+  <div class="tag">Project brief · written 2026-11-09</div>
+  <h1>Jev: what it is, what it has, what is missing</h1>
+  <p class="lede">Jev is a voice-first assistant that controls a whole computer. This page is meant to be handed to another AI: the pipeline, the parts that already work, the parts that do not, and a spec for the next feature (a "voice remote" like the Instagram video you sent).</p>
+</header>
+
+<section>
+  <h2>1. What Jev is</h2>
+  <p>Jev started as a Mac app (Swift overlay plus a Python brain, <code>jev.py</code>) where you hold a hotkey, say what you need, and an AI does it on your computer. This project is the <b>Linux port, renamed Jev</b>, running on GNOME Wayland. The Mac code path is untouched. On Linux, <code>jev.py</code> swaps in <code>linux/jev_linux.py</code> and stand-ins for every Mac-only piece.</p>
+  <p>It runs on an API model you choose (currently Gemini <code>gemini-2.5-flash</code> through its OpenAI-style endpoint). There is no local model any more. Safe mode is off (full access), sudo for package tools is on, and there is a hard gate that still blocks the dangerous commands.</p>
+</section>
+
+<section>
+  <h2>2. Pipeline: from your voice to an action</h2>
+  <pre class="mermaid">
+flowchart TD
+  A["You: hotkey (GNOME shortcut), wake word 'Jev', or mic button"] --> B["listen.py: pw-record 16 kHz, faster-whisper small, live words, ends after 0.8 s quiet"]
+  B --> C["host.py: GTK3 + WebKit box (ui/ui.html), shows words, Allow cards, answers"]
+  C --> D["worker.py starts jev.py (the brain) and reads its output lines"]
+  D --> E{"Simple command?<br/>(open app, play song, own shortcut)"}
+  E -- yes --> F["Runs instantly, no AI call"]
+  E -- no --> G["run_local: system prompt + your memory + one bash tool, sent to the API model"]
+  G --> H["Model answers or asks for a tool call"]
+  H --> I["Gate: hard safety check on every command (deletes, sends, purchases ask first)"]
+  I --> J["Tools: hands.py (AT-SPI + uinput keys/clicks), wm.py (windows), shot.py (screen + OCR), browser.py (Playwright browser), calendar, sysmon, bin/ shims"]
+  J --> G
+  F --> K["Result line to the box"]
+  H -- final answer --> K
+  K --> L["voice.py / say: Piper neural voice reads it aloud; ui shows it"]
+  </pre>
+  <h3>What each piece does</h3>
+  <div class="scroll"><table>
+    <tr><th>File</th><th>Role</th></tr>
+    <tr><td><code>jev.py</code> (8,572 lines)</td><td>The brain: prompt, memory, instant commands, the gate, <code>run_local</code> loop (up to 12 tool rounds), logging to <code>~/.config/jev/log.jsonl</code>.</td></tr>
+    <tr><td><code>linux/host.py</code></td><td>Floating box, hotkey socket, dock anchor, speech playback, opens Settings / Setup / Agents windows.</td></tr>
+    <tr><td><code>linux/listen.py</code></td><td>Microphone, Whisper transcription, wake word, end-of-speech detection.</td></tr>
+    <tr><td><code>linux/hands.py</code></td><td>Sees UI elements over AT-SPI, clicks, scrolls, presses keys and types through a virtual uinput keyboard and mouse (works on Wayland).</td></tr>
+    <tr><td><code>linux/browser.py</code></td><td>Own visible browser controlled with Playwright: open, read, click, fill.</td></tr>
+    <tr><td><code>linux/shot.py</code>, <code>wm.py</code></td><td>Screenshots through the desktop portal with OCR; window list and placement.</td></tr>
+    <tr><td><code>linux/voice.py</code></td><td>Piper voice (en_US-ryan-medium), tone presets, streamed speech.</td></tr>
+    <tr><td><code>linux/proactive.py</code>, <code>sysmon.py</code></td><td>Jev speaks first on calendar, battery, disk, CPU and temperature, within a budget.</td></tr>
+    <tr><td><code>ui/*.html</code></td><td>The box, Settings, Setup and Agents pages, shared with the Mac app.</td></tr>
+  </table></div>
+</section>
+
+<section>
+  <h2>3. Size of the project</h2>
+  <div class="pies"><div class="pie panel"><div class="tag">Lines of code by part</div><svg id="pieCode" viewBox="0 0 220 220" role="img" aria-label="Pie chart of lines of code by part"></svg><ul class="legend" id="legCode"></ul></div>
+  <div class="pie panel"><div class="tag">Video features: Jev coverage</div><svg id="pieCap" viewBox="0 0 220 220" role="img" aria-label="Pie chart of how many features the video needs are covered"></svg><ul class="legend" id="legCap"></ul></div></div>
+  <p style="margin-top:10px;color:var(--mute);font-size:13px">Left: 20,212 lines in total, counted with <code>wc -l</code>. The Swift file is Mac only and unused on Linux. Right: the 16 capabilities in section 4, counted from that table.</p>
+</section>
+
+<section>
+  <h2>4. What the video needs, and what Jev has</h2>
+  <p>The video (43 s, Instagram) shows a person talking to a Mac. Speech goes into the Claude app, "Send it" submits, "Go to Wikipedia" and section names navigate, and a live voice pill sits at the dock. Each capability below is checked against the code and the Linux parity doc. "Partly" means the pieces exist but the voice-command layer does not. I have not run the typing-into-other-apps path on this machine.</p>
+  <div class="scroll"><table id="caps">
+    <tr><th>Capability</th><th>Status</th><th>Where it lives / what is missing</th></tr>
+  </table></div>
+</section>
+
+<section>
+  <h2>5. The new feature: Voice Remote</h2>
+  <p>Goal: speak, and Jev drives whatever app is in front of you, with no AI call for simple commands, so it feels instant like the video. Anything that is not a known command still goes to the AI as today.</p>
+
+  <h3>How you will interact with it</h3>
+  <div class="cols">
+    <div class="panel"><b>Idle</b><p>Wake word or hotkey turns it on. A small pill at the dock shows the state: listening, typing, thinking.</p></div>
+    <div class="panel"><b>Command</b><p>You say a short phrase. If it matches the command list, Jev does it in about a second. No AI call, no quota used.</p></div>
+    <div class="panel"><b>Dictation</b><p>Say "type". Everything you say after goes, cleaned up, into the focused text field. Say "send it" to press Enter, or "stop typing" to leave.</p></div>
+    <div class="panel"><b>Ask the AI</b><p>Anything else, like "check the reviews of this laptop", goes to the brain as now, with the pill showing "thinking".</p></div>
+  </div>
+
+  <h3>Command set for version 1</h3>
+  <div class="scroll"><table>
+    <tr><th>You say</th><th>Jev does</th><th>Built from</th></tr>
+    <tr><td>"type" / "stop typing"</td><td>Dictation mode on or off, text typed into the focused field</td><td><code>listen.py</code> + <code>hands.py type</code></td></tr>
+    <tr><td>"send it"</td><td>Presses Enter in the focused app</td><td><code>hands.py press enter</code></td></tr>
+    <tr><td>"scroll down / up", "page down"</td><td>Scrolls the focused window</td><td><code>hands.py scroll</code></td></tr>
+    <tr><td>"go to Wikipedia", "go to Slack"</td><td>Opens a site in the browser or switches to the app</td><td><code>browser.py open</code>, <code>wm.py</code></td></tr>
+    <tr><td>"personal life", "legal affairs"</td><td>Jumps to that heading on the page</td><td>New: find heading text via AT-SPI or browser, then scroll to it</td></tr>
+    <tr><td>"switch to Codex", "next window"</td><td>Brings that window forward</td><td><code>wm.py</code> (limited on Wayland)</td></tr>
+    <tr><td>"stop", "cancel"</td><td>Stops speech and any running task</td><td>Already exists (Esc / stop)</td></tr>
+  </table></div>
+
+  <h3>What gets added</h3>
+  <ul>
+    <li><b>New module <code>linux/voicecmd.py</code></b> between <code>listen.py</code> and the brain. It holds a small grammar, matches each finished utterance to a command and calls <code>hands.py</code>, <code>browser.py</code> or <code>wm.py</code>. No match: pass the text to <code>jev.py</code> unchanged.</li>
+    <li><b>Mode state in <code>host.py</code></b>: idle, command, dictation, thinking. It drives the dock pill and the sound cues.</li>
+    <li><b>Faster end-of-speech for commands</b>: short utterances close after about 0.5 s of quiet, long dictation keeps the 0.8 s used now.</li>
+    <li><b>Settings switch</b> "Voice Remote" and a list of the user's own phrases, stored with the other settings in <code>~/.config/jev/settings.json</code>.</li>
+  </ul>
+
+  <h3>Safety</h3>
+  <p>Typing and Enter reach any focused app, so a wrong transcription can send a wrong message. Rules: "send it" works only right after dictation or when a text field has focus; destructive phrases never match the fast path and always go through the gate; the pill is always visible while Jev listens.</p>
+
+  <h3>Build order</h3>
+  <ol>
+    <li>Grammar and matcher in <code>voicecmd.py</code> with unit tests (pure Python, no hardware).</li>
+    <li>"type", "send it", "scroll" through <code>hands.py</code>; test in a text editor, then a browser.</li>
+    <li>"go to" for sites and apps; heading jump.</li>
+    <li>Dock pill and mode state; settings switch.</li>
+    <li>Live test on the real mic, in a quiet and a noisy room.</li>
+  </ol>
+
+  <h3>Risks</h3>
+  <ul>
+    <li>GNOME Wayland blocks reading and moving other windows. Typing through uinput works, but "switch to window" may stay limited. Untested here.</li>
+    <li>Whisper small on CPU adds about a second per utterance. A smaller model for commands only would cut that.</li>
+    <li>The Gemini free tier allows 5 requests a minute and 20 a day per model, so the fast command path matters more than the AI path.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>6. Paste this to another AI</h2>
+  <p>Copy the block below as the first message. It carries the whole picture in short form.</p>
+  <pre class="block" id="handoff">PROJECT: Jev, a voice-first assistant that controls a whole computer. Linux port (GNOME Wayland) of a Mac app. Folder: ~/Desktop/jev ai/atticus-mac.
+BRAIN: jev.py (Python, 8.5k lines). run_local sends the task, system prompt and memory to an OpenAI-style API (Gemini gemini-2.5-flash) with one bash tool, up to 12 tool rounds. Every command passes a hard gate. No local model.
+LINUX PARTS (linux/): listen.py (pw-record 16 kHz + faster-whisper small, wake word, ends after 0.8 s quiet), host.py (GTK3+WebKit box showing ui/ui.html, hotkey socket, dock anchor), hands.py (AT-SPI + uinput keyboard/mouse: see/click/scroll/press/type), browser.py (Playwright browser), shot.py (portal screenshot + OCR), wm.py (windows), voice.py (Piper TTS), proactive.py, sysmon.py.
+PIPELINE: hotkey or wake word -> listen.py -> host.py box -> worker.py -> jev.py -> [instant command, no AI] or [API model -> tool call -> gate -> hands/browser/shot/wm] -> answer -> box + spoken voice.
+SETTINGS: ~/.config/jev/settings.json (safe=false, sudo=true, speak=true, wakeWord=true). Tests: python3 -m unittest tests.test_linux_local (16 pass).
+NEW FEATURE TO BUILD: Voice Remote. New linux/voicecmd.py between listen.py and the brain. A small grammar maps finished utterances to actions with no AI call: "type" (dictation into focused field), "send it" (Enter), "scroll down/up", "go to &lt;site or app&gt;", "&lt;heading&gt;" (jump to a page section), "stop". No match: pass to jev.py unchanged. Add modes idle/command/dictation/thinking in host.py driving a dock pill, a faster 0.5 s end-of-speech for short commands, and a Settings switch.
+SAFETY: "send it" only after dictation or with a text field focused; destructive phrases never use the fast path; pill always visible while listening.
+RISKS: Wayland limits window control; Whisper on CPU adds ~1 s; free API quota is 5/min.
+SUCCESS: say "type", dictate a sentence, say "send it" in a real app and it arrives; "go to Wikipedia" then "personal life" lands on that section; each takes under 2 s with no API call.</pre>
+  <p style="margin-top:10px"><button id="copy" type="button">Copy brief</button> <span id="copied" style="color:var(--mute);font-size:13px"></span></p>
+</section>
+</main>
+
+<script>
+var css=function(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()};
+var CAPS=[
+["Voice in: speech to text","have","listen.py: pw-record + faster-whisper small, live words"],
+["Wake word (say \"Jev\")","have","listen.py wake; hands-free follow-up and 90 s idle fade are not ported"],
+["Floating box with answers and Allow cards","have","host.py + ui/ui.html"],
+["AI brain on an API key","have","jev.py run_local, Gemini endpoint"],
+["Safety gate on every command","have","jev.py gate(); deletes, sends, purchases ask first"],
+["Voice out (neural voice)","have","voice.py, Piper en_US-ryan-medium"],
+["Press keys, scroll, click, type into other apps","have","hands.py over uinput (works on Wayland). Not tested here for every app"],
+["Read the screen","have","shot.py portal screenshot + OCR; AT-SPI labels"],
+["Browser control and web research","have","browser.py (Playwright), --search, --read"],
+["Fast end-of-speech send","have","0.8 s quiet; needs a live mic test"],
+["Switch / list windows","part","wm.py; GNOME Wayland cannot move or read native windows"],
+["Dock status pill with live voice state","part","dock anchor exists; no listening / typing / thinking states"],
+["Typing mode (dictate into the focused field)","part","dictation loop exists for the box; no spoken switch into other apps"],
+["Spoken commands: \"send it\", \"scroll down\", \"stop typing\"","miss","no command grammar between listen.py and the brain"],
+["Jump to a page section by name","miss","heading search + scroll not written"],
+["Instant, no-AI voice path with a short end-of-speech","miss","every utterance currently waits for the brain"]];
+var L={have:"Have",part:"Partly",miss:"Missing"},N={have:0,part:0,miss:0},t=document.getElementById('caps');
+CAPS.forEach(function(c){N[c[1]]++;var r=t.insertRow();r.innerHTML='<td></td><td><span class="pill '+c[1]+'">'+L[c[1]]+'</span></td><td></td>';r.cells[0].textContent=c[0];r.cells[2].textContent=c[2]});
+function pie(id,leg,rows){
+  var tot=rows.reduce(function(a,r){return a+r[1]},0),a0=-Math.PI/2,svg=document.getElementById(id),ul=document.getElementById(leg),h='',l='';
+  rows.forEach(function(r){
+    var a1=a0+r[1]/tot*2*Math.PI,x0=110+100*Math.cos(a0),y0=110+100*Math.sin(a0),x1=110+100*Math.cos(a1),y1=110+100*Math.sin(a1),big=a1-a0>Math.PI?1:0;
+    h+='<path d="M110 110 L'+x0.toFixed(2)+' '+y0.toFixed(2)+' A100 100 0 '+big+' 1 '+x1.toFixed(2)+' '+y1.toFixed(2)+' Z" fill="'+css(r[2])+'" stroke="'+css('--panel')+'" stroke-width="2"/>';
+    l+='<li><i style="background:var('+r[2]+')"></i>'+r[0]+'<b>'+r[3]+'</b></li>';a0=a1});
+  svg.innerHTML=h;ul.innerHTML=l}
+function draw(){
+  pie('pieCode','legCode',[["jev.py (brain, shared)",8572,'--c1',"8,572 (42%)"],["Jev.swift (Mac only)",8469,'--c2',"8,469 (42%)"],["linux/ (the port)",2749,'--c3',"2,749 (14%)"],["jev_x/ (CLI tools)",422,'--c4',"422 (2%)"]]);
+  pie('pieCap','legCap',[["Have",N.have,'--have',N.have+" of 16"],["Partly",N.part,'--part',N.part+" of 16"],["Missing",N.miss,'--miss',N.miss+" of 16"]])}
+draw();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',draw);
+new MutationObserver(draw).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+document.getElementById('copy').onclick=function(){
+  var el=document.getElementById('handoff'),m=document.getElementById('copied');
+  navigator.clipboard.writeText(el.innerText).then(function(){m.textContent='Copied'},function(){var g=getSelection(),r=document.createRange();r.selectNodeContents(el);g.removeAllRanges();g.addRange(r);m.textContent='Press Ctrl+C'})};
+</script>

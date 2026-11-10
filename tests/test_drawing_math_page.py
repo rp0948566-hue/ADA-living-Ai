@@ -9,7 +9,7 @@ import tempfile
 import unittest
 
 from tests.test_shelf_page import HARNESS, ROOT
-import atticus
+import jev
 
 
 # Native geometry fixtures stub the pixel producer; they never need WebKit or app windows.
@@ -28,8 +28,8 @@ MATH_STUB = r'''enum DrawingMath {
 @unittest.skipUnless(sys.platform == 'darwin', 'macOS WebKit page check')
 class DrawingMathTests(unittest.TestCase):
     def test_drawing_contract_allows_typeset_math(self):
-        self.assertNotIn("Drawn text is plain Unicode, no LaTeX", atticus.DRAW_HELP)
-        self.assertIn("$…$", atticus.DRAW_HELP)
+        self.assertNotIn("Drawn text is plain Unicode, no LaTeX", jev.DRAW_HELP)
+        self.assertIn("$…$", jev.DRAW_HELP)
 
     @unittest.skipUnless(shutil.which('node'), 'Node required')
     def test_overlay_uses_safe_math_with_stubbed_measurement(self):

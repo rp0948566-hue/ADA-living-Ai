@@ -1,0 +1,3 @@
+#!/bin/sh
+echo "osascript is not available on Linux. Use the shell, xdg-open, gdbus, playerctl or the Jev helpers instead." >&2
+exit 1

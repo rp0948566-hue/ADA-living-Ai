@@ -1,0 +1,3 @@
+#!/bin/sh
+if command -v wl-copy >/dev/null; then exec wl-copy; fi
+exec xclip -selection clipboard
